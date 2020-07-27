@@ -1,0 +1,44 @@
+{
+  "id": "menhera",
+  "name": "Menhera-chan",
+  "author": "Taufik Nur Rahmanda",
+  "website": "https://www.taufiknur.com",
+  "version": "1.0",
+  "icon": "icon.gif",
+  "talkativeness": 5,
+  "hyperactiveness": 5,
+  "activities": [
+    {
+      "id": "bell",
+      "name": "Pencet Bel"
+    },
+    {
+      "id": "gabut",
+      "name": "Gabut"
+    },
+    {
+      "id": "joget",
+      "name": "Joget"
+    },
+    {
+      "id": "kepo",
+      "name": "Kepo"
+    },
+    {
+      "id": "makan",
+      "name": "Makan"
+    },
+    {
+      "id": "makan_roti",
+      "name": "Makan Roti"
+    },
+    {
+      "id": "ngambek",
+      "name": "Ngambek"
+    },
+    {
+      "id": "suka",
+      "name": "Suka"
+    }
+  ]
+}

@@ -79,6 +79,27 @@
       min-width: 550px;
       height: 100%;
     }
+    .panel-content {
+      height: 100%;
+    }
+    .panel-content > * {
+      height: 100%;
+    }
+    .panel[data-view] .panel-content [data-view] {
+      display: none;
+    }
+    .panel[data-view="1"] .panel-header ul li a[data-view="1"] {
+      text-decoration: underline;
+    }
+    .panel[data-view="2"] .panel-header ul li a[data-view="2"] {
+      text-decoration: underline;
+    }
+    .panel[data-view="1"] .panel-content [data-view="1"] {
+      display: block;
+    }
+    .panel[data-view="2"] .panel-content [data-view="2"] {
+      display: block;
+    }
     .panel > div {
       flex-grow: 1;
       display: flex;
@@ -182,6 +203,39 @@
     .row > .col:not(:first-child) {
       padding-left: 2rem;
     }
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+    }
+    .panel-header ul {
+      list-style: none;
+      padding-left: 0;
+      margin-left: 1rem;
+      display: flex;
+    }
+    .panel-header ul li a {
+      border-radius: 2rem;
+      padding: .25rem 1rem;
+      background: #eee;
+      font-weight: 600;
+      margin-left: .25rem;
+      cursor: pointer;
+    }
+    .form-group {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: .5rem;
+    }
+    .form-group label {
+      margin-right: 1rem;
+    }
+    .form-group input {
+      border-radius: 2rem;
+      border: 1px solid #eee;
+      box-shadow: 1px 1px 4px -2px rgba(0,0,0,.3);
+      padding: .5rem 1rem;
+    }
     @media only screen and (max-width: 825px) {
       #header h1 {
         display: none;
@@ -236,10 +290,48 @@
       </p>
     </div>
     <div class="container">
-      <div class="panel">
+      <div class="panel" data-view="1">
         <div id="panel-manifest" data-tab="manifest">
-          <h4>manifest.json</h4>
-          <textarea id="manifest"></textarea>
+          <div class="panel-header">
+            <h4>manifest.json</h4>
+            <ul>
+              <li><a data-view="1">Code View</a></li>
+              <li><a data-view="2">Form View</a></li>
+            </ul>
+          </div>
+          <div class="panel-content">
+            <textarea id="manifest" data-view="1"></textarea>
+            <form id="manifest-form" data-view="2">
+              <div class="form-group">
+                <label>ID</label>
+                <input type="text" name="id" required minlength="4"/>
+              </div>
+              <div class="form-group">
+                <label>Name</label>
+                <input type="text" name="name" required/>
+              </div>
+              <div class="form-group">
+                <label>Author</label>
+                <input type="text" name="author" required/>
+              </div>
+              <div class="form-group">
+                <label>Website</label>
+                <input type="url" name="website"/>
+              </div>
+              <div class="form-group">
+                <label>Version</label>
+                <input type="text" name="version" required/>
+              </div>
+              <div class="form-group">
+                <label>Talkativeness</label>
+                <input type="number" min="1" max="5" step="1" name="talkativeness"/>
+              </div>
+              <div class="form-group">
+                <label>Hyperactiveness</label>
+                <input type="number" min="1" max="5" step="1" name="hyperactiveness"/>
+              </div>
+            </form>
+          </div>
         </div>
         <div id="panel-html" data-tab="code">
           <h4>html.html</h4>
@@ -253,7 +345,7 @@
       <div class="content">
         <div id="content-manifest" data-tab="manifest">
           <h3>Icon</h3>
-          <p>Alpha transparent <code>.png</code> image with 32 x 32px size</p>
+          <p>Alpha transparent <code>.png</code> or <code>.gif</code> image with 32 x 32px size.</p>
           <div id="panel-icon">
             <img id="icon" src="assistants/new/icon.png"/>
             <input type="file" placeholder="Browse image"/>

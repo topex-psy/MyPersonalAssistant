@@ -1,0 +1,49 @@
+#menhera {
+  margin-bottom: -14px;
+}
+#menhera img {
+  height: 210px;
+  display: none;
+}
+#menhera img:first-child {
+  display: block;
+}
+#menhera[data-activity] img:first-child {
+  display: none;
+}
+#menhera[data-activity="walk"] .walk {
+  display: block;
+}
+#menhera[data-activity="bell"] .bell {
+  display: block;
+}
+#menhera[data-activity="gabut"] .gabut {
+  display: block;
+}
+#menhera[data-activity="joget"] .joget {
+  display: block;
+}
+#menhera[data-activity="kepo"] .kepo {
+  display: block;
+}
+#menhera[data-activity="makan"] .makan {
+  display: block;
+}
+#menhera[data-activity="makan_roti"] .makan_roti {
+  display: block;
+}
+#menhera[data-activity="ngambek"] .ngambek {
+  display: block;
+}
+#menhera[data-activity="nyimak"] .nyimak {
+  display: block;
+}
+#menhera[data-activity="suka"] .suka {
+  display: block;
+}
+#menhera[data-facing="right"] {
+  transform: rotateY(0deg);
+}
+#menhera[data-facing="left"] {
+  transform: rotateY(180deg);
+}

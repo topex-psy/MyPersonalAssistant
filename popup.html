@@ -36,6 +36,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
       position: relative;
       user-select: none;
     }
@@ -55,6 +56,9 @@
       animation: wobble 1s cubic-bezier(0.3, 0.41, 0.18, 1.01) infinite;
       pointer-events: none;
       opacity: .69;
+    }
+    li[data-assistant] {
+      width: 55px;
     }
     li[data-assistant].active {
       background: #6fff95;
@@ -151,6 +155,10 @@
         <li data-assistant="doggo" data-name="Doggo">
           <img src="assistants/doggo/icon.png"/>
           Doggo
+        </li>
+        <li data-assistant="menhera" data-name="Doggo">
+          <img src="assistants/menhera/icon.gif"/>
+          Menhera-chan
         </li>
         <li data-assistant="new">
           <h1>+</h1>

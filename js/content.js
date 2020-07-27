@@ -176,6 +176,7 @@ function closeBalloon(force = false) {
   clearTimeout(timeOutBalloon);
   balloon.classList.remove('show');
   if (force) balloon.classList.add('dismissed');
+  myAssistant.el.setAttribute("data-talking", false);
 }
 
 function setBalloon(message, options = {}) {
@@ -199,10 +200,11 @@ function setBalloon(message, options = {}) {
 
   balloon.classList.remove('dismissed');
   balloon.classList.add('show');
+  myAssistant.el.setAttribute("data-talking", true);
 
   clearTimeout(timeOutBalloon);
   timeOutBalloon = setTimeout(() => {
-    balloon.classList.remove('show');
+    closeBalloon();
   }, duration || 5000);
 }
 

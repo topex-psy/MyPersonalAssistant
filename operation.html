@@ -217,7 +217,7 @@
       <p data-tab="knowledge">
         Here you define any possible feedbacks from and to this assistant when clicked or based on current active URL.
       </p>
-      <p class="success" data-tab="code">
+      <p data-tab="code">
         TIPS: You can copy and edit in your code editor app and paste them back here.
       </p>
       <p class="warning" id="json-warning">
@@ -287,6 +287,7 @@
             <tbody>
               <tr><td><code>[data-activity="*"]</code></td><td>Filled with Activity ID as the attribute value e.g. <code>[data-activity="walk"]</code> which indicates what activity the assistant doing. Activity IDs other than "walk" can be defined in the <a href="#manifest">Manifest</a>.</td></tr>
               <tr><td><code>[data-facing="*"]</code></td><td>Filled with "left", "right", or "" (default) e.g. <code>[data-facing="right"]</code> which indicates where this assistant heading.</td></tr>
+              <tr><td><code>[data-talking="*"]</code></td><td>Filled with "true" or "false" which indicates whether this assistant is talking or not.</td></tr>
             </tbody>
           </table>
           <br/>
@@ -320,7 +321,8 @@
   transform: rotateY(180deg);
 }</code>
               <p>Example #2: (Play with visibility)</p>
-<code class="multiline">#doggo .layer {
+<code class="multiline">#doggo .layer.facing-left,
+#doggo .layer.facing-right {
   display: none;
 }
 #doggo[data-facing="left"] .layer.facing-left {
@@ -334,6 +336,7 @@
               <strong>Activity Style</strong>
               <p>Example:</p>
 <code class="multiline">#doggo[data-activity="walk"] {
+  /* CSS properties to animate this assistant. You can play with CSS keyframes, transforms, layer visibility, etc. */
 }
 #doggo[data-activity="dance"] {
 }

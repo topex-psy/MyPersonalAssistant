@@ -73,6 +73,13 @@
       text-align: center;
       color: #fff;
     }
+    li[data-assistant].active:hover {
+      background: #ff6f6f;
+    }
+    li[data-assistant].active:hover::after {
+      content: '\2715';
+      background: #ca1717;
+    }
     li[data-assistant="new"] {
       background: #fff;
       padding: .25rem .75rem;

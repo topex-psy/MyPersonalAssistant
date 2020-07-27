@@ -1,0 +1,47 @@
+{
+  "manifest_version": 2,
+  "name": "My Personal Assistant",
+  "version": "0.0.1",
+  "description": "Have an assistant that will be with you anywhere online!",
+  "author": "Taufik Nur Rahmanda",
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  "permissions": [
+    "activeTab",
+    "tabs",
+    "storage",
+    "http://*/*",
+    "https://*/*"
+  ],
+  "browser_action": {
+    "default_title": "Select Your Assistant",
+    "default_icon": {
+      "16": "icon16.png",
+      "24": "icon24.png",
+      "32": "icon32.png"
+    },
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "scripts": [
+      "vendor/jquery-2.1.3.min.js",
+      "js/background.js",
+      "js/helper.js"
+    ]
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "vendor/jquery-2.1.3.min.js",
+        "js/content.js",
+        "js/helper.js"
+      ]
+    }
+  ]
+}

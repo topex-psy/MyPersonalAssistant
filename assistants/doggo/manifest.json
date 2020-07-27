@@ -1,0 +1,26 @@
+{
+  "id": "doggo",
+  "name": "Doggo",
+  "author": "Ricardo Oliva Alonso",
+  "website": "https://codepen.io/ricardoolivaalonso/pen/oNjdBme",
+  "version": "1.0",
+  "talkativeness": 3,
+  "hyperactiveness": 1,
+  "activities": [
+    {
+      "id": "dance",
+      "name": "Dance",
+      "duration": "15000"
+    },
+    {
+      "id": "pee",
+      "name": "Pee",
+      "durationMin": "15000",
+      "durationMax": "15000"
+    },
+    {
+      "id": "poop",
+      "name": "Poop"
+    }
+  ]
+}

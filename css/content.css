@@ -1,0 +1,87 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,800;1,400&display=swap');
+
+.mpa-container {
+  font-family: 'Montserrat', sans-serif;
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  z-index: 999999;
+  transition: all .4s;
+}
+.mpa-wrapper {
+  transition: transform .4s;
+  transform-origin: bottom;
+}
+.mpa-balloon {
+  background: #fff;
+  padding: 1rem;
+  border-radius: 2rem;
+  margin-right: -5rem;
+  margin-left: 5rem;
+  z-index: 1;
+  transition: all 0.6s cubic-bezier(0.68, -0.6, 0.32, 1.6);
+  transform: scale(.5) translateY(30px);
+  transform-origin: left;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  bottom: 100px;
+  box-shadow: 1px 2px 5px rgba(0, 0, 0, .2);
+}
+.mpa-balloon::before {
+  content: '';
+  width: 0;
+  height: 0;
+  border-left: 20px solid transparent;
+  border-right: 20px solid transparent;
+  border-top: 20px solid #fff;
+  position: absolute;
+  left: 16px;
+  bottom: -16px;
+  transform: rotate(30deg) scaleX(.7) scaleY(1.5);
+}
+.mpa-container.right .mpa-balloon {
+  transform-origin: right;
+  margin-right: 5rem;
+  margin-left: -5rem;
+}
+.mpa-container.right .mpa-balloon::before {
+  transform: rotate(-30deg) scaleX(.7) scaleY(1.5);
+  left: auto;
+  right: 16px;
+}
+.mpa-balloon.show, .mpa-balloon:not(.dismissed):hover {
+  transform: scale(1) translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+.mpa-balloon big {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 23px;
+  color: #000;
+}
+.mpa-balloon ul {
+  list-style: none;
+  margin-left: 0;
+  padding-left: 0;
+}
+.mpa-balloon ul li {
+  line-height: 30px;
+}
+.mpa-balloon ul li a {
+  cursor: pointer;
+  background: #eefbfb;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 12px;
+  color: #71a3ff;
+  text-decoration: none;
+  transition: all .4s;
+}
+.mpa-balloon ul li a:hover {
+  background: #c7efef;
+}

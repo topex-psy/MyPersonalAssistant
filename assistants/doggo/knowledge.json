@@ -1,0 +1,139 @@
+{
+  "maximum_options": 2,
+  "responses": [],
+  "answers": [
+    "Masa sih?"
+  ],
+  "dismiss": [
+    "Oke",
+    "Ya tau",
+    "Iyain aja deh",
+    "Diem dong",
+    "Ya emang",
+    "Pfffft"
+  ],
+  "dispels": [
+    "Pergi sana",
+    "Kamu saya usir"
+  ],
+  "click": {
+    "responses": [
+      "Halo, aku [name] :3",
+      "Apaan sih pegang-pegang",
+      "Lapeeeeeer ....",
+      "Hey ..."
+    ],
+    "answers": [
+      "Eh, gimana menurutmu?",
+      "Menurutmu ini gimana?"
+    ]
+  },
+  "hosts": [
+    {
+      "keyword": "translate.google.com",
+      "responses": [
+        "Eaaaa google translate kok dipake",
+        "Bahasa inggrisku lebih jago lho",
+        "Translateku lebih gaul bro"
+      ]
+    },
+    {
+      "keyword": "facebook.com",
+      "responses": [
+        "Facebook terooos!",
+        "Berandamu varokah sekali",
+        "Sekrol-sekrol terooos!"
+      ]
+    },
+    {
+      "keyword": "twitter.com",
+      "responses": [
+        "Twitteran terooos!",
+        "Njiir isi twitternya ..."
+      ],
+      "title_remove": " / Twitter"
+    },
+    {
+      "keyword": "stackoverflow.com",
+      "responses": [
+        "Tinggal copas aja gan!",
+        "Wah, moga bugnya cepet solve!",
+        "Ada bug apa lagi, bro?"
+      ],
+      "title_remove": " - Stack Overflow"
+    },
+    {
+      "keyword": "youtube.com",
+      "responses": [
+        "YouTube teroooss!",
+        "Asyik nonton YouTube!"
+      ],
+      "title_remove": " - YouTube",
+      "specifics": [
+        {
+          "keyword": "/watch?v=",
+          "add_responses": [
+            "Kayaknya kita udah nonton yang ini deh ...",
+            "Njir, baru nonton sekarang, wkwkwk",
+            "[title]? Seriusan?"
+          ]
+        }
+      ]
+    },
+    {
+      "keyword": "pixiv.net",
+      "responses": [
+        "Hentong teroooss!"
+      ],
+      "add_answers": [
+        "Ssssssst!",
+        "Jangan bilang emak ya"
+      ],
+      "add_dispels": [
+        "Kamu nutupin gambar"
+      ],
+      "title_remove": " - pixiv",
+      "specifics": [
+        {
+          "keyword": "?illust_id=",
+          "add_responses": [
+            "Eaa, gambarnya mantap-mantap!",
+            "Duh, gak ngotak, sikat gan!",
+            "Yamette kudasai~"
+          ]
+        }
+      ]
+    },
+    {
+      "keyword": "myanimelist.net",
+      "responses": [
+        "Wibuuu wibuuuu wibuuuu~",
+        "Konnichiwa hajimemashite sayonara~",
+        "Cari anime genre apa ya?"
+      ],
+      "title_remove": " - MyAnimeList.net",
+      "specifics": [
+        {
+          "keyword": "/anime/",
+          "responses": [
+            "Belum nonton [title]?",
+            "Anime rekomen nih!",
+            "Anime jelek nih!",
+            "Ini bagus gak? Aku belum nonton"
+          ],
+          "add_answers": [
+            "Entahlah",
+            "Sorry lupa",
+            "Belum nonton, gak tau",
+            "Ga tau juga"
+          ]
+        }
+      ]
+    }
+  ],
+  "hosts_unknown": {
+    "add_responses": [
+      "Ini situs apa ya? Saya gak tau"
+    ]
+  }
+}

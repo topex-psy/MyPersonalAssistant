@@ -1,0 +1,12 @@
+imdb: "i've watched this one. it's suck"
+music: *joget
+klik: *embarased
+
+alarm/timer:
+teriak pada jam .... (list jam & keterangan)
+
+"kamu punya 102 tab yang kebuka"
+
+scale size
+
+"content_security_policy": "script-src 'unsafe-inline' https://fonts.googleapis.com"

@@ -115,10 +115,12 @@ function analizeTab(tab) {
     let host = hosts[0];
     item_title = title.replace(host.title_remove, '');
     possibleResponses = host.responses || arrayCombine(possibleResponses, host.add_responses);
-    let specifics = host.specifics.filter(specific => url.includes(specific.keyword));
-    if (specifics.length) {
-      let specific = specifics[0];
-      possibleResponses = specific.responses || arrayCombine(possibleResponses, specific.add_responses);
+    if (host.specifics) {
+      let specifics = host.specifics.filter(specific => url.includes(specific.keyword));
+      if (specifics.length) {
+        let specific = specifics[0];
+        possibleResponses = specific.responses || arrayCombine(possibleResponses, specific.add_responses);
+      }
     }
   } else {
     possibleResponses = meta.knowledge.hosts_unknown.responses || arrayCombine(possibleResponses, meta.knowledge.hosts_unknown.add_responses);
@@ -126,7 +128,7 @@ function analizeTab(tab) {
 
   // process raw message
   let message = getRandomFrom(possibleResponses)
-    .replace(/\[nama\]/g, assistant.name)
+    .replace(/\[name\]/g, assistant.meta.name)
     .replace(/\[title\]/g, item_title)
 
   // send message

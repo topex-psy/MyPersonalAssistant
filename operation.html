@@ -52,6 +52,10 @@
       height: 32px;
       margin-right: 1rem;
     }
+    #json-warning,
+    #json-success {
+      display: none;
+    }
     #btn-cancel {
       color: #333 !important;
       margin-left: 2rem !important;
@@ -150,7 +154,7 @@
       background-color: #fff4c4;
     }
     .caption p.warning::before {
-      content: '\2714';
+      content: '!';
       background: #ffbc00;
       color: #000;
     }
@@ -213,29 +217,29 @@
       <p data-tab="knowledge">
         Here you define any possible feedbacks from and to this assistant when clicked or based on current active URL.
       </p>
-      <p class="success">
+      <p class="success" data-tab="code">
         TIPS: You can copy and edit in your code editor app and paste them back here.
+      </p>
+      <p class="warning" id="json-warning">
+        WARNING: JSON must be in valid format.
+      </p>
+      <p class="success" id="json-success">
+        JSON format has been checked and valid.
       </p>
     </div>
     <div class="container">
       <div class="panel">
         <div id="panel-manifest" data-tab="manifest">
           <h4>manifest.json</h4>
-          <textarea>
-            Your Manifest
-          </textarea>
+          <textarea id="manifest"></textarea>
         </div>
         <div id="panel-html" data-tab="code">
           <h4>html.html</h4>
-          <textarea>
-            Your HTML
-          </textarea>
+          <textarea id="html"></textarea>
         </div>
         <div id="panel-knowledge" data-tab="knowledge">
           <h4>knowledge.json</h4>
-          <textarea>
-            Your Knowledge
-          </textarea>
+          <textarea id="knowledge"></textarea>
         </div>
       </div>
       <div class="content">
@@ -259,8 +263,8 @@
           <h3>Characteristics</h3>
           <table>
             <tbody>
-              <tr><td><code>talkativeness</code></td><td>1-5 Rating for talkativeness (e.g. 3). The higher means it'll be more often to say anything about your opened tab or activity. These things can be taught in the <a href="#knowledge">Knowledge</a> panel. (Optional) (Default = 3)</td></tr>
-              <tr><td><code>hyperactiveness</code></td><td>1-5 Rating for hyperactiveness (e.g. 3). The higher means it'll do much more thing in shorter time interval. (Optional) (Default = 3)</td></tr>
+              <tr><td><code>talkativeness</code></td><td>1-5 Rating for talkativeness. The higher means it'll be more often to say anything about your opened tab or activity. These things can be taught in the <a href="#knowledge">Knowledge</a> panel. (Optional) (Default = 3)</td></tr>
+              <tr><td><code>hyperactiveness</code></td><td>1-5 Rating for hyperactiveness. The higher means it'll do much more thing in shorter time interval. (Optional) (Default = 3)</td></tr>
             </tbody>
           </table>
           <h3>Activity</h3>
@@ -268,7 +272,7 @@
             <tbody>
               <tr><td><code>id</code></td><td>Activity ID that is lowercase text with no space e.g. "dance". Anything other than "walk" because it is default and preserved Activity ID.</td></tr>
               <tr><td><code>name</code></td><td>Activity name e.g. "Dance"</td></tr>
-              <tr><td><code>duration</code></td><td>Activity fixed duration in millisecond e.g. 5000 which means 5 seconds. (Optional)</td></tr>
+              <tr><td><code>duration</code></td><td>Activity fixed duration in millisecond e.g. 5000 which means 5 seconds. (Optional) (Default = random between 3 to 8 seconds)</td></tr>
               <tr><td><code>durationMin</code></td><td>For random duration, durationMax must also defined or else it'll be ignored. (Optional)</td></tr>
               <tr><td><code>durationMax</code></td><td>See above. (Optional)</td></tr>
             </tbody>
@@ -299,9 +303,7 @@
       <div class="panel">
         <div id="panel-css">
           <h4>style.css</h4>
-          <textarea>
-            Your CSS
-          </textarea>
+          <textarea id="css"></textarea>
         </div>
       </div>
       <div class="content">
@@ -310,14 +312,14 @@
           <div class="row">
             <div class="col" style="max-width: 280px;">
               <strong>Facing Style</strong>
-              <p>Example:</p>
+              <p>Example: (Play with transform)</p>
 <code class="multiline">#doggo[data-facing="left"] {
   transform: rotateY(0deg);
 }
 #doggo[data-facing="right"] {
   transform: rotateY(180deg);
 }</code>
-              <p>Example #2:</p>
+              <p>Example #2: (Play with visibility)</p>
 <code class="multiline">#doggo .layer {
   display: none;
 }

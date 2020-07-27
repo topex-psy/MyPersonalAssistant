@@ -30,6 +30,28 @@
   },
   "hosts": [
     {
+      "keyword": "github.com",
+      "responses": [
+        "Udah dipush belum projectnya?",
+        "[name] mau dong gabung ke reponya"
+      ]
+    },
+    {
+      "keyword": "discord.com",
+      "responses": [
+        "Ayo kita buat channel buat ngobrol"
+      ],
+      "specifics": [
+        {
+          "keyword": "/channels/",
+          "add_responses": [
+            "[name] mau dong join ke channelnya",
+            "Invite [name] dong ke channelnya"
+          ]
+        }
+      ]
+    },
+    {
       "keyword": "translate.google.com",
       "responses": [
         "Eaaaa google translate kok dipake",

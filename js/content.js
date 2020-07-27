@@ -122,7 +122,7 @@ function onClickAssistant() {
     if (Math.random() > .5) {
       let possibleResponses = meta.knowledge.click.responses;
       let message = getRandomFrom(possibleResponses);
-      message = message.replace('[name]', myAssistant.name);
+      message = message.replace('[name]', myAssistant.meta.name);
       setBalloon(message, {
         duration: 8000,
         replies: [

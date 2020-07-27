@@ -60,12 +60,11 @@ function checkJSONValidity() {
   if (!value) {
     document.querySelector('#json-success').style.display = 'none';
     document.querySelector('#json-warning').style.display = 'none';
-    document.getElementById(tab + '-form').reset();
+    document.getElementById(tab + '-form')?.reset();
   } else {
     let parsed = isJSONValid(value);
     if (parsed) {
-      let form = document.getElementById(tab + '-form');
-      form.querySelectorAll('input').forEach(input => {
+      document.getElementById(tab + '-form')?.querySelectorAll('input').forEach(input => {
         let name = input.getAttribute('name');
         input.value = parsed[name];
       });

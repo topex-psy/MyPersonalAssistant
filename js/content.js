@@ -39,6 +39,8 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         if (myAssistant.options.scale != scale) setScale(scale);
         if (myAssistant.state.activity != activity) setAction(activity);
         if (myAssistant.meta.id != meta.id) setAssistant({meta, dom, css});
+      } else {
+        dismiss();
       }
     } else {
       console.log('initiating assistant');

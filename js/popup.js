@@ -76,6 +76,7 @@ function click(e) {
 }
 
 function setAssistant(assistant) {
+  document.querySelectorAll('li[data-assistant]').forEach(li => li.classList.remove('active'));
   console.log('getting assistant data ...', assistant);
   $.when(
     $.get('assistants/' + assistant + '/html.html'),

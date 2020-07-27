@@ -358,6 +358,7 @@
               <tr><td><code>author</code></td><td>Author of this assistant</td></tr>
               <tr><td><code>website</code></td><td>Website (URL) of the author or this assistant</td></tr>
               <tr><td><code>version</code></td><td>Version number of this assistant</td></tr>
+              <tr><td><code>icon</code></td><td><code>icon.png</code> or <code>icon.gif</code> based on icon format.</td></tr>
             </tbody>
           </table>
           <h3>Characteristics</h3>
@@ -390,7 +391,7 @@
               <tr><td><code>[data-talking="*"]</code></td><td>Filled with "true" or "false" which indicates whether this assistant is talking or not.</td></tr>
             </tbody>
           </table>
-          <br/>
+          <p>If you're using image files, host them to fast web hosting service of your own. Use <code>https</code>!</p>
           <strong>
             Don't use javascript!
           </strong>
@@ -407,6 +408,7 @@
               <tr><td><code>hosts</code></td><td>When this assistant activated or looking into your opened URL, it'll say anything about that based on knowledge defined here.</td></tr>
               <tr><td><code>hosts_unknown</code></td><td>If cannot find any match in the <code>hosts</code> knowledge, it'll become the fallback.</td></tr>
               <tr><td><code>maximum_options</code></td><td>Determine how much answers options available to respond to this assistant talking</td></tr>
+              <tr><td><code>balloon_offset</code></td><td>Set the <code>bottom</code> and <code>left</code> value to customize the position of dialog balloon.</td></tr>
             </tbody>
           </table>
           <h3>Child</h3>

@@ -1,5 +1,5 @@
 {
-  "maximum_options": 2,
+  "maximum_options": 5,
   "balloon_offset": {
     "bottom": 200,
     "left": 120
@@ -67,7 +67,7 @@
       "keyword": "facebook.com",
       "responses": [
         "Facebook terooos!",
-        "Berandamu varokah sekali",
+        "Timelinemu varokah sekali",
         "Sekrol-sekrol terooos!"
       ]
     },

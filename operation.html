@@ -182,6 +182,11 @@
     .row > .col:not(:first-child) {
       padding-left: 2rem;
     }
+    @media only screen and (max-width: 825px) {
+      #header h1 {
+        display: none;
+      }
+    }
     @media only screen and (max-width: 1199px) {
       .row {
         flex-direction: column;
@@ -197,6 +202,9 @@
   </head>
   <body>
     <div id="header">
+      <h1>
+        Operation Room
+      </h1>
       <div>
         <a href="#manifest" class="active">Identity</a>
         <a href="#code">Body</a>
@@ -221,7 +229,7 @@
         TIPS: You can copy and edit in your code editor app and paste them back here.
       </p>
       <p class="warning" id="json-warning">
-        WARNING: JSON must be in valid format.
+        WARNING:&nbsp;<span>JSON must be in valid format.</span>
       </p>
       <p class="success" id="json-success">
         JSON format has been checked and valid.
@@ -247,13 +255,13 @@
           <h3>Icon</h3>
           <p>Alpha transparent <code>.png</code> image with 32 x 32px size</p>
           <div id="panel-icon">
-            <img id="icon" src="assistants/doggo/icon.png"/>
+            <img id="icon" src="assistants/new/icon.png"/>
             <input type="file" placeholder="Browse image"/>
           </div>
           <h3>Basic Informations</h3>
           <table>
             <tbody>
-              <tr><td><code>id</code></td><td>Assistant ID that is lowercase text with no space</td></tr>
+              <tr><td><code>id</code></td><td>Assistant ID that is lowercase text with no space, minimum 4 letters</td></tr>
               <tr><td><code>name</code></td><td>Assistant name</td></tr>
               <tr><td><code>author</code></td><td>Author of this assistant</td></tr>
               <tr><td><code>website</code></td><td>Website (URL) of the author or this assistant</td></tr>
@@ -296,7 +304,42 @@
           </strong>
         </div>
         <div id="content-knowledge" data-tab="knowledge">
-        
+          <h3>Parent</h3>
+          <table>
+            <tbody>
+              <tr><td><code>responses</code></td><td>List of default feedbacks in all circumstances, unless replaced by <code>responses</code> later in the child knowledge.</td></tr>
+              <tr><td><code>answers</code></td><td>List of default answers that will trigger another response in all circumstances, unless replaced by <code>answers</code> later in the child knowledge.</td></tr>
+              <tr><td><code>dismiss</code></td><td>List of default answers that will only dismiss the talk balloon in all circumstances, unless replaced by <code>dismiss</code> later in the child knowledge.</td></tr>
+              <tr><td><code>dispels</code></td><td>List of default answers that will dismissing this assistant in all circumstances, unless replaced by <code>dispels</code> later in the child knowledge.</td></tr>
+              <tr><td><code>click</code></td><td>When this assistant clicked, containing list of <code>responses</code> and <code>answers</code> or <code>add_answers</code> which used to trigger the lookup for current opened URL.</td></tr>
+              <tr><td><code>hosts</code></td><td>When this assistant activated or looking into your opened URL, it'll say anything about that based on knowledge defined here.</td></tr>
+              <tr><td><code>hosts_unknown</code></td><td>If cannot find any match in the <code>hosts</code> knowledge, it'll become the fallback.</td></tr>
+              <tr><td><code>maximum_options</code></td><td>Determine how much answers options available to respond to this assistant talking</td></tr>
+            </tbody>
+          </table>
+          <h3>Child</h3>
+          <table>
+            <tbody>
+              <tr><td><code>responses</code></td><td>This will replaces <code>responses</code> that have been defined in the parent. (See above)</td></tr>
+              <tr><td><code>answers</code></td><td>This will replaces <code>answers</code> that have been defined in the parent. (See above)</td></tr>
+              <tr><td><code>dismiss</code></td><td>This will replaces <code>dismiss</code> that have been defined in the parent. (See above)</td></tr>
+              <tr><td><code>dispels</code></td><td>This will replaces <code>dispels</code> that have been defined in the parent. (See above)</td></tr>
+              <tr><td><code>add_responses</code></td><td>This will concatenates with the <code>responses</code> that have been defined in the parent. (See above)</td></tr>
+              <tr><td><code>add_answers</code></td><td>This will concatenates with the <code>answers</code> that have been defined in the parent. (See above)</td></tr>
+              <tr><td><code>add_dismiss</code></td><td>This will concatenates with the <code>dismiss</code> that have been defined in the parent. (See above)</td></tr>
+              <tr><td><code>add_dispels</code></td><td>This will concatenates with the <code>dispels</code> that have been defined in the parent. (See above)</td></tr>
+              <tr><td><code>keyword</code></td><td>Child of <code>hosts</code> that is portion of website URL to match the knowledge, usually the hostname.</td></tr>
+              <tr><td><code>specifics</code></td><td>Child of <code>hosts</code> that is another portion of website URL to match the knowledge in order to make more specific feedbacks.</td></tr>
+              <tr><td><code>title_remove</code></td><td>Child of <code>hosts</code> that is part of the website title that is not needed to say.</td></tr>
+            </tbody>
+          </table>
+          <h3>Wildcards</h3>
+          <table>
+            <tbody>
+              <tr><td><code>[name]</code></td><td>This will be replaced with the name of this assistant e.g. "Hello, my name is [name]!"</td></tr>
+              <tr><td><code>[title]</code></td><td>This will be replaced with website title or portion of it if you defined <code>title_remove</code> e.g. "I've watched [title] and it's good!"</td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

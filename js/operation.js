@@ -1,7 +1,9 @@
-var assistant = "doggo";
+var assistant;
 var options = {};
 
 (function() {
+  console.log('location', location.href)
+  assistant = new URL(location.href).searchParams.get("id") || 'new';
   $.when(
     $.get('assistants/' + assistant + '/html.html'),
     $.get('assistants/' + assistant + '/style.css'),
@@ -24,11 +26,12 @@ var options = {};
 })();
 
 function initEditor() {
+  document.querySelector('#icon').src = "assistants/" + assistant + "/icon.png";
   document.querySelector('#panel-html textarea').value = options.dom;
   document.querySelector('#panel-css textarea').value = options.css;
   document.querySelector('#panel-knowledge textarea').value = JSON.stringify(options.knowledge, null, 2);
   document.querySelector('#panel-manifest textarea').value = JSON.stringify(options.manifest, null, 2);
-  document.title = "Operation Room";
+  document.title = assistant == 'new' ? "Create New Assistant" : "Operation Room";
   checkJSONValidity();
 }
 
@@ -47,38 +50,61 @@ function onTabChange() {
   } else {
     checkJSONValidity();
   }
+  // document.documentElement.scrollTop = 0;
+  window.scrollTo(0, 0);
 }
 
-function checkJSONValidity(value = null) {
-  if (value == null) {
-    let tab = location.hash.substr(1) || 'manifest';
-    value = document.getElementById(tab).value
-  }
+function checkJSONValidity() {
+  let tab = location.hash.substr(1) || 'manifest';
+  let value = document.getElementById(tab).value;
   if (!value) {
     document.querySelector('#json-success').style.display = 'none';
     document.querySelector('#json-warning').style.display = 'none';
-  } else if (isJSONValid(value)) {
-    document.querySelector('#json-success').style.display = 'flex'
-    document.querySelector('#json-warning').style.display = 'none'
   } else {
-    document.querySelector('#json-success').style.display = 'none'
-    document.querySelector('#json-warning').style.display = 'flex'
+    let parsed = isJSONValid(value);
+    if (parsed) {
+      let errors = []
+      if (tab == 'manifest') {
+        if (!parsed.id) errors.push('<code>id</code> property must be set!')
+        if (!parsed.name) errors.push('<code>name</code> property must be set!')
+        if (!parsed.author) errors.push('<code>author</code> property must be set!')
+        if (!parsed.version) errors.push('<code>version</code> property must be set!')
+        if (!parsed.activities) errors.push('<code>activities</code> property must be set!')
+      } else if (tab == 'knowledge') {
+        if (!parsed.click) errors.push('<code>click</code> property must be set!')
+        if (!parsed.hosts) errors.push('<code>hosts</code> property must be set!')
+        if (!parsed.hosts_unknown) errors.push('<code>hosts_unknown</code> property must be set!')
+      }
+      if (errors.length) {
+        document.querySelector('#json-success').style.display = 'none'
+        document.querySelector('#json-warning span').innerHTML = errors.join('<br/>')
+        document.querySelector('#json-warning').style.display = 'flex'
+      } else {
+        document.querySelector('#json-success').style.display = 'flex'
+        document.querySelector('#json-warning').style.display = 'none'
+      }
+    } else {
+      document.querySelector('#json-success').style.display = 'none'
+      document.querySelector('#json-warning span').innerHTML = 'JSON must be in valid format.'
+      document.querySelector('#json-warning').style.display = 'flex'
+    }
   }
 }
 
 function isJSONValid(str) {
+  let parsed;
   try {
-    JSON.parse(str);
+    parsed = JSON.parse(str);
   } catch (e) {
-    return false;
+    return null;
   }
-  return true;
+  return parsed;
 }
 
 document.addEventListener('DOMContentLoaded', function () {
   document.querySelector('#btn-cancel').onclick = () => window.close();
   document.querySelectorAll('#manifest, #knowledge').forEach(el => {
-    el.addEventListener('input', (e) => checkJSONValidity(e.target.value));
+    el.addEventListener('input', checkJSONValidity);
   });
   onTabChange();
 });

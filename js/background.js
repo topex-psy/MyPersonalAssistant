@@ -32,10 +32,12 @@ function bindListeners() {
   chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     console.log("on action", request, sender);
     let {action, update} = request;
-    if (action == 'lookup') lookup();
+    if (action == 'lookup') {
+      if (sender.tab.selected) lookup();
+    }
     else if (action == 'count') count();
     else if (action == 'operation') {
-      chrome.tabs.create({active: true, url: chrome.runtime.getURL("operation.html")});
+      chrome.tabs.create({active: true, url: chrome.runtime.getURL("operation.html?id=" + assistant.meta.id)});
     }
     else if (action == 'update') {
       if (update.hasOwnProperty('activity')) assistant.activity = update.activity;
@@ -108,7 +110,7 @@ function analizeTab(tab) {
 
   // getting matched response from knowledge.json
   let { meta } = assistant;
-  let possibleResponses = meta.knowledge.responses;
+  let possibleResponses = meta.knowledge.responses || [];
   let item_title = title.split('-')[0].trim();
   let hosts = meta.knowledge.hosts.filter(host => url.includes(host.keyword));
   if (hosts.length) {
@@ -159,7 +161,7 @@ function analizeTab(tab) {
           : arrayCombine(meta.knowledge.dismiss, meta.knowledge.add_dismiss, meta.knowledge.click.add_dismiss)
         ),
       },
-    ], meta.knowledge.maximum_options),
+    ], meta.knowledge.maximum_options || 2),
   });
 }
 

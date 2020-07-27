@@ -43,9 +43,13 @@ function click(e) {
     if (e.target.classList.contains('active')) {
       send({ action: 'request', type: 'dismiss' });
     } else {
-      let name = e.target.getAttribute("data-name");
-      console.log("will set assistant to:", name);
-      setAssistant(assistant);
+      if (assistant == "new") {
+        chrome.tabs.create({active: true, url: chrome.runtime.getURL("operation.html")});
+      } else {
+        let name = e.target.getAttribute("data-name");
+        console.log("will set assistant to:", name);
+        setAssistant(assistant);
+      }
     }
   } else if (request) {
     send({

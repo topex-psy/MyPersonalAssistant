@@ -20,9 +20,21 @@
     "Pergi sana",
     "Kamu saya usir"
   ],
+  "greet": {
+    "responses": [
+      "Halo, aku [name]. Yoroshiku ne~",
+      "Halo, [name] di sini!"
+    ],
+    "add_dismiss": [
+      "Yoroshiku~",
+      "Salam kenal",
+      "Iya, mohon bantuannya",
+      "Mohon kerjasamanya"
+    ]
+  },
   "click": {
     "responses": [
-      "Halo, aku [name] :3",
+      "Ada apa?",
       "Apaan sih pegang-pegang",
       "Lapeeeeeer ....",
       "Hey ..."
@@ -51,6 +63,23 @@
           "add_responses": [
             "[name] mau dong join ke channelnya",
             "Invite [name] dong ke channelnya"
+          ]
+        }
+      ]
+    },
+    {
+      "keyword": "tokopedia.com",
+      "responses": [
+        "Cieee, belanja~",
+        "Cieee, baru gajian nih kayaknya :3",
+        "Selamat datang di toko kami, selamat belanja!",
+        "Beliin aku dong~ :3"
+      ],
+      "specifics": [
+        {
+          "keyword": "tab=wishlist",
+          "add_responses": [
+            "Wishlist mulu, kapan dibelinya?"
           ]
         }
       ]

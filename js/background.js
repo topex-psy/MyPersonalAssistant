@@ -9,21 +9,25 @@ var assistant = {
   activity: null,
   scale: 1.0,
 };
+var position = {
+  window: null,
+  tab: null,
+}
 
-(function() {
-  $.get('css/content.css', function(css) {
-    initOptions = {css};
-    console.log('initOptions', initOptions);
-  });
-})();
+$.get('css/content.css', function(css) {
+  initOptions = {css};
+  console.log('initOptions', initOptions);
+});
 
 chrome.storage.local.get('assistant', function(data) {
   console.log('loaded assistant data', data);
   if (data.assistant) assistant = data.assistant;
   chrome.tabs.getSelected(null, function(tab) {
-    if (isTabReady(tab)) {
-      initiateAssistant(tabId);
-    }
+    position.tab = tab.id;
+    position.window = tab.windowId;
+    // if (isTabReady(tab)) {
+    //   initiateAssistant(tab.id);
+    // }
   });
   bindListeners();
 });
@@ -63,6 +67,25 @@ function bindListeners() {
       });
     }
     sendResponse({ok: true});
+  });
+
+  chrome.tabs.onSelectionChanged.addListener(function(tabId, selectInfo) {
+    console.log("tab changed", position.tab, '->', tabId, selectInfo);
+    // if (assistant.meta?.id) {
+    //   chrome.tabs.get(+position.tab, function(tab) {
+    //     console.log("tab previous get", tab);
+    //     if (tab && isHttp(tab.url) && tab.status == "complete") {
+    //       chrome.tabs.sendMessage(tab.id, { action: 'get_position' }, function(response) {
+    //         console.log('assistant position get', response);
+    //         chrome.tabs.sendMessage(tabId, { action: 'set_position', options: response }, function(response) {
+    //           console.log('assistant position set', response);
+    //         });
+    //       });
+    //     }
+    //   });
+    // }
+    position.tab = tabId;
+    position.window = selectInfo.windowId;
   });
   
   chrome.tabs.onActivated.addListener(function(info) {
@@ -221,5 +244,5 @@ function lookup() {
 }
 
 function isTabReady(tab) {
-  return isHttp(tab.url) && tab.status == "complete" && tab.selected;
+  return tab && isHttp(tab.url) && tab.status == "complete" && tab.selected;
 }

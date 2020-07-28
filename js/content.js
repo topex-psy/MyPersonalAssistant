@@ -6,6 +6,8 @@ var timeOutWalk;
 var intervalWalk;
 var div;
 
+var disableWalk = false;
+
 // got it from: https://stackoverflow.com/a/15506705/5060513
 const setAssistantStyle = (() => {
   const style = document.createElement('style');
@@ -30,7 +32,7 @@ var myAssistant = {
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   console.log("request received", request, sender);
   let {message, type, options} = request;
-  let isReady = div && myAssistant.el;
+  let isReady = !!(div && myAssistant.el);
   let response = {isReady};
   if (request.action == 'init') {
     let {meta, dom, css, activity, scale } = options.assistant;
@@ -73,6 +75,25 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     let {activity, facing, x} = myAssistant.state;
     let {meta} = myAssistant;
     response = {meta, scale, activity, facing, x};
+  } else if (request.action == 'get_position') {
+    // let {activity, facing, x} = myAssistant.state;
+    // response = {activity, facing, x};
+  } else if (request.action == 'set_position') {
+    // let {activity, facing, x} = options;
+    // if (myAssistant.state.activity != activity) setAction(activity);
+    // myAssistant.state.facing = facing;
+    // myAssistant.state.x = x;
+    // setDataAttributes();
+    
+    // TODO FIXME this will cause laggy animation for 400ms
+    // disableWalk = true;
+    // div.classList.add('notransition');
+    // div.style.left = myAssistant.state.x + '%';
+    // setTimeout(() => {
+    //   div.classList.remove('notransition');
+    //   disableWalk = false;
+    // }, 400);
+
   } else if (request.action == 'assistant') {
     setAssistant(options);
   } else if (request.action == 'request') {
@@ -113,7 +134,7 @@ function setAssistant(options = {}) {
   setScale(myAssistant.options.scale);
   
   closeBalloon();
-  setTimeout(() => requestAction('lookup'), 3000 * Math.random());
+  setTimeout(() => requestAction('greeting'), 3000 * Math.random());
 
   sendUpdate({meta, dom, css});
   doTheThings();
@@ -165,7 +186,29 @@ function onClickAssistant() {
 }
 
 function requestAction(action) {
-  if (action == 'shutup') {
+  if (action == 'greeting') {
+    let { meta } = myAssistant;
+    let possibleResponses = meta.knowledge.greet?.responses;
+    if (possibleResponses && possibleResponses.length) {
+      let message = getRandomFrom(possibleResponses).replace('[name]', myAssistant.meta.name);
+      let answers = getRandomFrom(
+        meta.knowledge.greet.dismiss
+        ? arrayCombine(meta.knowledge.greet.dismiss, meta.knowledge.greet.add_dismiss)
+        : arrayCombine(meta.knowledge.dismiss, meta.knowledge.add_dismiss, meta.knowledge.greet.add_dismiss)
+      , 2);
+      setBalloon(message, {
+        duration: 8000,
+        replies: answers.map(answer => {
+          return {
+            action: 'shutup',
+            title: answer,
+          }
+        })
+      });
+    } else {
+      requestAction('lookup');
+    }
+  } else if (action == 'shutup') {
     closeBalloon(true);
   } else if (action == 'dismiss') {
     doNothing();
@@ -227,18 +270,15 @@ function setAction(action, options = {}, callback = function(){}) {
   if (!myAssistant.el) return;
   doNothing();
 
-  
   let previousActivity = myAssistant.state.activity;
   let duration = options?.duration || (3000 + Math.random() * 5000);
+  let facing = options?.facing || null;
   console.log("change action from", previousActivity);
   console.log('now do', action, 'for', duration, 'ms');
 
-  let facing;
   if (action == 'walk') {
-    facing = getRandomFrom(['left', 'right']);
+    facing = facing || getRandomFrom(['left', 'right']);
     intervalWalk = setInterval(doWalk, 100);
-  } else {
-    facing = null;
   }
   myAssistant.state.activity = action;
   myAssistant.state.facing = facing;
@@ -329,6 +369,7 @@ function doRandomWalk() {
 }
 
 function doWalk() {
+  if (disableWalk) return;
   if (myAssistant.state.facing == 'left') {
     myAssistant.state.x--;
     if (myAssistant.state.x <= 10) doChangeFacing();

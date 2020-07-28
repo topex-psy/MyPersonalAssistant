@@ -2,6 +2,8 @@
   margin-bottom: -14px;
 }
 #menhera img {
+  width: 259px;
+  min-width: 259px;
   height: 210px;
   display: none;
 }

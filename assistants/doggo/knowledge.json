@@ -20,9 +20,17 @@
     "Pergi sana",
     "Kamu saya usir"
   ],
+  "greet": {
+    "responses": [
+      "Halo, aku [name] :3"
+    ],
+    "add_dismiss": [
+      "Iya, mohon bantuannya",
+      "Mohon kerjasamanya"
+    ]
+  },
   "click": {
     "responses": [
-      "Halo, aku [name] :3",
       "Apaan sih pegang-pegang",
       "Lapeeeeeer ....",
       "Hey ..."

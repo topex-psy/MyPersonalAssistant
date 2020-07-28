@@ -64,7 +64,11 @@
       "responses": [
         "Facebook terooos!",
         "Timelinemu varokah sekali",
-        "Sekrol-sekrol terooos!"
+        "Sekrol-sekrol terooos!",
+        "Apa yang kamu pikirkan?",
+        "Apa-apa dijadiin status",
+        "Block aja tuh si itu ...",
+        "Hati-hati berita hoax gan"
       ]
     },
     {
@@ -78,11 +82,20 @@
     {
       "keyword": "stackoverflow.com",
       "responses": [
-        "Tinggal copas aja gan!",
         "Wah, moga bugnya cepet solve!",
         "Ada bug apa lagi, bro?"
       ],
-      "title_remove": " - Stack Overflow"
+      "title_remove": " - Stack Overflow",
+      "specifics": [
+        {
+          "keyword": "/questions/",
+          "add_responses": [
+            "Tinggal copas aja gan!",
+            "Ah masa ini aja ga tau ...",
+            "Ah gampang ini, masa ga bisa?"
+          ]
+        }
+      ]
     },
     {
       "keyword": "youtube.com",

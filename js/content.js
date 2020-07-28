@@ -65,7 +65,6 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
       // initiating ass
       if (meta?.id) {
         setAssistant({meta, dom, css});
-        setScale(scale);
       }
     }
   } else if (request.action == 'get_init') {
@@ -226,12 +225,11 @@ function setAction(action, options = {}, callback = function(){}) {
     facing = getRandomFrom(['left', 'right']);
     intervalWalk = setInterval(doWalk, 100);
   } else {
-    facing = '';
+    facing = null;
   }
-  myAssistant.state.facing = facing;
-  myAssistant.el.setAttribute("data-activity", action);
-  myAssistant.el.setAttribute("data-facing", facing);
   myAssistant.state.activity = action;
+  myAssistant.state.facing = facing;
+  setDataAttributes();
   sendUpdate({activity: action});
   alignBalloon();
 
@@ -239,22 +237,42 @@ function setAction(action, options = {}, callback = function(){}) {
   timeOutAction = setTimeout(() => doNothing(callback), duration);
 }
 
+function setDataAttributes() {
+  let {el, state} = myAssistant;
+  let {activity, facing} = state;
+  if (activity) {
+    el.setAttribute("data-activity", activity);
+  } else {
+    el.removeAttribute("data-activity");
+  }
+  if (facing) {
+    el.setAttribute("data-facing", facing);
+  } else {
+    el.removeAttribute("data-facing");
+  }
+}
+
 function doChangeFacing() {
   let previousFacing = myAssistant.state.facing;
   let newFacing = previousFacing == 'left' ? 'right' : 'left';
   myAssistant.state.facing = newFacing;
-  myAssistant.el.setAttribute("data-facing", newFacing);
+  setDataAttributes();
   alignBalloon();
 }
 
 function doRandomLook() {
   let delay;
-  let level = +myAssistant.meta.talkativeness;
-  if (level == 1) delay = 15000 + Math.random() * 70000;
-  else if (level == 2) delay = 12000 + Math.random() * 60000;
-  else if (level == 4) delay = 7000 + Math.random() * 40000;
-  else if (level == 5) delay = 5000 + Math.random() * 30000;
-  else delay = 9000 + Math.random() * 50000;
+  let level = +myAssistant.meta.talkativeness || 3;
+  if (level < 1) level = 1;
+  if (level > 5) level = 5;
+
+  switch (level) {
+    case 1: delay = 15000 + Math.random() * 70000; break;
+    case 2: delay = 12000 + Math.random() * 60000; break;
+    case 3: delay = 9000 + Math.random() * 50000; break;
+    case 4: delay = 7000 + Math.random() * 40000; break;
+    case 5: delay = 5000 + Math.random() * 30000; break;
+  }
 
   console.log('do random look', delay);
   clearTimeout(timeOutLook);
@@ -266,12 +284,17 @@ function doRandomLook() {
 
 function doRandomWalk() {
   let delay;
-  let level = +myAssistant.meta.hyperactiveness;
-  if (level == 1) delay = 15000 + Math.random() * 30000;
-  else if (level == 2) delay = 10000 + Math.random() * 30000;
-  else if (level == 4) delay = 5000 + Math.random() * 20000;
-  else if (level == 5) delay = 5000 + Math.random() * 10000;
-  else delay = 5000 + Math.random() * 30000;
+  let level = +myAssistant.meta.hyperactiveness || 3;
+  if (level < 1) level = 1;
+  if (level > 5) level = 5;
+
+  switch (level) {
+    case 1: delay = 15000 + Math.random() * 30000; break;
+    case 2: delay = 10000 + Math.random() * 30000; break;
+    case 3: delay = 5000 + Math.random() * 30000; break;
+    case 4: delay = 5000 + Math.random() * 20000; break;
+    case 5: delay = 5000 + Math.random() * 10000; break;
+  }
 
   clearTimeout(timeOutWalk);
   timeOutWalk = setTimeout(() => {
@@ -312,9 +335,9 @@ function doTheThings() {
 function doNothing(callback = function(){}) {
   let previousActivity = myAssistant.state.activity;
   console.log("idle from", previousActivity);
-  myAssistant.el.removeAttribute("data-activity");
-  myAssistant.el.removeAttribute("data-facing");
   myAssistant.state.activity = null;
+  myAssistant.state.facing = null;
+  setDataAttributes();
   clearTimeout(timeOutAction);
   clearInterval(intervalWalk);
   sendUpdate({activity: null});

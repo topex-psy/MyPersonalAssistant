@@ -42,9 +42,11 @@ function click(e) {
   if (assistant) {
     if (e.target.classList.contains('active')) {
       send({ action: 'request', type: 'dismiss' });
+      window.close();
     } else {
       if (assistant == "new") {
         chrome.tabs.create({active: true, url: chrome.runtime.getURL("operation.html")});
+        window.close();
       } else {
         let name = e.target.getAttribute("data-name");
         console.log("will set assistant to:", name);
@@ -56,6 +58,9 @@ function click(e) {
       action: 'request',
       type: request
     });
+    if (request == 'dismiss') {
+      window.close();
+    }
   } else if (action) {
     let duration = +e.target.getAttribute("data-duration");
     let durationMin = +e.target.getAttribute("data-duration-min");
@@ -99,6 +104,7 @@ function setAssistant(assistant) {
       action: 'assistant',
       options
     });
+    window.close();
   });
 }
 

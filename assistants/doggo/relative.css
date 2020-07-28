@@ -1,7 +1,7 @@
 #doggo {
   position: relative;
-  width: 202.5px;
-  height: 74.25px;
+  width: 22.5vmax;
+  height: 8.25vmax;
 }
 
 /* Facing Styles */
@@ -27,10 +27,10 @@
 #doggo::before {
   content: '';
   position: absolute;
-  bottom: -6.75px;
-  right: -1.35px;
+  bottom: -0.75vmax;
+  right: -0.15vmax;
   width: 100%;
-  height: 13.5px;
+  height: 1.5vmax;
   background-color: rgba(28, 49, 48, 0.1);
   border-radius: 50%;
   z-index: -1000;
@@ -40,37 +40,37 @@
 #doggo .leg {
   position: absolute;
   bottom: 0;
-  width: 27px;
-  height: 37.125px;
+  width: 3vmax;
+  height: 4.125vmax;
 }
 
 #doggo .paw {
   position: absolute;
   bottom: 0;
   left: 0;
-  width: 33.75px;
-  height: 16.875px;
+  width: 3.75vmax;
+  height: 1.875vmax;
   overflow: hidden;
 }
 
 #doggo .paw::before {
   content: '';
   position: absolute;
-  width: 33.75px;
-  height: 33.75px;
+  width: 3.75vmax;
+  height: 3.75vmax;
   border-radius: 50%;
 }
 
 #doggo .top {
   position: absolute;
   bottom: 0;
-  left: 6.75px;
-  height: 40.5px;
-  width: 23.625px;
-  border-top-left-radius: 12.825px;
-  border-top-right-radius: 12.825px;
+  left: 0.75vmax;
+  height: 4.5vmax;
+  width: 2.625vmax;
+  border-top-left-radius: 1.425vmax;
+  border-top-right-radius: 1.425vmax;
   transform-origin: bottom right;
-  transform: rotateZ(90deg) translateX(-0.9px) translateY(13.5px);
+  transform: rotateZ(90deg) translateX(-0.1vmax) translateY(1.5vmax);
   z-index: -1;
   background-image: linear-gradient(70deg, transparent 20%, #ff8b56 20%);
   background-color: transparent;
@@ -78,37 +78,37 @@
 
 #doggo .dog__head {
   position: absolute;
-  left: 13.5px;
+  left: 1.5vmax;
   bottom: 0;
-  width: 87.75px;
-  height: 74.25px;
-  border-top-left-radius: 36.45px;
-  border-top-right-radius: 36.45px;
-  border-bottom-right-radius: 29.7px;
-  border-bottom-left-radius: 29.7px;
+  width: 9.75vmax;
+  height: 8.25vmax;
+  border-top-left-radius: 4.05vmax;
+  border-top-right-radius: 4.05vmax;
+  border-bottom-right-radius: 3.3vmax;
+  border-bottom-left-radius: 3.3vmax;
   background-color: #FF8147;
   animation: head 10s cubic-bezier(0.3, 0.41, 0.18, 1.01) infinite;
 }
 
 #doggo .dog__head-c {
   position: absolute;
-  left: 13.5px;
+  left: 1.5vmax;
   bottom: 0;
-  width: 87.75px;
-  height: 74.25px;
+  width: 9.75vmax;
+  height: 8.25vmax;
   animation: head 10s cubic-bezier(0.3, 0.41, 0.18, 1.01) infinite;
   z-index: -1;
 }
 
 #doggo .dog__snout {
   position: absolute;
-  left: -13.5px;
+  left: -1.5vmax;
   bottom: 0;
-  width: 67.5px;
-  height: 33.75px;
-  border-top-right-radius: 27px;
-  border-bottom-right-radius: 27px;
-  border-bottom-left-radius: 40.5px;
+  width: 7.5vmax;
+  height: 3.75vmax;
+  border-top-right-radius: 3vmax;
+  border-bottom-right-radius: 3vmax;
+  border-bottom-left-radius: 4.5vmax;
   background-color: #D7DBD2;
   animation: snout 10s cubic-bezier(0.3, 0.41, 0.18, 1.01) infinite;
 }
@@ -116,24 +116,24 @@
 #doggo .dog__snout::before {
   content: '';
   position: absolute;
-  left: -1.0125px;
-  top: -1.35px;
-  width: 16.875px;
-  height: 10.125px;
-  border-top-right-radius: 27px;
-  border-bottom-right-radius: 27px;
-  border-bottom-left-radius: 40.5px;
+  left: -0.1125vmax;
+  top: -0.15vmax;
+  width: 1.875vmax;
+  height: 1.125vmax;
+  border-top-right-radius: 3vmax;
+  border-bottom-right-radius: 3vmax;
+  border-bottom-left-radius: 4.5vmax;
   background-color: #1C3130;
   animation: snout-b 10s cubic-bezier(0.3, 0.41, 0.18, 1.01) infinite;
 }
 
 #doggo .dog__nose {
   position: absolute;
-  top: -17.55px;
+  top: -1.95vmax;
   left: 40%;
-  width: 6.75px;
-  height: 21.6px;
-  border-radius: 4.725px;
+  width: 0.75vmax;
+  height: 2.4vmax;
+  border-radius: 0.525vmax;
   transform-origin: bottom;
   transform: rotateZ(10deg);
   background-color: #D7DBD2;
@@ -141,9 +141,9 @@
 
 #doggo .dog__eye-l, #doggo .dog__eye-r {
   position: absolute;
-  top: -8.1px;
-  width: 6.075px;
-  height: 3.375px;
+  top: -0.9vmax;
+  width: 0.675vmax;
+  height: 0.375vmax;
   border-radius: 50%;
   background-color: #1C3130;
   animation: eye 10s cubic-bezier(0.3, 0.41, 0.18, 1.01) infinite;
@@ -159,18 +159,18 @@
 
 #doggo .dog__ear-l, #doggo .dog__ear-r {
   position: absolute;
-  width: 94.5px;
-  height: 30.375px;
-  border-top-left-radius: 0px;
-  border-top-right-radius: 0px;
-  border-bottom-right-radius: 29.7px;
-  border-bottom-left-radius: 29.7px;
+  width: 10.5vmax;
+  height: 3.375vmax;
+  border-top-left-radius: 0vmax;
+  border-top-right-radius: 0vmax;
+  border-bottom-right-radius: 3.3vmax;
+  border-bottom-left-radius: 3.3vmax;
   background-color: #E26538;
 }
 
 #doggo .dog__ear-l {
-  top: 13.5px;
-  left: 54px;
+  top: 1.5vmax;
+  left: 6vmax;
   transform-origin: bottom left;
   transform: rotateZ(-50deg);
   z-index: -1;
@@ -178,8 +178,8 @@
 }
 
 #doggo .dog__ear-r {
-  top: 13.5px;
-  right: 27px;
+  top: 1.5vmax;
+  right: 3vmax;
   transform-origin: bottom right;
   transform: rotateZ(20deg);
   z-index: -2;
@@ -191,14 +191,14 @@
   justify-content: center;
   align-items: flex-end;
   position: absolute;
-  bottom: 2.75px;
-  left: 33.75px;
-  width: 168.75px;
-  height: 64.8px;
-  border-top-left-radius: 27px;
-  border-top-right-radius: 54px;
-  border-bottom-right-radius: 13.5px;
-  border-bottom-left-radius: 54px;
+  bottom: 0.3vmax;
+  left: 3.75vmax;
+  width: 18.75vmax;
+  height: 7.2vmax;
+  border-top-left-radius: 3vmax;
+  border-top-right-radius: 6vmax;
+  border-bottom-right-radius: 1.5vmax;
+  border-bottom-left-radius: 6vmax;
   background-color: #ff702e;
   z-index: -2;
   animation: body 10s cubic-bezier(0.3, 0.41, 0.18, 1.01) infinite;
@@ -206,23 +206,23 @@
 
 #doggo .dog__tail {
   position: absolute;
-  right: -27px;
-  height: 13.5px;
-  width: 40.5px;
+  right: -3vmax;
+  height: 1.5vmax;
+  width: 4.5vmax;
   background-color: #E96839;
-  border-radius: 13.5px;
+  border-radius: 1.5vmax;
 }
 
 #doggo .dog__paws {
   position: absolute;
   bottom: 0;
-  left: 67.5px;
-  width: 108px;
-  height: 27px;
+  left: 7.5vmax;
+  width: 12vmax;
+  height: 3vmax;
 }
 
 #doggo .dog__bl-leg {
-  left: -27px;
+  left: -3vmax;
   z-index: -10;
 }
 
@@ -257,34 +257,34 @@
 /*==============================*/
 @keyframes head {
   0%, 10%, 20%, 26%, 28%, 90%, 100% {
-    height: 74.25px;
+    height: 8.25vmax;
     bottom: 0;
     transform-origin: bottom right;
     transform: rotateZ(0);
   }
   5%, 15%, 22%, 24%, 30% {
-    height: 72.9px;
+    height: 8.1vmax;
   }
   32%, 50% {
-    height: 74.25px;
+    height: 8.25vmax;
   }
   55%, 60% {
-    bottom: 6.75px;
+    bottom: 0.75vmax;
     transform-origin: bottom right;
     transform: rotateZ(0);
   }
   70%, 80% {
-    bottom: 6.75px;
+    bottom: 0.75vmax;
     transform-origin: bottom right;
     transform: rotateZ(10deg);
   }
 }
 @keyframes body {
   0%, 10%, 20%, 26%, 28%, 32%, 100% {
-    height: 64.8px;
+    height: 7.2vmax;
   }
   5%, 15%, 22%, 24%, 30% {
-    height: 63.45px;
+    height: 7.05vmax;
   }
 }
 @keyframes ear-l {
@@ -317,21 +317,21 @@
 }
 @keyframes snout {
   0%, 10%, 20%, 26%, 28%, 82%, 100% {
-    height: 33.75px;
+    height: 3.75vmax;
   }
   5%, 15%, 22%, 24% {
-    height: 31.05px;
+    height: 3.45vmax;
   }
 }
 @keyframes snout-b {
   0%, 10%, 20%, 26%, 28%, 98%, 100% {
-    width: 16.875px;
+    width: 1.875vmax;
   }
   5%, 15%, 22%, 24% {
-    width: 16.2px;
+    width: 1.8vmax;
   }
   34%, 98% {
-    width: 11.475px;
+    width: 1.275vmax;
   }
 }
 @keyframes shadow {
@@ -347,18 +347,18 @@
 }
 @keyframes eye {
   0%, 30% {
-    width: 6.075px;
-    height: 2.75px;
+    width: 0.675vmax;
+    height: 0.3vmax;
   }
   32%, 59%, 90%, 100% {
-    width: 4.725px;
-    height: 4.725px;
+    width: 0.525vmax;
+    height: 0.525vmax;
     transform: translateY(0);
   }
   60%, 75% {
-    transform: translateY(-2.7px);
+    transform: translateY(-0.3vmax);
   }
   80%, 85% {
-    transform: translateY(1.35px);
+    transform: translateY(0.15vmax);
   }
 }

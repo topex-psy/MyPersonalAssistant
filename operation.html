@@ -447,19 +447,21 @@
       <div class="content">
         <div id="content-css">
           <h3>CSS</h3>
+          <strong>General Style</strong>
+          <p>Please don't use relative units such as <code>vw</code>, <code>vh</code>, <code>vmin</code>, <code>vmax</code>. Just use <code>px</code>!</p>
           <div class="row">
             <div class="col" style="max-width: 280px;">
               <strong>Facing Style</strong>
               <p>Example: (Play with transform)</p>
-<code class="multiline">#doggo[data-facing="left"] {
-  transform: rotateY(0deg);
-}
-#doggo[data-facing="right"] {
+<code class="multiline">#doggo[data-facing="right"] {
   transform: rotateY(180deg);
 }</code>
               <p>Example #2: (Play with visibility)</p>
 <code class="multiline">#doggo .layer.facing-left,
 #doggo .layer.facing-right {
+  display: none;
+}
+#doggo[data-facing] .layer.facing-front {
   display: none;
 }
 #doggo[data-facing="left"] .layer.facing-left {

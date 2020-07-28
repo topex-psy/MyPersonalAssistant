@@ -16,8 +16,6 @@
   background: #fff;
   padding: 1rem;
   border-radius: 2rem;
-  /* margin-right: -100px;
-  margin-left: 100px; */
   z-index: 1;
   transition: all 0.6s cubic-bezier(0.68, -0.6, 0.32, 1.6);
   transform: scale(.5) translateY(30px);
@@ -25,8 +23,9 @@
   opacity: 0;
   pointer-events: none;
   position: absolute;
-  bottom: 150px;
   box-shadow: 1px 2px 5px rgba(0, 0, 0, .2);
+  display: flex;
+  flex-direction: column;
 }
 .mpa-balloon::before {
   content: '';
@@ -42,8 +41,6 @@
 }
 .mpa-container.right .mpa-balloon {
   transform-origin: right;
-  /* margin-right: 100px;
-  margin-left: -100px; */
 }
 .mpa-container.right .mpa-balloon::before {
   transform: rotate(-30deg) scaleX(.7) scaleY(1.5);
@@ -81,6 +78,7 @@
   color: #71a3ff;
   text-decoration: none;
   transition: all .4s;
+  white-space: nowrap;
 }
 .mpa-balloon ul li a:hover {
   background: #c7efef;

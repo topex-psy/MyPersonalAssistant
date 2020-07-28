@@ -22,7 +22,6 @@ var options = {};
     };
     console.log('loaded data', options);
     initEditor();
-    initFile();
   });
 })();
 
@@ -34,35 +33,6 @@ function initEditor() {
   document.querySelector('#panel-manifest textarea').value = JSON.stringify(options.manifest, null, 2);
   document.title = assistant == 'new' ? "Create New Assistant" : "Operation Room";
   checkJSONValidity();
-}
-
-function initFile() {
-  window.requestFileSystem  = window.requestFileSystem || window.webkitRequestFileSystem;
-  window.requestFileSystem(window.TEMPORARY, 5*1024*1024, initFileSuccess, initFileError);
-}
-
-function initFileSuccess(fs) {
-  console.log('init file system api success', fs);
-  var dirReader = fs.root.createReader();
-  dirReader.readEntries(function(entries) {
-    console.log('entries', entries);
-    for (var i = 0; i < entries.length; i++) {
-      var entry = entries[i];
-      if (entry.isDirectory){
-        console.log('Directory: ' + entry.fullPath);
-      }
-      else if (entry.isFile){
-        console.log('File: ' + entry.fullPath);
-      }
-    }
-  }, initFileError);
-  // fs.root.getDirectory('assistants', {create: false}, function(dirEntry) {
-  //   console.log('assistants directory', dirEntry);
-  // }, initFileError);
-}
-
-function initFileError(err) {
-  console.log('init file error', err);
 }
 
 window.onhashchange = onTabChange;
@@ -139,7 +109,10 @@ function isJSONValid(str) {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-  document.querySelector('#btn-cancel').onclick = () => window.close();
+  document.querySelector('#btn-close').onclick = () => {
+    // TODO confirm dulu
+    window.close();
+  }
   document.querySelectorAll('.panel-header ul li a').forEach(el => el.onclick = (e) => {
     let panel = e.target.closest(".panel");
     panel.setAttribute('data-view', e.target.getAttribute('data-view'));

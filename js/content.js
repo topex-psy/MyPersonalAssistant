@@ -1,4 +1,5 @@
 var timeOutAction;
+var timeOutAttention;
 var timeOutBalloon;
 var timeOutLook;
 var timeOutWalk;
@@ -40,7 +41,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         if (myAssistant.state.activity != activity) setAction(activity);
         if (myAssistant.meta.id != meta.id) setAssistant({meta, dom, css});
       } else {
-        dismiss();
+        dismiss(true);
       }
     } else {
       console.log('initiating assistant');
@@ -82,6 +83,8 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     setBalloon(message, options);
   } else if (request.action == 'scale') {
     setScale(options.scale);
+  } else if (request.action == 'dismissed') {
+    dismiss(true);
   }
   console.log('sendResponse', response);
   sendResponse(response);
@@ -92,6 +95,10 @@ function setAssistant(options = {}) {
   
   if (!div) {
     console.log('not ready yet!');
+    return;
+  }
+  if (meta.id == myAssistant.meta?.id) {
+    console.log('same assistant!');
     return;
   }
 
@@ -121,7 +128,11 @@ function onClickAssistant() {
   if (isBalloonShown) {
     closeBalloon();
   } else {
-    doNothing(); // TODO do terpanggil
+    doNothing();
+    myAssistant.el.setAttribute("data-attention", true);
+    timeOutAttention = setTimeout(() => {
+      myAssistant.el.removeAttribute("data-attention");
+    }, 3000);
     if (Math.random() > .5) {
       let possibleResponses = meta.knowledge.click.responses;
       let message = getRandomFrom(possibleResponses);
@@ -175,11 +186,12 @@ function requestAction(action) {
 }
 
 function closeBalloon(force = false) {
+  if (!myAssistant.el) return;
   let balloon = div.firstElementChild;
   clearTimeout(timeOutBalloon);
   balloon.classList.remove('show');
   if (force) balloon.classList.add('dismissed');
-  myAssistant.el.setAttribute("data-talking", false);
+  myAssistant.el.removeAttribute("data-talking");
 }
 
 function setBalloon(message, options = {}) {
@@ -195,6 +207,7 @@ function setBalloon(message, options = {}) {
     balloon.querySelector('ul').innerHTML = listActionEl;
     balloon.querySelectorAll('li a').forEach(li => li.addEventListener('click', e => {
       requestAction(e.target.parentNode.getAttribute('data-action'));
+      myAssistant.el.removeAttribute("data-attention");
     }));
   } else {
     balloon.querySelector('ul').innerHTML = ''
@@ -339,6 +352,7 @@ function doNothing(callback = function(){}) {
   myAssistant.state.facing = null;
   setDataAttributes();
   clearTimeout(timeOutAction);
+  clearTimeout(timeOutAttention);
   clearInterval(intervalWalk);
   sendUpdate({activity: null});
   alignBalloon();
@@ -362,7 +376,8 @@ function alignBalloon() {
   div.classList.add(facing);
 }
 
-function dismiss() {
+function dismiss(silent = false) {
+  if (!myAssistant.el) return;
   doNothing();
   clearTimeout(timeOutLook);
   clearTimeout(timeOutWalk);
@@ -373,7 +388,7 @@ function dismiss() {
   myAssistant.el.remove();
   myAssistant.el = null;
   myAssistant.meta = null;
-  sendUpdate({
+  if (!silent) sendUpdate({
     meta: null,
     dom: null,
     css: null

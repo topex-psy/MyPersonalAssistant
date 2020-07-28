@@ -56,7 +56,7 @@
     #json-success {
       display: none;
     }
-    #btn-cancel {
+    #btn-close {
       color: #333 !important;
       margin-left: 2rem !important;
     }
@@ -75,9 +75,9 @@
     .panel {
       display: flex;
       flex-direction: column;
-      width: 550px;
-      min-width: 550px;
+      min-width: 350px;
       height: 100%;
+      width: 45%;
     }
     .panel-content {
       height: 100%;
@@ -180,8 +180,8 @@
       color: #000;
     }
     .content {
-      flex-grow: 1;
       margin-left: 2rem;
+      width: 55%;
     }
     .content > div {
       display: flex;
@@ -220,6 +220,7 @@
       font-weight: 600;
       margin-left: .25rem;
       cursor: pointer;
+      white-space: nowrap;
     }
     .form-group {
       display: flex;
@@ -265,7 +266,8 @@
         <a href="#knowledge">Knowledge</a>
       </div>
       <div>
-        <a id="btn-cancel">Cancel</a>
+        <a id="btn-close">Close</a>
+        <a id="btn-import">Import/Export &#x25BC;</a>
         <a id="btn-save">Save Changes</a>
       </div>
     </div>
@@ -286,7 +288,7 @@
         WARNING:&nbsp;<span>JSON must be in valid format.</span>
       </p>
       <p class="success" id="json-success">
-        JSON format has been checked and valid.
+        All fields has been checked and valid.
       </p>
     </div>
     <div class="container">
@@ -386,9 +388,10 @@
           </p>
           <table>
             <tbody>
-              <tr><td><code>[data-activity="*"]</code></td><td>Filled with Activity ID as the attribute value e.g. <code>[data-activity="walk"]</code> which indicates what activity the assistant doing. Activity IDs other than "walk" can be defined in the <a href="#manifest">Manifest</a>.</td></tr>
-              <tr><td><code>[data-facing="*"]</code></td><td>Filled with "left", "right", or "" (default) e.g. <code>[data-facing="right"]</code> which indicates where this assistant heading.</td></tr>
-              <tr><td><code>[data-talking="*"]</code></td><td>Filled with "true" or "false" which indicates whether this assistant is talking or not.</td></tr>
+              <tr><td><code>[data-activity="('walk' or custom)"]</code></td><td>Filled with Activity ID as the attribute value e.g. <code>[data-activity="walk"]</code> which indicates what activity the assistant doing. Activity IDs other than "walk" can be defined in the <a href="#manifest">Manifest</a>.</td></tr>
+              <tr><td><code>[data-facing="('left' or 'right')"]</code></td><td>Filled with "left", "right", or removed which indicates where this assistant heading.</td></tr>
+              <tr><td><code>[data-talking="true"]</code></td><td>Filled with "true" or removed which indicates whether this assistant is talking or not.</td></tr>
+              <tr><td><code>[data-attention="true"]</code></td><td>Filled with "true" or removed which indicates whether this assistant is talking or not.</td></tr>
             </tbody>
           </table>
           <p>If you're using image files, host them to fast web hosting service of your own. Use <code>https</code>!</p>
@@ -407,7 +410,7 @@
               <tr><td><code>click</code></td><td>When this assistant clicked, containing list of <code>responses</code> and <code>answers</code> or <code>add_answers</code> which used to trigger the lookup for current opened URL.</td></tr>
               <tr><td><code>hosts</code></td><td>When this assistant activated or looking into your opened URL, it'll say anything about that based on knowledge defined here.</td></tr>
               <tr><td><code>hosts_unknown</code></td><td>If cannot find any match in the <code>hosts</code> knowledge, it'll become the fallback.</td></tr>
-              <tr><td><code>maximum_options</code></td><td>Determine how much answers options available to respond to this assistant talking</td></tr>
+              <tr><td><code>maximum_options</code></td><td>Determine how much answers options available to respond to this assistant talking, can be between 1 and 3, the default is 2.</td></tr>
               <tr><td><code>balloon_offset</code></td><td>Set the <code>bottom</code> and <code>left</code> value to customize the position of dialog balloon.</td></tr>
             </tbody>
           </table>

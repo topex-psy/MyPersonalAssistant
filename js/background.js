@@ -46,6 +46,17 @@ function bindListeners() {
         assistant.meta = update.meta;
         assistant.dom = update.dom;
         assistant.css = update.css;
+        chrome.tabs.query({windowType: 'normal', url: ['http://*/*', 'https://*/*'], status: 'complete'}, function(tabs) {
+          // if (isHttp(tab.url) && tab.status == "complete")
+          tabs.forEach(tab => {
+            if (update.meta) {
+              let {meta, dom, css} = assistant;
+              chrome.tabs.sendMessage(tab.id, { action: 'assistant', options: {meta, dom, css} });
+            } else {
+              chrome.tabs.sendMessage(tab.id, { action: 'dismissed' });
+            }
+          });
+        });
       }
       chrome.storage.local.set({assistant}, function() {
         console.log('all data saved!')

@@ -79,6 +79,7 @@
   text-decoration: none;
   transition: all .4s;
   white-space: nowrap;
+  border: 0;
 }
 .mpa-balloon ul li a:hover {
   background: #c7efef;

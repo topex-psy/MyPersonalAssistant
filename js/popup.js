@@ -1,5 +1,21 @@
 'use strict';
 
+(function() {
+  chrome.storage.local.get('list_assistant', function(data) {
+    console.log('loaded assistant list', data);
+    let {list_assistant} = data;
+    let ul = document.querySelector('.assistant-list');
+    let li_new = document.querySelector('li[data-assistant="new"]');
+    if (list_assistant?.length) list_assistant.forEach(assistant => {
+      let li = document.createElement('li');
+      li.setAttribute('data-assistant', assistant.id);
+      li.setAttribute('data-name', assistant.name);
+      li.innerHTML = '<img src="assistants/' + assistant.id + '/' + assistant.icon + '"/>' + assistant.name;
+      ul.insertBefore(li, li_new);
+    });
+  });
+})();
+
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   console.log("on update", request, sender);
   let {action, update} = request;

@@ -1,3 +1,5 @@
+var durationGreeting = 8000;
+
 function arrayCombine(...arrays) {
   let result = [];
   arrays.forEach(arr => {

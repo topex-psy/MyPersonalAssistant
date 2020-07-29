@@ -206,37 +206,30 @@ function click() {
 
 function generateAnswer(type = 'click', action = 'lookup', qty = 1) {
   let { knowledge } = assistant.meta;
-  let title = action;
+  let titles = action;
   switch (action) {
     case 'lookup':
-      title = getRandomFrom(
-        knowledge[type]?.to_lookup
+      titles = knowledge[type]?.to_lookup
         ? arrayCombine(knowledge[type]?.to_lookup, knowledge[type]?.to_lookup_add)
-        : arrayCombine(knowledge.to_lookup, knowledge.to_lookup_add, knowledge[type]?.to_lookup_add)
-        , qty);
+        : arrayCombine(knowledge.to_lookup, knowledge.to_lookup_add, knowledge[type]?.to_lookup_add);
       break;
     case 'dismiss':
-      title = getRandomFrom(
-        knowledge[type]?.to_dismiss
+      titles = knowledge[type]?.to_dismiss
         ? arrayCombine(knowledge[type]?.to_dismiss, knowledge[type]?.to_dismiss_add)
-        : arrayCombine(knowledge.to_dismiss, knowledge.to_dismiss_add, knowledge[type]?.to_dismiss_add)
-        , qty);
+        : arrayCombine(knowledge.to_dismiss, knowledge.to_dismiss_add, knowledge[type]?.to_dismiss_add);
       break;
     case 'shutup':
-      title = getRandomFrom(
-        knowledge[type]?.to_shutup
+      titles = knowledge[type]?.to_shutup
         ? arrayCombine(knowledge[type]?.to_shutup, knowledge[type]?.to_shutup_add)
-        : arrayCombine(knowledge.to_shutup, knowledge.to_shutup_add, knowledge[type]?.to_shutup_add)
-        , qty);
+        : arrayCombine(knowledge.to_shutup, knowledge.to_shutup_add, knowledge[type]?.to_shutup_add);
       break;
     case 'dispel':
-      title = getRandomFrom(
-        knowledge[type]?.to_dispel
+      titles = knowledge[type]?.to_dispel
         ? arrayCombine(knowledge[type]?.to_dispel, knowledge[type]?.to_dispel_add)
-        : arrayCombine(knowledge.to_dispel, knowledge.to_dispel_add, knowledge[type]?.to_dispel_add)
-        , qty);
+        : arrayCombine(knowledge.to_dispel, knowledge.to_dispel_add, knowledge[type]?.to_dispel_add);
       break;
   }
+  let title = getRandomFrom(titles, qty);
   return typeof title === 'string' ? { action, title } : title;
 }
 
@@ -272,7 +265,7 @@ function greeting() {
       return { action: 'shutup', title }
     });
     sendBalloon(message, {
-      duration: 8000,
+      duration: durationGreeting,
       replies
     });
   } else {

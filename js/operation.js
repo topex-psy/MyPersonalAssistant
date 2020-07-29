@@ -108,9 +108,9 @@ function isJSONValid(str) {
   return parsed;
 }
 
-function exportFile({manifest}) {
+function exportFile({manifest, html, css, knowledge}) {
   var fileName = `${manifest.id}.txt`;
-  var content = JSON.stringify(manifest, null, 2);
+  var content = JSON.stringify({manifest, html, css, knowledge}, null, 2);
   var blob = writeBlob(content);
   var url = window.URL.createObjectURL(blob);
   var a = document.createElement('a');
@@ -134,16 +134,57 @@ function writeBlob(content, type = 'text/plain') {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
+  document.body.onclick = (e) => {
+    if (!e.target.classList.contains('dropdown') && !e.target.closest('.dropdown'))
+      document.querySelectorAll('.dropdown-list').forEach(d => d.classList.remove('show'));
+  }
+  document.querySelectorAll('.dropdown').forEach(el => el.onclick = (e) => {
+    if (e.target.classList.contains('btn-dropdown') || e.target.closest('.btn-dropdown'))
+      e.currentTarget.querySelector('.dropdown-list').classList.toggle('show');
+  });
+  document.querySelector('#file-import').oninput = (e) => {
+    var file = e.currentTarget.files[0];
+    if (file) {
+      var reader = new FileReader();
+      reader.readAsText(file, "UTF-8");
+      reader.onload = function (evt) {
+        let fileContent = evt.target.result;
+        console.log("success reading file", fileContent);
+        let json = isJSONValid(fileContent);
+        if (json) {
+          document.getElementById('manifest').value = JSON.stringify(json.manifest, null, 2);
+          document.getElementById('html').value = json.html;
+          document.getElementById('css').value = json.css;
+          document.getElementById('knowledge').value = JSON.stringify(json.knowledge, null, 2);
+        } else {
+          alert("Cannot import: file content invalid!");
+        }
+      }
+      reader.onerror = function (evt) {
+        console.log("error reading file");
+      }
+    }
+  }
   document.querySelector('#btn-close').onclick = () => {
     if (confirm(`Are you sure you're done here?`)) window.close();
   }
   document.querySelector('#btn-import').onclick = () => {
-    let manifestRaw = document.getElementById('manifest').value;
-    let manifest = isJSONValid(manifestRaw);
-    if (manifest) {
+    document.querySelector('#file-import').click();
+  }
+  document.querySelector('#btn-export').onclick = () => {
+    let manifest = isJSONValid(document.getElementById('manifest').value);
+    let knowledge = isJSONValid(document.getElementById('knowledge').value);
+    let html = document.getElementById('html').value;
+    let css = document.getElementById('css').value;
+    if (manifest && knowledge) {
       exportFile({
-        manifest
+        manifest,
+        html,
+        css,
+        knowledge
       });
+    } else {
+      alert(`Please fix all the errors in order to export!`)
     }
   }
   document.querySelectorAll('.panel-header ul li a').forEach(el => el.onclick = (e) => {

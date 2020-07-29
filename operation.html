@@ -15,6 +15,9 @@
       flex-direction: column;
       height: 100vh;
     }
+    #file-import {
+      display: none;
+    }
     #header {
       padding: 1rem;
       display: flex;
@@ -34,6 +37,7 @@
       color: #3b6fff;
       white-space: nowrap;
       cursor: pointer;
+      box-shadow: 0px 1px 5px -2px rgba(0,0,0,.3);
       transition: all .4s;
     }
     #header a:hover {
@@ -136,6 +140,32 @@
       height: 100%;
       box-shadow: 0px 2px 11px -6px rgba(0, 0, 0, .5);
       font-size: 1rem;
+    }
+    .dropdown {
+      display: inline-block;
+      position: relative;
+      z-index: 999;
+    }
+    .dropdown .dropdown-list {
+      display: none;
+      position: absolute;
+      left: 0;
+      right: .5rem;
+      top: 1rem;
+      list-style: none;
+      padding-left: 0;
+      pointer-events: none;
+    }
+    .dropdown .dropdown-list.show {
+      display: block;
+      pointer-events: auto;
+    }
+    .dropdown .dropdown-list li {
+      margin-bottom: .25rem;
+    }
+    .dropdown .dropdown-list li a {
+      display: block;
+      width: 100%;
     }
     .caption {
       padding: 0 1rem;
@@ -240,7 +270,7 @@
     .no-padding {
       padding: 0 !important;
     }
-    @media only screen and (max-width: 825px) {
+    @media only screen and (max-width: 991px) {
       #header h1 {
         display: none;
       }
@@ -270,7 +300,17 @@
       </div>
       <div>
         <a id="btn-close">Close</a>
-        <a id="btn-import">Import/Export &#x25BC;</a>
+        <div class="dropdown">
+          <a class="btn-dropdown">
+            <span>
+              Import/Export &#x25BC;
+            </span>
+          </a>
+          <ul class="dropdown-list">
+            <li><a id="btn-import">Import</a></li>
+            <li><a id="btn-export">Export</a></li>
+          </ul>
+        </div>
         <a id="btn-save">Save Changes</a>
       </div>
     </div>
@@ -507,5 +547,6 @@
         </div>
       </div>
     </div>
+    <input type="file" id="file-import"/>
   </body>
 </html>

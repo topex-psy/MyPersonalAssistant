@@ -1,6 +1,7 @@
 var timeOutAction;
 var timeOutAttention;
 var timeOutBalloon;
+var timeOutGreeting;
 var timeOutLook;
 var timeOutWalk;
 var intervalWalk;
@@ -134,7 +135,13 @@ function setAssistant(options = {}) {
   setScale(myAssistant.options.scale);
   
   closeBalloon();
-  setTimeout(() => requestAction('greeting'), 3000 * Math.random());
+  setTimeout(() => {
+    myAssistant.el.setAttribute("data-greeting", true);
+    timeOutGreeting = setTimeout(() => {
+      myAssistant.el.removeAttribute("data-greeting");
+    }, durationGreeting);
+    requestAction('greeting');
+  }, 3000 * Math.random());
 
   sendUpdate({meta, dom, css});
   doTheThings();
@@ -194,6 +201,7 @@ function setBalloon(message, options = {}) {
     balloon.querySelectorAll('li a').forEach(li => li.addEventListener('click', e => {
       requestAction(e.target.parentNode.getAttribute('data-action'));
       myAssistant.el.removeAttribute("data-attention");
+      myAssistant.el.removeAttribute("data-greeting");
     }));
   } else {
     balloon.querySelector('ul').innerHTML = ''
@@ -335,7 +343,10 @@ function doNothing(callback = function(){}) {
   console.log("idle from", previousActivity);
   clearTimeout(timeOutAction);
   clearTimeout(timeOutAttention);
+  clearTimeout(timeOutGreeting);
   clearInterval(intervalWalk);
+  myAssistant.el.removeAttribute("data-attention");
+  myAssistant.el.removeAttribute("data-greeting");
   myAssistant.state.activity = null;
   myAssistant.state.facing = null;
   setDataAttributes();

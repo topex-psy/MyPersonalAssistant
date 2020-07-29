@@ -153,7 +153,7 @@ document.addEventListener('DOMContentLoaded', function () {
       action: 'get_init',
     }, function(response) {
       console.log('get init result', response);
-      document.querySelector('input[name="scale"]').value = response.scale;
+      document.querySelector('input[name="scale"]').value = response?.scale || 1;
       assistantMetaUpdated(response.meta);
       if (response.activity) {
         document.querySelector('li[data-action="' + response.activity + '"]').classList.add('active');

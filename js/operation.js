@@ -9,9 +9,15 @@ var editors = {
   css: ace.edit("editor-css", { mode: "ace/mode/css" })
 };
 var options = {
-  id: new URL(location.href).searchParams.get("id") || 'new'
+  manifest: {
+    id: new URL(location.href).searchParams.get("id") || 'new'
+  },
+  knowledge: null,
+  html: null,
+  css: null
 };
 var timeoutCheck;
+var isImporting = false;
 
 // setting up code editor
 for (let key in editors) {
@@ -30,6 +36,10 @@ function getCurrentTab() {
 
 // listen code editor
 function codeValidity(tab = null) {
+  if (isImporting) {
+    console.log("still importing ...");
+    return;
+  }
   tab = tab || getCurrentTab();
   console.log("check validity", tab);
   clearTimeout(timeoutCheck);
@@ -74,11 +84,10 @@ function codeValidity(tab = null) {
       });
       let errors = []
       if (tab == 'manifest') {
-        let final = finalizeScripts(parsed.id);
-        editors.html.session.setValue(final.html);
-        editors.css.session.setValue(final.css);
+        finalizeScripts(parsed.id, true);
         document.getElementById('header-title').innerText = parsed.name || 'Anonymous';
         document.getElementById('header-author').innerText = parsed.author || 'Anonymous';
+        document.getElementById('icon').src = "assistants/" + parsed.id + "/" + (parsed.icon || "icon.png");
   
         if (!parsed.id) errors.push('<code>id</code> property must be set!')
         else if (parsed.id.length < 4) errors.push('<code>id</code> property must contains at least 4 letters!')
@@ -113,10 +122,10 @@ function codeValidity(tab = null) {
 (function() {
   console.log('location', location.href)
   $.when(
-    $.get('assistants/' + options.id + '/html.html'),
-    $.get('assistants/' + options.id + '/style.css'),
-    $.get('assistants/' + options.id + '/knowledge.json'),
-    $.get('assistants/' + options.id + '/manifest.json'),
+    $.get('assistants/' + options.manifest.id + '/html.html'),
+    $.get('assistants/' + options.manifest.id + '/style.css'),
+    $.get('assistants/' + options.manifest.id + '/knowledge.json'),
+    $.get('assistants/' + options.manifest.id + '/manifest.json'),
   ).done(function (htmlResult, cssResult, knowledgeResult, manifestResult) {
     let manifest = manifestResult[0];
     let knowledge = knowledgeResult[0];
@@ -135,8 +144,8 @@ function codeValidity(tab = null) {
 })();
 
 function initEditor() {
-  document.title = options.id == 'new' ? "Create New Assistant" : "Operation Room";
-  document.getElementById('icon').src = "assistants/" + options.id + "/" + (options.manifest.icon || "icon.png");
+  document.title = options.manifest.id == 'new' ? "Create New Assistant" : "Operation Room";
+  // document.getElementById('icon').src = "assistants/" + options.manifest.id + "/" + (options.manifest.icon || "icon.png");
   editors.html.session.setValue(options.html);
   editors.css.session.setValue(options.css);
   editors.manifest.session.setValue(JSON.stringify(options.manifest, null, 2));
@@ -156,24 +165,38 @@ function onTabChange() {
   document.querySelectorAll('[data-tab="' + tab + '"]').forEach(el => el.style.display = 'flex');
   document.querySelectorAll('#header a').forEach(a => a.classList.remove('active'));
   document.querySelector('#header a[href="#' + tab + '"]').classList.add('active');
-  // if (tab == 'code') {
-  //   document.querySelector('#json-success').style.display = 'none';
-  //   document.querySelector('#json-warning').style.display = 'none';
-  // }
+  switch (tab) {
+    case 'manifest':
+      editors.manifest.resize();
+      break;
+    case 'knowledge':
+      editors.knowledge.resize();
+      break;
+    case 'code':
+      editors.html.resize();
+      editors.css.resize();
+      break;
+  }
   console.log('check validity from: onTabChange');
   codeValidity();
   window.scrollTo(0, 0);
 }
 
-function finalizeScripts(cssID) {
+function finalizeScripts(cssID, setValues = false) {
   let html = editors.html.session.getValue().replace(/id="([^"]+)"/, `id="${cssID}"`)
   let css = editors.css.session.getValue()
     .replace(/#([^"]+) {/, `#${cssID} {`)
     .replace(/#([^"]+)\[/g, `#${cssID}\[`)
     .replace(/#([^"]+)::/g, `#${cssID}::`)
     .replace(/#([^"]+):/g, `#${cssID}:`)
-    .replace(/#([^"]+)\./g, `#${cssID}\.`)
-  return { html, css }
+    .replace(/#([^"]+)\./g, `#${cssID}\.`);
+  let result = { html, css };
+  if (setValues) {
+    editors.html.session.setValue(html);
+    editors.css.session.setValue(css);
+    options = {...options, ...result};
+  }
+  return result;
 }
 
 function isHTMLValid(html) {
@@ -230,6 +253,7 @@ document.addEventListener('DOMContentLoaded', function () {
   document.querySelector('#file-import').oninput = (e) => {
     var file = e.currentTarget.files[0];
     if (file) {
+      isImporting = true;
       var reader = new FileReader();
       reader.readAsText(file, "UTF-8");
       reader.onload = function (evt) {
@@ -237,14 +261,19 @@ document.addEventListener('DOMContentLoaded', function () {
         console.log("success reading file", fileContent);
         let json = isJSONValid(fileContent);
         if (json) {
-          options = {...json, ...finalizeScripts(json.manifest.id)}
-          editors.manifest.session.setValue(JSON.stringify(options.manifest, null, 2));
+          options = json;
+          editors.html.session.setValue(options.html);
+          editors.css.session.setValue(options.css);
           editors.knowledge.session.setValue(JSON.stringify(options.knowledge, null, 2));
+          editors.manifest.session.setValue(JSON.stringify(options.manifest, null, 2));
+          finalizeScripts(json.manifest.id, true);
+          for (let key in editors) {
+            editors[key].renderer.updateFull();
+          }
           setTimeout(() => {
-            editors.html.session.setValue(options.html);
-            editors.css.session.setValue(options.css);
+            isImporting = false;
+            codeValidity();
           }, 1000)
-          // codeValidity();
         } else {
           alert("Cannot import: invalid content!");
         }

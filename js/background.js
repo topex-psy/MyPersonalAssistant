@@ -12,7 +12,7 @@ var assistant = {
 var position = {
   window: null,
   tab: null,
-}
+};
 
 $.get('css/content.css', function(css) {
   initOptions = {css};
@@ -234,7 +234,9 @@ function generateAnswer(type = 'click', action = 'lookup', qty = 1) {
 }
 
 function getMaxOptions() {
-  return assistant.meta.knowledge.maximum_options || 2;
+  let {maximum_options} = assistant.meta.knowledge;
+  if (!maximum_options || maximum_options < 1 || maximum_options > 5) return 2;
+  return maximum_options;
 }
 
 function count() {

@@ -1,86 +1,66 @@
-var assistant;
-var options = {};
+ace.config.set('basePath', 'https://pagecdn.io/lib/ace/1.4.12/');
 
-// var exportExtension = 'txt';
 var exportExtension = 'json';
-// var exportMime = 'text/plain';
 var exportMime = 'application/json';
+var editors = {
+  manifest: ace.edit("editor-manifest", { mode: "ace/mode/json" }),
+  knowledge: ace.edit("editor-knowledge", { mode: "ace/mode/json" }),
+  html: ace.edit("editor-html", { mode: "ace/mode/html" }),
+  css: ace.edit("editor-css", { mode: "ace/mode/css" })
+};
+var options = {
+  id: new URL(location.href).searchParams.get("id") || 'new'
+};
+var timeoutCheck;
 
-(function() {
-  console.log('location', location.href)
-  assistant = new URL(location.href).searchParams.get("id") || 'new';
-  $.when(
-    $.get('assistants/' + assistant + '/html.html'),
-    $.get('assistants/' + assistant + '/style.css'),
-    $.get('assistants/' + assistant + '/knowledge.json'),
-    $.get('assistants/' + assistant + '/manifest.json'),
-  ).done(function (domResult, cssResult, knowledgeResult, manifestResult) {
-    let manifest = manifestResult[0];
-    let knowledge = knowledgeResult[0];
-    let dom = domResult[0];
-    let css = cssResult[0];
-    options = {
-      manifest,
-      knowledge,
-      dom,
-      css
-    };
-    console.log('loaded data', options);
-    initEditor();
+// setting up code editor
+for (let key in editors) {
+  let editor = editors[key];
+  editor.setTheme("ace/theme/chrome");
+  editor.setShowPrintMargin(false);
+  editor.on('change', function(delta) {
+    console.log("editor onchange", key, delta);
+    codeValidity(key);
   });
-})();
-
-function initEditor() {
-  document.title = assistant == 'new' ? "Create New Assistant" : "Operation Room";
-  document.getElementById('icon').src = "assistants/" + assistant + "/" + (options.manifest.icon || "icon.png");
-  document.getElementById('html').value = options.dom;
-  document.getElementById('css').value = options.css;
-  document.getElementById('knowledge').value = JSON.stringify(options.knowledge, null, 2);
-  document.getElementById('manifest').value = JSON.stringify(options.manifest, null, 2);
-  document.getElementById('header-title').innerText = options.manifest.name || 'Anonymous';
-  document.getElementById('header-author').innerText = options.manifest.author || 'Anonymous';
-  console.log('check validity from: initEditor');
-  checkValidity();
 }
 
-window.onhashchange = onTabChange;
-
-function onTabChange() {
-  let tab = location.hash.substr(1) || 'manifest';
-  console.log('hash changed', tab);
-  document.querySelectorAll('[data-tab]').forEach(el => el.style.display = 'none');
-  document.querySelectorAll('[data-tab="' + tab + '"]').forEach(el => el.style.display = 'flex');
-  document.querySelectorAll('#header a').forEach(a => a.classList.remove('active'));
-  document.querySelector('#header a[href="#' + tab + '"]').classList.add('active');
-  if (tab == 'code') {
-    document.querySelector('#json-success').style.display = 'none';
-    document.querySelector('#json-warning').style.display = 'none';
-  } else {
-    console.log('check validity from: onTabChange');
-    checkValidity();
-  }
-  window.scrollTo(0, 0);
+function getCurrentTab() {
+  return location.hash.substr(1) || 'manifest';
 }
 
-function finalizeScripts(cssID) {
-  let inputHTML = document.getElementById('html');
-  let inputCSS = document.getElementById('css');
-  let html = inputHTML.value.replace(/id="([^"]+)"/, `id="${cssID}"`)
-  let css = inputCSS.value
-    .replace(/#([^"]+) {/, `#${cssID} {`)
-    .replace(/#([^"]+)\[/g, `#${cssID}\[`)
-    .replace(/#([^"]+)\./g, `#${cssID}\.`)
-  return { html, css }
-}
+// listen code editor
+function codeValidity(tab = null) {
+  tab = tab || getCurrentTab();
+  console.log("check validity", tab);
+  clearTimeout(timeoutCheck);
 
-function checkValidity() {
-  let tab = location.hash.substr(1) || 'manifest';
-  console.log('checking validity .......', tab);
-  if (tab == 'code') {
-    // TODO html css code validation
+  if (['code', 'html', 'css'].includes(tab)) {
+    timeoutCheck = setTimeout(() => {
+      if (getCurrentTab() != 'code') return;
+      let annotations = {
+        html: editors.html.getSession().getAnnotations().filter(a => a.type == 'error'),
+        css: editors.css.getSession().getAnnotations().filter(a => a.type == 'error'),
+      };
+      let statusHTML = document.querySelector('#panel-html .status');
+      let statusCSS = document.querySelector('#panel-css .status');
+      console.log('annotations', annotations);
+      if (annotations.html.length || annotations.css.length) {
+        if (annotations.html.length) statusHTML.classList.add('error'); else statusHTML.classList.remove('error');
+        if (annotations.css.length) statusCSS.classList.add('error'); else statusCSS.classList.remove('error');
+        document.querySelector('#json-success').style.display = 'none';
+        document.querySelector('#json-warning span').innerHTML = `There's some errors. Please fix them.`;
+        document.querySelector('#json-warning').style.display = 'flex';
+      } else {
+        statusHTML.classList.remove('error');
+        statusCSS.classList.remove('error');
+        document.querySelector('#json-success').style.display = 'flex';
+        document.querySelector('#json-warning').style.display = 'none';
+      }
+    }, 500);
     return;
   }
-  let value = document.getElementById(tab).value;
+
+  let value = editors[tab].session.getValue();
   if (!value) {
     document.querySelector('#json-success').style.display = 'none';
     document.querySelector('#json-warning').style.display = 'none';
@@ -95,11 +75,11 @@ function checkValidity() {
       let errors = []
       if (tab == 'manifest') {
         let final = finalizeScripts(parsed.id);
-        document.getElementById('html').value = final.html;
-        document.getElementById('css').value = final.css;
+        editors.html.session.setValue(final.html);
+        editors.css.session.setValue(final.css);
         document.getElementById('header-title').innerText = parsed.name || 'Anonymous';
         document.getElementById('header-author').innerText = parsed.author || 'Anonymous';
-
+  
         if (!parsed.id) errors.push('<code>id</code> property must be set!')
         else if (parsed.id.length < 4) errors.push('<code>id</code> property must contains at least 4 letters!')
         else if (!/^[a-z]+$/.test(parsed.id)) errors.push('<code>id</code> property must contains only lowercase letters without spaces, numbers, etc!')
@@ -114,19 +94,93 @@ function checkValidity() {
         if (!parsed.hosts_unknown) errors.push('<code>hosts_unknown</code> property must be set!')
       }
       if (errors.length) {
-        document.querySelector('#json-success').style.display = 'none'
-        document.querySelector('#json-warning span').innerHTML = errors.join('<br/>')
-        document.querySelector('#json-warning').style.display = 'flex'
+        document.querySelector('#json-success').style.display = 'none';
+        document.querySelector('#json-warning span').innerHTML = errors.join('<br/>');
+        document.querySelector('#json-warning').style.display = 'flex';
       } else {
-        document.querySelector('#json-success').style.display = 'flex'
-        document.querySelector('#json-warning').style.display = 'none'
+        document.querySelector('#json-success').style.display = 'flex';
+        document.querySelector('#json-warning').style.display = 'none';
       }
     } else {
-      document.querySelector('#json-success').style.display = 'none'
-      document.querySelector('#json-warning span').innerHTML = 'JSON must be in valid format.'
-      document.querySelector('#json-warning').style.display = 'flex'
+      document.querySelector('#json-success').style.display = 'none';
+      document.querySelector('#json-warning span').innerHTML = 'JSON must be in valid format.';
+      document.querySelector('#json-warning').style.display = 'flex';
     }
   }
+}
+
+// load initial data
+(function() {
+  console.log('location', location.href)
+  $.when(
+    $.get('assistants/' + options.id + '/html.html'),
+    $.get('assistants/' + options.id + '/style.css'),
+    $.get('assistants/' + options.id + '/knowledge.json'),
+    $.get('assistants/' + options.id + '/manifest.json'),
+  ).done(function (htmlResult, cssResult, knowledgeResult, manifestResult) {
+    let manifest = manifestResult[0];
+    let knowledge = knowledgeResult[0];
+    let html = htmlResult[0];
+    let css = cssResult[0];
+    options = {
+      ...options,
+      manifest,
+      knowledge,
+      html,
+      css
+    };
+    console.log('loaded data', options);
+    initEditor();
+  });
+})();
+
+function initEditor() {
+  document.title = options.id == 'new' ? "Create New Assistant" : "Operation Room";
+  document.getElementById('icon').src = "assistants/" + options.id + "/" + (options.manifest.icon || "icon.png");
+  editors.html.session.setValue(options.html);
+  editors.css.session.setValue(options.css);
+  editors.manifest.session.setValue(JSON.stringify(options.manifest, null, 2));
+  editors.knowledge.session.setValue(JSON.stringify(options.knowledge, null, 2));
+  document.getElementById('header-title').innerText = options.manifest.name || 'Anonymous';
+  document.getElementById('header-author').innerText = options.manifest.author || 'Anonymous';
+  console.log('check validity from: initEditor');
+  codeValidity();
+}
+
+window.onhashchange = onTabChange;
+
+function onTabChange() {
+  let tab = location.hash.substr(1) || 'manifest';
+  console.log('hash changed', tab);
+  document.querySelectorAll('[data-tab]').forEach(el => el.style.display = 'none');
+  document.querySelectorAll('[data-tab="' + tab + '"]').forEach(el => el.style.display = 'flex');
+  document.querySelectorAll('#header a').forEach(a => a.classList.remove('active'));
+  document.querySelector('#header a[href="#' + tab + '"]').classList.add('active');
+  // if (tab == 'code') {
+  //   document.querySelector('#json-success').style.display = 'none';
+  //   document.querySelector('#json-warning').style.display = 'none';
+  // }
+  console.log('check validity from: onTabChange');
+  codeValidity();
+  window.scrollTo(0, 0);
+}
+
+function finalizeScripts(cssID) {
+  let html = editors.html.session.getValue().replace(/id="([^"]+)"/, `id="${cssID}"`)
+  let css = editors.css.session.getValue()
+    .replace(/#([^"]+) {/, `#${cssID} {`)
+    .replace(/#([^"]+)\[/g, `#${cssID}\[`)
+    .replace(/#([^"]+)::/g, `#${cssID}::`)
+    .replace(/#([^"]+):/g, `#${cssID}:`)
+    .replace(/#([^"]+)\./g, `#${cssID}\.`)
+  return { html, css }
+}
+
+function isHTMLValid(html) {
+  var doc = document.createElement('div');
+  doc.innerHTML = html;
+  console.log('isHTMLValid', doc.innerHTML, doc.innerHTML === html, html);
+  return doc.innerHTML === html;
 }
 
 function isJSONValid(str) {
@@ -183,18 +237,20 @@ document.addEventListener('DOMContentLoaded', function () {
         console.log("success reading file", fileContent);
         let json = isJSONValid(fileContent);
         if (json) {
-          let final = finalizeScripts(json.manifest.id)
-          document.getElementById('manifest').value = JSON.stringify(json.manifest, null, 2);
-          document.getElementById('knowledge').value = JSON.stringify(json.knowledge, null, 2);
-          document.getElementById('html').value = final.html;
-          document.getElementById('css').value = final.css;
-          checkValidity();
+          options = {...json, ...finalizeScripts(json.manifest.id)}
+          editors.manifest.session.setValue(JSON.stringify(options.manifest, null, 2));
+          editors.knowledge.session.setValue(JSON.stringify(options.knowledge, null, 2));
+          setTimeout(() => {
+            editors.html.session.setValue(options.html);
+            editors.css.session.setValue(options.css);
+          }, 1000)
+          // codeValidity();
         } else {
-          alert("Cannot import: file content invalid!");
+          alert("Cannot import: invalid content!");
         }
       }
       reader.onerror = function (evt) {
-        console.log("error reading file");
+        console.log("error reading file", evt);
       }
     }
   }
@@ -205,16 +261,13 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelector('#file-import').click();
   }
   document.querySelector('#btn-export').onclick = () => {
-    let manifest = isJSONValid(document.getElementById('manifest').value);
-    let knowledge = isJSONValid(document.getElementById('knowledge').value);
-    let {html, css} = finalizeScripts(manifest.id + '' + new Date().getTime());
-  
+    let manifest = isJSONValid(editors.manifest.session.getValue());
+    let knowledge = isJSONValid(editors.knowledge.session.getValue());
     if (manifest && knowledge) {
       exportFile({
         manifest,
-        html,
-        css,
-        knowledge
+        knowledge,
+        ...finalizeScripts(manifest.id + '' + new Date().getTime())
       });
     } else {
       alert(`Please fix all the errors in order to export!`)
@@ -224,18 +277,14 @@ document.addEventListener('DOMContentLoaded', function () {
     let panel = e.target.closest(".panel");
     panel.setAttribute('data-view', e.target.getAttribute('data-view'));
   });
-  document.querySelectorAll('#manifest, #knowledge').forEach(el => {
-    el.addEventListener('input', checkValidity);
-  });
   document.querySelectorAll('#manifest-form input').forEach(el => {
     el.oninput = (e) => {
-      let json = document.getElementById('manifest').value;
-      let parsed = isJSONValid(json);
+      let parsed = isJSONValid(editors.manifest.session.getValue());
       if (parsed) {
         parsed[e.target.getAttribute('name')] = e.target.value;
         document.getElementById('manifest').value = JSON.stringify(parsed, null, 2);
       }
-      checkValidity();
+      codeValidity('manifest');
     };
   });
   onTabChange();

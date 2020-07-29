@@ -5,8 +5,8 @@ klik: *embarased
 alarm/timer:
 teriak pada jam .... (list jam & keterangan)
 
-"kamu punya 102 tab yang kebuka"
 
-scale size
 
-"content_security_policy": "script-src 'unsafe-inline' https://fonts.googleapis.com"
+
+"content_security_policy": "default-src 'self' fonts.googleapis.com"
+"content_security_policy": "font-src fonts.googleapis.com"

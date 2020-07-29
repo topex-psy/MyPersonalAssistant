@@ -42,5 +42,6 @@
         "js/helper.js"
       ]
     }
-  ]
+  ],
+  "content_security_policy": "script-src 'self' https://pagecdn.io; object-src 'self'"
 }

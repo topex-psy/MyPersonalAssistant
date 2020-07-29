@@ -5,6 +5,7 @@
   position: fixed;
   left: 50%;
   bottom: 0;
+  font-size: 0;
   z-index: 2147483647;
   transition: all .4s;
 }
@@ -78,7 +79,7 @@
   border-radius: 8px;
   font-weight: 600;
   font-size: 12px;
-  color: #71a3ff;
+  color: #71a3ff !important;
   text-decoration: none;
   transition: all .4s;
   white-space: nowrap;

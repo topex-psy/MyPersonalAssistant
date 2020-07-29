@@ -141,7 +141,7 @@ function setAssistant(options = {}) {
       myAssistant.el.removeAttribute("data-greeting");
     }, durationGreeting);
     requestAction('greeting');
-  }, 3000 * Math.random());
+  }, maxDelayGreeting * Math.random());
 
   sendUpdate({meta, dom, css});
   doTheThings();
@@ -160,7 +160,7 @@ function onClickAssistant() {
     myAssistant.el.setAttribute("data-attention", true);
     timeOutAttention = setTimeout(() => {
       myAssistant.el.removeAttribute("data-attention");
-    }, 3000);
+    }, durationAttention);
     requestAction('click');
   }
 }
@@ -172,6 +172,7 @@ function requestAction(action) {
     dismiss();
   } else {
     if (action == 'dismiss') doNothing();
+    if (action == 'lookup' && myAssistant.el.hasAttribute("data-greeting")) return;
     chrome.runtime.sendMessage({action: action}, function(response) {
       console.log(action + ' response', response);
     });
@@ -214,7 +215,7 @@ function setBalloon(message, options = {}) {
   clearTimeout(timeOutBalloon);
   timeOutBalloon = setTimeout(() => {
     closeBalloon();
-  }, duration || 5000);
+  }, duration || defaultBalloonDuration);
 }
 
 function setAction(action, options = {}, callback = function(){}) {
@@ -222,7 +223,7 @@ function setAction(action, options = {}, callback = function(){}) {
   doNothing();
 
   let previousActivity = myAssistant.state.activity;
-  let duration = options?.duration || (3000 + Math.random() * 5000);
+  let duration = options?.duration || getMinMax(durationActivityMin, durationActivityMax);
   let facing = options?.facing || null;
   console.log("change action from", previousActivity);
   console.log('now do', action, 'for', duration, 'ms');
@@ -311,7 +312,7 @@ function doRandomWalk() {
       let durationMin = +activity.durationMin;
       let durationMax = +activity.durationMax;
       if (durationMin && durationMax) {
-        duration = durationMin + Math.random() * (durationMax - durationMin);
+        duration = getMinMax(durationMin, durationMax);
       } else {
         duration = +activity.duration;
       }
@@ -357,7 +358,7 @@ function doNothing(callback = function(){}) {
 
 function setScale(scale = 1.0) {
   let {meta, options} = myAssistant;
-  div.firstElementChild.style.bottom = ((meta.knowledge.balloon_offset?.bottom || 150) * scale) + 'px';
+  div.firstElementChild.style.bottom = ((meta.knowledge.balloon_offset?.bottom || defaultBalloonOffsetBottom) * scale) + 'px';
   div.lastElementChild.style.transform = 'scale(' + scale + ')';
   options.scale = scale;
   sendUpdate({scale});
@@ -368,8 +369,8 @@ function alignBalloon() {
   let {meta, el} = myAssistant;
   let facing = el.getAttribute("data-facing") || 'left';
   let multip = facing == 'left' ? 1 : -1;
-  div.firstElementChild.style.marginLeft = ((meta.knowledge.balloon_offset?.left || 100) * multip) + 'px';
-  div.firstElementChild.style.marginRight = ((meta.knowledge.balloon_offset?.left || 100) * -multip) + 'px';
+  div.firstElementChild.style.marginLeft = ((meta.knowledge.balloon_offset?.left || defaultBalloonOffsetLeft) * multip) + 'px';
+  div.firstElementChild.style.marginRight = ((meta.knowledge.balloon_offset?.left || defaultBalloonOffsetLeft) * -multip) + 'px';
   div.classList.remove(facing == 'left' ? 'right' : 'left');
   div.classList.add(facing);
 }

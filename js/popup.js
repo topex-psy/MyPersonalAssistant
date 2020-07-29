@@ -82,7 +82,7 @@ function click(e) {
     let durationMin = +e.target.getAttribute("data-duration-min");
     let durationMax = +e.target.getAttribute("data-duration-max");
     if (durationMin && durationMax) {
-      duration = durationMin + Math.random() * (durationMax - durationMin);
+      duration = getMinMax(durationMin, durationMax);
     }
     duration = duration || (3000 + Math.random() * 5000);
     let options = {

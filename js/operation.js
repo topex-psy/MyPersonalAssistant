@@ -1,6 +1,11 @@
 var assistant;
 var options = {};
 
+// var exportExtension = 'txt';
+var exportExtension = 'json';
+// var exportMime = 'text/plain';
+var exportMime = 'application/json';
+
 (function() {
   console.log('location', location.href)
   assistant = new URL(location.href).searchParams.get("id") || 'new';
@@ -32,7 +37,8 @@ function initEditor() {
   document.querySelector('#panel-knowledge textarea').value = JSON.stringify(options.knowledge, null, 2);
   document.querySelector('#panel-manifest textarea').value = JSON.stringify(options.manifest, null, 2);
   document.title = assistant == 'new' ? "Create New Assistant" : "Operation Room";
-  checkJSONValidity();
+  console.log('check validity from: initEditor');
+  checkValidity();
 }
 
 window.onhashchange = onTabChange;
@@ -48,13 +54,30 @@ function onTabChange() {
     document.querySelector('#json-success').style.display = 'none';
     document.querySelector('#json-warning').style.display = 'none';
   } else {
-    checkJSONValidity();
+    console.log('check validity from: onTabChange');
+    checkValidity();
   }
   window.scrollTo(0, 0);
 }
 
-function checkJSONValidity() {
+function finalizeScripts(cssID) {
+  let inputHTML = document.getElementById('html');
+  let inputCSS = document.getElementById('css');
+  let html = inputHTML.value.replace(/id="([^"]+)"/, `id="${cssID}"`)
+  let css = inputCSS.value
+    .replace(/#([^"]+) {/, `#${cssID} {`)
+    .replace(/#([^"]+)\[/g, `#${cssID}\[`)
+    .replace(/#([^"]+)\./g, `#${cssID}\.`)
+  return { html, css }
+}
+
+function checkValidity() {
   let tab = location.hash.substr(1) || 'manifest';
+  console.log('checking validity .......', tab);
+  if (tab == 'code') {
+    // TODO html css code validation
+    return;
+  }
   let value = document.getElementById(tab).value;
   if (!value) {
     document.querySelector('#json-success').style.display = 'none';
@@ -69,6 +92,10 @@ function checkJSONValidity() {
       });
       let errors = []
       if (tab == 'manifest') {
+        let final = finalizeScripts(parsed.id);
+        document.getElementById('html').value = final.html;
+        document.getElementById('css').value = final.css;
+
         if (!parsed.id) errors.push('<code>id</code> property must be set!')
         else if (parsed.id.length < 4) errors.push('<code>id</code> property must contains at least 4 letters!')
         else if (!/^[a-z]+$/.test(parsed.id)) errors.push('<code>id</code> property must contains only lowercase letters without spaces, numbers, etc!')
@@ -109,7 +136,7 @@ function isJSONValid(str) {
 }
 
 function exportFile({manifest, html, css, knowledge}) {
-  var fileName = `${manifest.id}.txt`;
+  var fileName = `${manifest.id}.${exportExtension}`;
   var content = JSON.stringify({manifest, html, css, knowledge}, null, 2);
   var blob = writeBlob(content);
   var url = window.URL.createObjectURL(blob);
@@ -122,7 +149,7 @@ function exportFile({manifest, html, css, knowledge}) {
   window.URL.revokeObjectURL(url);
 }
 
-function writeBlob(content, type = 'text/plain') {
+function writeBlob(content, type = exportMime) {
   try {
     return new Blob([content], {type});
   } catch (e) {
@@ -152,10 +179,12 @@ document.addEventListener('DOMContentLoaded', function () {
         console.log("success reading file", fileContent);
         let json = isJSONValid(fileContent);
         if (json) {
+          let final = finalizeScripts(json.manifest.id)
           document.getElementById('manifest').value = JSON.stringify(json.manifest, null, 2);
-          document.getElementById('html').value = json.html;
-          document.getElementById('css').value = json.css;
           document.getElementById('knowledge').value = JSON.stringify(json.knowledge, null, 2);
+          document.getElementById('html').value = final.html;
+          document.getElementById('css').value = final.css;
+          checkValidity();
         } else {
           alert("Cannot import: file content invalid!");
         }
@@ -174,8 +203,8 @@ document.addEventListener('DOMContentLoaded', function () {
   document.querySelector('#btn-export').onclick = () => {
     let manifest = isJSONValid(document.getElementById('manifest').value);
     let knowledge = isJSONValid(document.getElementById('knowledge').value);
-    let html = document.getElementById('html').value;
-    let css = document.getElementById('css').value;
+    let {html, css} = finalizeScripts(manifest.id + '' + new Date().getTime());
+  
     if (manifest && knowledge) {
       exportFile({
         manifest,
@@ -192,7 +221,7 @@ document.addEventListener('DOMContentLoaded', function () {
     panel.setAttribute('data-view', e.target.getAttribute('data-view'));
   });
   document.querySelectorAll('#manifest, #knowledge').forEach(el => {
-    el.addEventListener('input', checkJSONValidity);
+    el.addEventListener('input', checkValidity);
   });
   document.querySelectorAll('#manifest-form input').forEach(el => {
     el.oninput = (e) => {
@@ -202,7 +231,7 @@ document.addEventListener('DOMContentLoaded', function () {
         parsed[e.target.getAttribute('name')] = e.target.value;
         document.getElementById('manifest').value = JSON.stringify(parsed, null, 2);
       }
-      checkJSONValidity();
+      checkValidity();
     };
   });
   onTabChange();

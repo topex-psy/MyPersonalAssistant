@@ -1,8 +1,8 @@
 {
   "maximum_options": 5,
   "balloon_offset": {
-    "bottom": 200,
-    "left": 120
+    "bottom": 150,
+    "left": 100
   },
   "responses": [],
   "to_lookup": [

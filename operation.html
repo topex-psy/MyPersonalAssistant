@@ -237,6 +237,9 @@
       box-shadow: 1px 1px 4px -2px rgba(0,0,0,.3);
       padding: .5rem 1rem;
     }
+    .no-padding {
+      padding: 0 !important;
+    }
     @media only screen and (max-width: 825px) {
       #header h1 {
         display: none;
@@ -394,23 +397,30 @@
               <tr><td><code>[data-attention="true"]</code></td><td>Filled with "true" or removed which indicates whether this assistant is talking or not.</td></tr>
             </tbody>
           </table>
-          <p>If you're using image files, host them to fast web hosting service of your own. Use <code>https</code>!</p>
-          <strong>
-            Don't use javascript!
-          </strong>
+          <div class="caption no-padding">
+            <p>If you're using image files, host them to fast web hosting service of your own. Use <code>https</code>!</p>
+            <p class="warning">
+              <strong>
+                Don't use javascript!
+              </strong>
+            </p>
+          </div>
         </div>
         <div id="content-knowledge" data-tab="knowledge">
           <h3>Parent</h3>
           <table>
             <tbody>
               <tr><td><code>responses</code></td><td>List of default feedbacks in all circumstances, unless replaced by <code>responses</code> later in the child knowledge.</td></tr>
-              <tr><td><code>answers</code></td><td>List of default answers that will trigger another response in all circumstances, unless replaced by <code>answers</code> later in the child knowledge.</td></tr>
-              <tr><td><code>dismiss</code></td><td>List of default answers that will only dismiss the talk balloon in all circumstances, unless replaced by <code>dismiss</code> later in the child knowledge.</td></tr>
-              <tr><td><code>dispels</code></td><td>List of default answers that will dismissing this assistant in all circumstances, unless replaced by <code>dispels</code> later in the child knowledge.</td></tr>
-              <tr><td><code>click</code></td><td>When this assistant clicked, containing list of <code>responses</code> and <code>answers</code> or <code>add_answers</code> which used to trigger the lookup for current opened URL.</td></tr>
+              <tr><td><code>to_lookup</code></td><td>List of default answers that will trigger another response in all circumstances, unless replaced by <code>to_lookup</code> later in the child knowledge.</td></tr>
+              <tr><td><code>to_shutup</code></td><td>List of default answers that will only dismiss the talk balloon in all circumstances, unless replaced by <code>to_shutup</code> later in the child knowledge.</td></tr>
+              <tr><td><code>to_dismiss</code></td><td>List of default answers that will dismissing this assistant in all circumstances, unless replaced by <code>to_dismiss</code> later in the child knowledge.</td></tr>
+              <tr><td><code>greet</code></td><td>When this assistant greets you, containing list of <code>responses</code> and <code>to_shutup</code> or <code>to_shutup_add</code> which used to dismiss the talk balloon.</td></tr>
+              <tr><td><code>dismiss</code></td><td>When this assistant about to be dismissed, containing list of <code>responses</code>, <code>to_dispel</code> to confirm, and <code>to_shutup</code> or <code>to_shutup_add</code> to cancel the dismission.</td></tr>
+              <tr><td><code>click</code></td><td>When this assistant clicked, containing list of <code>responses</code> and <code>to_lookup</code> or <code>to_lookup_add</code> which used to trigger the lookup for current opened URL.</td></tr>
+              <tr><td><code>count</code></td><td>When this assistant count your opened tabs, containing list of <code>responses</code> that's divided into <code>less</code> and <code>many</code> (if more than 25 tabs opened) and <code>to_shutup</code> or <code>to_shutup_add</code>.</td></tr>
               <tr><td><code>hosts</code></td><td>When this assistant activated or looking into your opened URL, it'll say anything about that based on knowledge defined here.</td></tr>
               <tr><td><code>hosts_unknown</code></td><td>If cannot find any match in the <code>hosts</code> knowledge, it'll become the fallback.</td></tr>
-              <tr><td><code>maximum_options</code></td><td>Determine how much answers options available to respond to this assistant talking, can be between 1 and 3, the default is 2.</td></tr>
+              <tr><td><code>maximum_options</code></td><td>Determine how much answers options available to respond to this assistant talking, minimum is 1 and the default is 2.</td></tr>
               <tr><td><code>balloon_offset</code></td><td>Set the <code>bottom</code> and <code>left</code> value to customize the position of dialog balloon.</td></tr>
             </tbody>
           </table>
@@ -418,13 +428,14 @@
           <table>
             <tbody>
               <tr><td><code>responses</code></td><td>This will replaces <code>responses</code> that have been defined in the parent. (See above)</td></tr>
-              <tr><td><code>answers</code></td><td>This will replaces <code>answers</code> that have been defined in the parent. (See above)</td></tr>
-              <tr><td><code>dismiss</code></td><td>This will replaces <code>dismiss</code> that have been defined in the parent. (See above)</td></tr>
-              <tr><td><code>dispels</code></td><td>This will replaces <code>dispels</code> that have been defined in the parent. (See above)</td></tr>
-              <tr><td><code>add_responses</code></td><td>This will concatenates with the <code>responses</code> that have been defined in the parent. (See above)</td></tr>
-              <tr><td><code>add_answers</code></td><td>This will concatenates with the <code>answers</code> that have been defined in the parent. (See above)</td></tr>
-              <tr><td><code>add_dismiss</code></td><td>This will concatenates with the <code>dismiss</code> that have been defined in the parent. (See above)</td></tr>
-              <tr><td><code>add_dispels</code></td><td>This will concatenates with the <code>dispels</code> that have been defined in the parent. (See above)</td></tr>
+              <tr><td><code>to_lookup</code></td><td>This will replaces <code>to_lookup</code> that have been defined in the parent. (See above)</td></tr>
+              <tr><td><code>to_shutup</code></td><td>This will replaces <code>to_shutup</code> that have been defined in the parent. (See above)</td></tr>
+              <tr><td><code>to_dismiss</code></td><td>This will replaces <code>to_dismiss</code> that have been defined in the parent. (See above)</td></tr>
+              <tr><td><code>to_dispel</code></td><td>This will dismiss the assistant from all tabs. Can only be used in the <code>dismiss</code>.</td></tr>
+              <tr><td><code>responses_add</code></td><td>This will concatenates with the <code>responses</code> that have been defined in the parent. (See above)</td></tr>
+              <tr><td><code>to_lookup_add</code></td><td>This will concatenates with the <code>to_lookup</code> that have been defined in the parent. (See above)</td></tr>
+              <tr><td><code>to_shutup_add</code></td><td>This will concatenates with the <code>to_shutup</code> that have been defined in the parent. (See above)</td></tr>
+              <tr><td><code>to_dismiss_add</code></td><td>This will concatenates with the <code>to_dismiss</code> that have been defined in the parent. (See above)</td></tr>
               <tr><td><code>keyword</code></td><td>Child of <code>hosts</code> that is portion of website URL to match the knowledge, usually the hostname.</td></tr>
               <tr><td><code>specifics</code></td><td>Child of <code>hosts</code> that is another portion of website URL to match the knowledge in order to make more specific feedbacks.</td></tr>
               <tr><td><code>title_remove</code></td><td>Child of <code>hosts</code> that is part of the website title that is not needed to say.</td></tr>
@@ -435,6 +446,7 @@
             <tbody>
               <tr><td><code>[name]</code></td><td>This will be replaced with the name of this assistant e.g. "Hello, my name is [name]!"</td></tr>
               <tr><td><code>[title]</code></td><td>This will be replaced with website title or portion of it if you defined <code>title_remove</code> e.g. "I've watched [title] and it's good!"</td></tr>
+              <tr><td><code>[count]</code></td><td>This will be replaced with the count of your opened tabs. This can only be used in <code>responses</code> of <code>count</code></td></tr>
             </tbody>
           </table>
         </div>
@@ -486,7 +498,10 @@
 }
 #doggo[data-activity="poop"] {
 }</code>
-              <p>Note that <code>[data-activity="walk"]</code> is mandatory as it's a default preserved Activity ID. Any other IDs defined in <a href="#manifest">Manifest</a> must be set in your CSS respectively.</p>
+              <div class="caption no-padding">
+                <p>Note that <code>[data-activity="walk"]</code> is mandatory as it's a default preserved Activity ID. That's used to trigger the walking motion of this assistant, but just stay in place, don't make them move!</p>
+                <p>Any other IDs defined in <a href="#manifest">Manifest</a> must be set in your CSS respectively.</p>
+              </div>
             </div>
           </div>
         </div>

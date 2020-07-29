@@ -1,10 +1,14 @@
 {
-  "maximum_options": 2,
+  "maximum_options": 5,
+  "balloon_offset": {
+    "bottom": 200,
+    "left": 120
+  },
   "responses": [],
-  "answers": [
+  "to_lookup": [
     "Masa sih?"
   ],
-  "dismiss": [
+  "to_shutup": [
     "Oke",
     "Ya tau",
     "Iyain aja deh",
@@ -12,20 +16,60 @@
     "Ya emang",
     "Pfffft"
   ],
-  "dispels": [
+  "to_dismiss": [
     "Pergi sana",
     "Kamu saya usir"
   ],
+  "greet": {
+    "responses": [
+      "Halo, aku [name]. Yoroshiku ne~",
+      "Halo, [name] di sini!"
+    ],
+    "to_shutup_add": [
+      "Yoroshiku~",
+      "Salam kenal",
+      "Iya, mohon bantuannya",
+      "Mohon kerjasamanya"
+    ]
+  },
+  "dismiss": {
+    "responses": [
+      "Yakin nih ga mau ditemenin?",
+      "Yakin ga mau ditemenin sama [name]?"
+    ],
+    "to_dispel": [
+      "Yakin",
+      "Ya, sana pergi"
+    ],
+    "to_shutup": [
+      "Ga jadi"
+    ]
+  },
   "click": {
     "responses": [
-      "Halo, aku [name] :3",
+      "Ada apa?",
       "Apaan sih pegang-pegang",
       "Lapeeeeeer ....",
       "Hey ..."
     ],
-    "answers": [
+    "to_lookup": [
       "Eh, gimana menurutmu?",
       "Menurutmu ini gimana?"
+    ]
+  },
+  "count": {
+    "responses": {
+      "less": [
+        "Cuma ada [count] tab bro"
+      ],
+      "many": [
+        "Njir [count] tab!",
+        "Buset gan masa buka [count] tab!",
+        "Banyak amat sampe [count] tab!"
+      ]
+    },
+    "to_shutup_add": [
+      "Oke, thanks"
     ]
   },
   "hosts": [
@@ -44,9 +88,26 @@
       "specifics": [
         {
           "keyword": "/channels/",
-          "add_responses": [
+          "responses_add": [
             "[name] mau dong join ke channelnya",
             "Invite [name] dong ke channelnya"
+          ]
+        }
+      ]
+    },
+    {
+      "keyword": "tokopedia.com",
+      "responses": [
+        "Cieee, belanja~",
+        "Cieee, baru gajian nih kayaknya :3",
+        "Selamat datang di toko kami, selamat belanja!",
+        "Beliin aku dong~ :3"
+      ],
+      "specifics": [
+        {
+          "keyword": "tab=wishlist",
+          "responses_add": [
+            "Wishlist mulu, kapan dibelinya?"
           ]
         }
       ]
@@ -64,11 +125,7 @@
       "responses": [
         "Facebook terooos!",
         "Timelinemu varokah sekali",
-        "Sekrol-sekrol terooos!",
-        "Apa yang kamu pikirkan?",
-        "Apa-apa dijadiin status",
-        "Block aja tuh si itu ...",
-        "Hati-hati berita hoax gan"
+        "Sekrol-sekrol terooos!"
       ]
     },
     {
@@ -82,20 +139,11 @@
     {
       "keyword": "stackoverflow.com",
       "responses": [
+        "Tinggal copas aja gan!",
         "Wah, moga bugnya cepet solve!",
         "Ada bug apa lagi, bro?"
       ],
-      "title_remove": " - Stack Overflow",
-      "specifics": [
-        {
-          "keyword": "/questions/",
-          "add_responses": [
-            "Tinggal copas aja gan!",
-            "Ah masa ini aja ga tau ...",
-            "Ah gampang ini, masa ga bisa?"
-          ]
-        }
-      ]
+      "title_remove": " - Stack Overflow"
     },
     {
       "keyword": "youtube.com",
@@ -107,7 +155,7 @@
       "specifics": [
         {
           "keyword": "/watch?v=",
-          "add_responses": [
+          "responses_add": [
             "Kayaknya kita udah nonton yang ini deh ...",
             "Njir, baru nonton sekarang, wkwkwk",
             "[title]? Seriusan?"
@@ -120,18 +168,18 @@
       "responses": [
         "Hentong teroooss!"
       ],
-      "add_answers": [
+      "to_lookup_add": [
         "Ssssssst!",
         "Jangan bilang emak ya"
       ],
-      "add_dispels": [
+      "to_dismiss_add": [
         "Kamu nutupin gambar"
       ],
       "title_remove": " - pixiv",
       "specifics": [
         {
           "keyword": "?illust_id=",
-          "add_responses": [
+          "responses_add": [
             "Eaa, gambarnya mantap-mantap!",
             "Duh, gak ngotak, sikat gan!",
             "Yamette kudasai~"
@@ -156,7 +204,7 @@
             "Anime jelek nih!",
             "Ini bagus gak? Aku belum nonton"
           ],
-          "add_answers": [
+          "to_lookup_add": [
             "Entahlah",
             "Sorry lupa",
             "Belum nonton, gak tau",
@@ -167,8 +215,9 @@
     }
   ],
   "hosts_unknown": {
-    "add_responses": [
-      "Ini situs apa ya? Saya gak tau"
+    "responses_add": [
+      "Ini situs apa ya? Saya gak tau",
+      "Kenapa aku ada di sini? XD"
     ]
   }
 }

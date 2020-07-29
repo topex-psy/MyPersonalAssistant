@@ -36,13 +36,12 @@ function bindListeners() {
   chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     console.log("on action", request, sender);
     let {action, update} = request;
-    if (action == 'lookup') {
-      if (sender.tab.selected) lookup();
-    }
+    if (action == 'lookup' && sender.tab.selected) lookup();
+    else if (action == 'click') click();
     else if (action == 'count') count();
-    else if (action == 'operation') {
-      chrome.tabs.create({active: true, url: chrome.runtime.getURL("operation.html?id=" + assistant.meta.id)});
-    }
+    else if (action == 'greeting') greeting();
+    else if (action == 'dismiss') dismiss();
+    else if (action == 'operation') chrome.tabs.create({active: true, url: chrome.runtime.getURL("operation.html?id=" + assistant.meta.id)});
     else if (action == 'update') {
       if (update.hasOwnProperty('activity')) assistant.activity = update.activity;
       if (update.hasOwnProperty('scale')) assistant.scale = update.scale;
@@ -137,8 +136,7 @@ function analizeTab(tab) {
         console.log('=> data meta', property, content);
       });
     } catch(e) {
-      alert(e.message);
-      return;
+      console.log('=> obtain meta failed', e);
     }
   });
 
@@ -150,16 +148,16 @@ function analizeTab(tab) {
   if (hosts.length) {
     let host = hosts[0];
     item_title = title.replace(host.title_remove, '');
-    possibleResponses = host.responses || arrayCombine(possibleResponses, host.add_responses);
+    possibleResponses = host.responses || arrayCombine(possibleResponses, host.responses_add);
     if (host.specifics) {
       let specifics = host.specifics.filter(specific => url.includes(specific.keyword));
       if (specifics.length) {
         let specific = specifics[0];
-        possibleResponses = specific.responses || arrayCombine(possibleResponses, specific.add_responses);
+        possibleResponses = specific.responses || arrayCombine(possibleResponses, specific.responses_add);
       }
     }
   } else {
-    possibleResponses = meta.knowledge.hosts_unknown.responses || arrayCombine(possibleResponses, meta.knowledge.hosts_unknown.add_responses);
+    possibleResponses = meta.knowledge.hosts_unknown.responses || arrayCombine(possibleResponses, meta.knowledge.hosts_unknown.responses_add);
   }
 
   // process raw message
@@ -171,31 +169,10 @@ function analizeTab(tab) {
   sendBalloon(message, {
     duration: 5000,
     replies: getRandomFrom([
-      {
-        action: 'lookup',
-        title: getRandomFrom(
-          meta.knowledge.click.answers
-          ? arrayCombine(meta.knowledge.click.answers, meta.knowledge.click.add_answers)
-          : arrayCombine(meta.knowledge.answers, meta.knowledge.add_answers, meta.knowledge.click.add_answers)
-        ),
-      },
-      {
-        action: 'dismiss',
-        title: getRandomFrom(
-          meta.knowledge.click.dispels
-          ? arrayCombine(meta.knowledge.click.dispels, meta.knowledge.click.add_dispels)
-          : arrayCombine(meta.knowledge.dispels, meta.knowledge.add_dispels, meta.knowledge.click.add_dispels)
-        ),
-      },
-      {
-        action: 'shutup',
-        title: getRandomFrom(
-          meta.knowledge.click.dismiss
-          ? arrayCombine(meta.knowledge.click.dismiss, meta.knowledge.click.add_dismiss)
-          : arrayCombine(meta.knowledge.dismiss, meta.knowledge.add_dismiss, meta.knowledge.click.add_dismiss)
-        ),
-      },
-    ], meta.knowledge.maximum_options || 2),
+      generateAnswer('click', 'lookup'),
+      generateAnswer('click', 'dismiss'),
+      generateAnswer('click', 'shutup'),
+    ], getMaxOptions()),
   });
 }
 
@@ -209,30 +186,118 @@ function sendBalloon(message, options = {}) {
   });
 }
 
+function click() {
+  let { meta } = assistant;
+  if (Math.random() > .5) {
+    let possibleResponses = meta.knowledge.click.responses;
+    let message = getRandomFrom(possibleResponses);
+    message = message.replace('[name]', meta.name);
+    sendBalloon(message, {
+      duration: 8000,
+      replies: [
+        generateAnswer('click', 'lookup'),
+        generateAnswer('click', 'dismiss'),
+      ],
+    });
+  } else {
+    lookup();
+  }
+}
+
+function generateAnswer(type = 'click', action = 'lookup', qty = 1) {
+  let { knowledge } = assistant.meta;
+  let title = action;
+  switch (action) {
+    case 'lookup':
+      title = getRandomFrom(
+        knowledge[type]?.to_lookup
+        ? arrayCombine(knowledge[type]?.to_lookup, knowledge[type]?.to_lookup_add)
+        : arrayCombine(knowledge.to_lookup, knowledge.to_lookup_add, knowledge[type]?.to_lookup_add)
+        , qty);
+      break;
+    case 'dismiss':
+      title = getRandomFrom(
+        knowledge[type]?.to_dismiss
+        ? arrayCombine(knowledge[type]?.to_dismiss, knowledge[type]?.to_dismiss_add)
+        : arrayCombine(knowledge.to_dismiss, knowledge.to_dismiss_add, knowledge[type]?.to_dismiss_add)
+        , qty);
+      break;
+    case 'shutup':
+      title = getRandomFrom(
+        knowledge[type]?.to_shutup
+        ? arrayCombine(knowledge[type]?.to_shutup, knowledge[type]?.to_shutup_add)
+        : arrayCombine(knowledge.to_shutup, knowledge.to_shutup_add, knowledge[type]?.to_shutup_add)
+        , qty);
+      break;
+    case 'dispel':
+      title = getRandomFrom(
+        knowledge[type]?.to_dispel
+        ? arrayCombine(knowledge[type]?.to_dispel, knowledge[type]?.to_dispel_add)
+        : arrayCombine(knowledge.to_dispel, knowledge.to_dispel_add, knowledge[type]?.to_dispel_add)
+        , qty);
+      break;
+  }
+  return typeof title === 'string' ? { action, title } : title;
+}
+
+function getMaxOptions() {
+  return assistant.meta.knowledge.maximum_options || 2;
+}
+
 function count() {
   console.log("count opened tabs ...");
+  let { meta } = assistant;
   chrome.tabs.query({currentWindow: true, windowType: 'normal'}, function(tabs) {
     console.log("tabs in current window", tabs.length);
-    let arr = [];
-    if (tabs.length > 25) {
-      arr.push(
-        'Njir ' + tabs.length + ' tab!',
-        'Buset gan masa buka ' + tabs.length + ' tab!',
-        'Banyak amat sampe ' + tabs.length + ' tab!'
-      );
-    } else {
-      arr.push(
-        'Ada ' + tabs.length + ' tab yang kebuka',
-      );
-    }
-    sendBalloon(getRandomFrom(arr), {
+    let responses = meta.knowledge.count?.responses;
+    let arr = tabs.length > 25 ? responses?.many : responses?.less;
+    let message = arr?.length ? getRandomFrom(arr) : 'You have [count] opened tabs in current window';
+    let replies = generateAnswer('count', 'shutup', getMaxOptions()).map(title => {
+      return { action: 'shutup', title }
+    });
+    sendBalloon(message.replace('[count]', tabs.length), {
       duration: 5000,
-      replies: [
-        {title: 'Oke, thanks', action: 'shutup'},
-      ],
+      replies
     });
   });
 }
+
+function greeting() {
+  console.log("greeting ...");
+  let { meta } = assistant;
+  let possibleResponses = meta.knowledge.greet?.responses;
+  if (possibleResponses && possibleResponses.length) {
+    let message = getRandomFrom(possibleResponses).replace('[name]', meta.name);
+    let replies = generateAnswer('greet', 'shutup', getMaxOptions()).map(title => {
+      return { action: 'shutup', title }
+    });
+    sendBalloon(message, {
+      duration: 8000,
+      replies
+    });
+  } else {
+    lookup();
+  }
+}
+
+function dismiss() {
+  console.log("dismiss ...");
+  let { meta } = assistant;
+  let possibleResponses = meta.knowledge.dismiss?.responses;
+  if (possibleResponses && possibleResponses.length) {
+    let message = getRandomFrom(possibleResponses).replace('[name]', meta.name);
+    sendBalloon(message, {
+      duration: 10000,
+      replies: [
+        generateAnswer('dismiss', 'dispel'),
+        generateAnswer('dismiss', 'shutup'),
+      ],
+    });
+  } else {
+    lookup();
+  }
+}
+
 function lookup() {
   console.log("lookup ...");
   chrome.tabs.getSelected(null, function(tab) {

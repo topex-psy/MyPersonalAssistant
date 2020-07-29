@@ -154,74 +154,17 @@ function onClickAssistant() {
     timeOutAttention = setTimeout(() => {
       myAssistant.el.removeAttribute("data-attention");
     }, 3000);
-    if (Math.random() > .5) {
-      let possibleResponses = meta.knowledge.click.responses;
-      let message = getRandomFrom(possibleResponses);
-      message = message.replace('[name]', myAssistant.meta.name);
-      setBalloon(message, {
-        duration: 8000,
-        replies: [
-          {
-            action: 'lookup',
-            title: getRandomFrom(
-              meta.knowledge.click.answers
-              ? arrayCombine(meta.knowledge.click.answers, meta.knowledge.click.add_answers)
-              : arrayCombine(meta.knowledge.answers, meta.knowledge.add_answers, meta.knowledge.click.add_answers)
-            ),
-          },
-          {
-            action: 'dismiss',
-            title: getRandomFrom(
-              meta.knowledge.click.dispels
-              ? arrayCombine(meta.knowledge.click.dispels, meta.knowledge.click.add_dispels)
-              : arrayCombine(meta.knowledge.dispels, meta.knowledge.add_dispels, meta.knowledge.click.add_dispels)
-            ),
-          },
-        ],
-      });
-    } else {
-      requestAction('lookup');
-    }
+    requestAction('click');
   }
 }
 
 function requestAction(action) {
-  if (action == 'greeting') {
-    let { meta } = myAssistant;
-    let possibleResponses = meta.knowledge.greet?.responses;
-    if (possibleResponses && possibleResponses.length) {
-      let message = getRandomFrom(possibleResponses).replace('[name]', myAssistant.meta.name);
-      let answers = getRandomFrom(
-        meta.knowledge.greet.dismiss
-        ? arrayCombine(meta.knowledge.greet.dismiss, meta.knowledge.greet.add_dismiss)
-        : arrayCombine(meta.knowledge.dismiss, meta.knowledge.add_dismiss, meta.knowledge.greet.add_dismiss)
-      , 2);
-      setBalloon(message, {
-        duration: 8000,
-        replies: answers.map(answer => {
-          return {
-            action: 'shutup',
-            title: answer,
-          }
-        })
-      });
-    } else {
-      requestAction('lookup');
-    }
-  } else if (action == 'shutup') {
+  if (action == 'shutup') {
     closeBalloon(true);
-  } else if (action == 'dismiss') {
-    doNothing();
-    setBalloon('Yakin ga mau ditemenin?', {
-      duration: 10000,
-      replies: [
-        {title: getRandomFrom(['Yakin']), action: 'dismiss_for_real'},
-        {title: getRandomFrom(['Ga jadi']), action: 'shutup'},
-      ],
-    });
-  } else if (action == 'dismiss_for_real') {
+  } else if (action == 'dispel') {
     dismiss();
   } else {
+    if (action == 'dismiss') doNothing();
     chrome.runtime.sendMessage({action: action}, function(response) {
       console.log(action + ' response', response);
     });
@@ -291,6 +234,7 @@ function setAction(action, options = {}, callback = function(){}) {
 }
 
 function setDataAttributes() {
+  if (!myAssistant.el) return;
   let {el, state} = myAssistant;
   let {activity, facing} = state;
   if (activity) {
@@ -389,30 +333,32 @@ function doTheThings() {
 function doNothing(callback = function(){}) {
   let previousActivity = myAssistant.state.activity;
   console.log("idle from", previousActivity);
-  myAssistant.state.activity = null;
-  myAssistant.state.facing = null;
-  setDataAttributes();
   clearTimeout(timeOutAction);
   clearTimeout(timeOutAttention);
   clearInterval(intervalWalk);
+  myAssistant.state.activity = null;
+  myAssistant.state.facing = null;
+  setDataAttributes();
   sendUpdate({activity: null});
   alignBalloon();
   callback();
 }
 
 function setScale(scale = 1.0) {
-  div.firstElementChild.style.bottom = ((myAssistant.meta.knowledge.balloon_offset?.bottom || 150) * scale) + 'px';
+  let {meta, options} = myAssistant;
+  div.firstElementChild.style.bottom = ((meta.knowledge.balloon_offset?.bottom || 150) * scale) + 'px';
   div.lastElementChild.style.transform = 'scale(' + scale + ')';
-  myAssistant.options.scale = scale;
+  options.scale = scale;
   sendUpdate({scale});
   alignBalloon();
 }
 
 function alignBalloon() {
-  let facing = myAssistant.el.getAttribute("data-facing") || 'left';
+  let {meta, el} = myAssistant;
+  let facing = el.getAttribute("data-facing") || 'left';
   let multip = facing == 'left' ? 1 : -1;
-  div.firstElementChild.style.marginLeft = ((myAssistant.meta.knowledge.balloon_offset?.left || 100) * multip) + 'px';
-  div.firstElementChild.style.marginRight = ((myAssistant.meta.knowledge.balloon_offset?.left || 100) * -multip) + 'px';
+  div.firstElementChild.style.marginLeft = ((meta.knowledge.balloon_offset?.left || 100) * multip) + 'px';
+  div.firstElementChild.style.marginRight = ((meta.knowledge.balloon_offset?.left || 100) * -multip) + 'px';
   div.classList.remove(facing == 'left' ? 'right' : 'left');
   div.classList.add(facing);
 }

@@ -108,10 +108,43 @@ function isJSONValid(str) {
   return parsed;
 }
 
+function exportFile({manifest}) {
+  var fileName = `${manifest.id}.txt`;
+  var content = JSON.stringify(manifest, null, 2);
+  var blob = writeBlob(content);
+  var url = window.URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.style.display = 'none';
+  a.href = url;
+  a.download = fileName;
+  document.body.append(a);
+  a.click();
+  window.URL.revokeObjectURL(url);
+}
+
+function writeBlob(content, type = 'text/plain') {
+  try {
+    return new Blob([content], {type});
+  } catch (e) {
+    var BlobBuilder = window.WebKitBlobBuilder || window.MozBlobBuilder || window.BlobBuilder || window.OperaBlobBuilder;
+    var bb = new BlobBuilder();
+    bb.append(content);
+    return bb.getBlob(type);
+  }
+}
+
 document.addEventListener('DOMContentLoaded', function () {
   document.querySelector('#btn-close').onclick = () => {
-    // TODO confirm dulu
-    window.close();
+    if (confirm(`Are you sure you're done here?`)) window.close();
+  }
+  document.querySelector('#btn-import').onclick = () => {
+    let manifestRaw = document.getElementById('manifest').value;
+    let manifest = isJSONValid(manifestRaw);
+    if (manifest) {
+      exportFile({
+        manifest
+      });
+    }
   }
   document.querySelectorAll('.panel-header ul li a').forEach(el => el.onclick = (e) => {
     let panel = e.target.closest(".panel");

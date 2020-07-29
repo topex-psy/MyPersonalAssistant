@@ -31,12 +31,14 @@ var exportMime = 'application/json';
 })();
 
 function initEditor() {
-  document.querySelector('#icon').src = "assistants/" + assistant + "/" + (options.manifest.icon || "icon.png");
-  document.querySelector('#panel-html textarea').value = options.dom;
-  document.querySelector('#panel-css textarea').value = options.css;
-  document.querySelector('#panel-knowledge textarea').value = JSON.stringify(options.knowledge, null, 2);
-  document.querySelector('#panel-manifest textarea').value = JSON.stringify(options.manifest, null, 2);
   document.title = assistant == 'new' ? "Create New Assistant" : "Operation Room";
+  document.getElementById('icon').src = "assistants/" + assistant + "/" + (options.manifest.icon || "icon.png");
+  document.getElementById('html').value = options.dom;
+  document.getElementById('css').value = options.css;
+  document.getElementById('knowledge').value = JSON.stringify(options.knowledge, null, 2);
+  document.getElementById('manifest').value = JSON.stringify(options.manifest, null, 2);
+  document.getElementById('header-title').innerText = options.manifest.name || 'Anonymous';
+  document.getElementById('header-author').innerText = options.manifest.author || 'Anonymous';
   console.log('check validity from: initEditor');
   checkValidity();
 }
@@ -95,6 +97,8 @@ function checkValidity() {
         let final = finalizeScripts(parsed.id);
         document.getElementById('html').value = final.html;
         document.getElementById('css').value = final.css;
+        document.getElementById('header-title').innerText = parsed.name || 'Anonymous';
+        document.getElementById('header-author').innerText = parsed.author || 'Anonymous';
 
         if (!parsed.id) errors.push('<code>id</code> property must be set!')
         else if (parsed.id.length < 4) errors.push('<code>id</code> property must contains at least 4 letters!')

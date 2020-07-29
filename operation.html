@@ -24,7 +24,11 @@
       flex-direction: row;
       align-items: center;
       justify-content: space-between;
-      min-height: 60px;
+      min-height: 69px;
+    }
+    #header h1 {
+      margin-bottom: .25rem;
+      margin-top: .5rem;
     }
     #header a {
       border-radius: 2rem;
@@ -274,7 +278,7 @@
       padding: 0 !important;
     }
     @media only screen and (max-width: 991px) {
-      #header h1 {
+      #header-wrapper {
         display: none;
       }
     }
@@ -293,9 +297,14 @@
   </head>
   <body>
     <div id="header">
-      <h1>
-        Operation Room
-      </h1>
+      <div id="header-wrapper">
+        <h1 id="header-title">
+          Operation Room
+        </h1>
+        <small>
+          by <span id="header-author"></span>
+        </small>
+      </div>
       <div>
         <a href="#manifest" class="active">Identity</a>
         <a href="#code">Body</a>
@@ -438,6 +447,7 @@
               <tr><td><code>[data-facing="('left' or 'right')"]</code></td><td>Filled with "left", "right", or removed which indicates where this assistant heading.</td></tr>
               <tr><td><code>[data-talking="true"]</code></td><td>Filled with "true" or removed which indicates whether this assistant is talking or not.</td></tr>
               <tr><td><code>[data-attention="true"]</code></td><td>Filled with "true" or removed which indicates whether this assistant is talking or not.</td></tr>
+              <tr><td><code>[data-greeting="true"]</code></td><td>Filled with "true" or removed which indicates whether this assistant is introducing themself or not. Usually once when this assistant is summoned.</td></tr>
             </tbody>
           </table>
           <div class="caption no-padding">
@@ -550,6 +560,6 @@
         </div>
       </div>
     </div>
-    <input type="file" id="file-import"/>
+    <input type="file" id="file-import" accept="application/JSON"/>
   </body>
 </html>

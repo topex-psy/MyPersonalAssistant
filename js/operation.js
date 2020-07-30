@@ -106,6 +106,7 @@ function codeValidity(key = null) {
   
         if (!parsed.id) errors.push('<code>id</code> property must be set!')
         else if (parsed.id.length < 4) errors.push('<code>id</code> property must contains at least 4 letters!')
+        else if (parsed.id.length > 50) errors.push('<code>id</code> property must not longer than 50 letters!')
         else if (!/^[a-z]+$/.test(parsed.id)) errors.push('<code>id</code> property must contains only lowercase letters without spaces, numbers, etc!')
         if (!parsed.name) errors.push('<code>name</code> property must be set!')
         if (!parsed.author) errors.push('<code>author</code> property must be set!')

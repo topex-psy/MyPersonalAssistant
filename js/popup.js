@@ -1,20 +1,41 @@
 'use strict';
 
-(function() {
-  chrome.storage.local.get('list_assistant', function(data) {
-    console.log('loaded assistant list', data);
-    let {list_assistant} = data;
-    let ul = document.querySelector('.assistant-list');
-    let li_new = document.querySelector('li[data-assistant="new"]');
-    if (list_assistant?.length) list_assistant.forEach(assistant => {
+var isLoading = true;
+
+chrome.storage.local.get('list_assistant', function(data) {
+  console.log('loaded assistant list', data);
+  let list_assistant = arrayCombine(data.list_assistant, defaultAssistants);
+  $.get(baseUrl + 'assistants/get.php?ids=' + list_assistant.join(), function(result) {
+    let ul = document.querySelector('ul.assistant-list');
+    let list = JSON.parse(result) || [];
+    console.log("list result", list);
+    ul.querySelectorAll('li:not([data-assistant="new"])').forEach(l => l.remove());
+    list.forEach(res => {
       let li = document.createElement('li');
-      li.setAttribute('data-assistant', assistant.id);
-      li.setAttribute('data-name', assistant.name);
-      li.innerHTML = '<img src="' + baseUrl + 'assistants/' + assistant.id + '/' + assistant.icon + '"/>' + assistant.name;
-      ul.insertBefore(li, li_new);
+      li.setAttribute('data-assistant', res.ID);
+      li.setAttribute('data-name', res.NAME);
+      li.innerHTML = `<img src="${baseUrl}assistants/${res.ID}/${res.ICON}"/> ${res.NAME}`;
+      li.onclick = click;
+      ul.insertBefore(li, ul.querySelector('li[data-assistant="new"]'));
+    });
+    chrome.tabs.getSelected(null, function(tab) {
+      if (isHttp(tab.url)) {
+        chrome.tabs.sendMessage(tab.id, { action: 'get_init' }, function(response) {
+          console.log('get init result', response);
+          if (!response) return;
+          document.querySelector('input[name="scale"]').value = response?.scale || 1;
+          assistantMetaUpdated(response.meta);
+          if (response.activity) {
+            document.querySelector('li[data-action="' + response.activity + '"]').classList.add('active');
+          }
+          isLoading = false;
+        });
+      } else {
+        console.log('not a http or https');
+      }
     });
   });
-})();
+});
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   console.log("on update", request, sender);
@@ -96,23 +117,8 @@ function click(e) {
   }
 }
 
-function loadAssistants() {
-  $.get(baseUrl + 'assistants/get.php', function(list) {
-    var ul = document.querySelector('ul.assistant-list');
-    ul.innerHTML = '';
-    list.forEach(res => {
-      let li = document.createElement('li');
-      li.setAttribute(data-assistant, res.ID);
-      li.setAttribute(data-name, res.NAME);
-      li.innerHTML = `<img src="${baseUrl}assistants/${res.ID}/${res.ICON}"/>
-      ${res.NAME}`;
-      ul.appendChild(li);
-    });
-  });
-}
-
 function setAssistant(assistant) {
-  document.querySelectorAll('li[data-assistant]').forEach(li => li.classList.remove('active'));
+  document.querySelectorAll('li[data-assistant]').forEach(li => li?.classList?.remove('active'));
   console.log('getting assistant data ...', assistant);
   $.when(
     $.get(baseUrl + 'assistants/' + assistant + '/html.html'),
@@ -163,23 +169,6 @@ function send(message) {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-  chrome.tabs.getSelected(null, function(tab) {
-    if (isHttp(tab.url)) {
-      chrome.tabs.sendMessage(tab.id, {
-        action: 'get_init',
-      }, function(response) {
-        console.log('get init result', response);
-        if (!response) return;
-        document.querySelector('input[name="scale"]').value = response?.scale || 1;
-        assistantMetaUpdated(response.meta);
-        if (response.activity) {
-          document.querySelector('li[data-action="' + response.activity + '"]').classList.add('active');
-        }
-      });
-    } else {
-      // TODO ui cannot apply on non-http
-    }
-  });
   document.querySelectorAll('li').forEach(li => li.addEventListener('click', click));
   document.querySelector('input[name="scale"]').oninput = (e) => {
     send({

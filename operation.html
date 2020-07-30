@@ -44,7 +44,7 @@
         Here you provide body structure of this assistant using HTML and CSS code.
       </p>
       <p data-tab="knowledge">
-        Here you define any possible feedbacks from and to this assistant when triggered or based on current active URL.
+        Here you define any possible feedbacks from and to this assistant.
       </p>
       <p data-tab="code">
         TIPS: You can copy and edit in your code editor app and paste them back here.
@@ -73,7 +73,7 @@
             <form id="manifest-form" data-view="2">
               <div class="form-group">
                 <label>ID</label>
-                <input type="text" name="id" required minlength="4"/>
+                <input type="text" name="id" required minlength="4" maxlength="50"/>
               </div>
               <div class="form-group">
                 <label>Name</label>
@@ -179,7 +179,7 @@
               <tr><td><code>[data-facing="('left' or 'right')"]</code></td><td>Filled with "left", "right", or removed which indicates where this assistant heading.</td></tr>
               <tr><td><code>[data-talking="true"]</code></td><td>Filled with "true" or removed which indicates whether this assistant is talking or not.</td></tr>
               <tr><td><code>[data-attention="true"]</code></td><td>Filled with "true" or removed which indicates whether this assistant is talking or not.</td></tr>
-              <tr><td><code>[data-greeting="true"]</code></td><td>Filled with "true" or removed which indicates whether this assistant is introducing themself or not. Usually once when this assistant is summoned.</td></tr>
+              <tr><td><code>[data-greeting="true"]</code></td><td>Filled with "true" or removed which indicates whether this assistant is introducing themself or not. Usually once when this assistant appears on your screen.</td></tr>
             </tbody>
           </table>
           <div class="caption no-padding">

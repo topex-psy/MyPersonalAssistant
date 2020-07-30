@@ -25,9 +25,6 @@ chrome.storage.local.get('assistant', function(data) {
   chrome.tabs.getSelected(null, function(tab) {
     position.tab = tab.id;
     position.window = tab.windowId;
-    // if (isTabReady(tab)) {
-    //   initiateAssistant(tab.id);
-    // }
   });
   bindListeners();
 });

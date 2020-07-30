@@ -10,7 +10,7 @@ var durationActivityMax = 8000;
 
 var isLocal = false;
 var baseUrl = isLocal ? '' : 'https://www.taufiknur.com/';
-
+var defaultAssistants = ['doggo', 'menhera'];
 
 function arrayCombine(...arrays) {
   let result = [];

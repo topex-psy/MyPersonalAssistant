@@ -1,5 +1,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,800;1,400&display=swap');
 
+a {
+  font-weight: 600;
+  text-decoration: none;
+  color: #5596ff;
+}
+a:hover {
+  text-decoration: underline;
+  color: #3482ff;
+}
 body {
   font-family: 'Montserrat', sans-serif;
   overflow: hidden;
@@ -10,7 +19,6 @@ body {
   padding: 1rem;
   text-align: center;
 }
-
 ul {
   list-style: none;
   display: flex;
@@ -19,7 +27,6 @@ ul {
   margin-left: 0;
   padding-left: 0;
 }
-
 li {
   cursor: pointer;
   text-align: center;
@@ -129,18 +136,28 @@ input {
 input[type="number"] {
   text-align: center;
 }
+input[name="mute"] {
+  margin-right: 4px;
+  margin-left: 20px;
+}
 .assistant {
   padding-bottom: 8px;
 }
 .btn-import {
   padding-left: 1rem;
 }
-.container {
-  position: relative;
-}
 .tool {
   padding-top: 8px;
   display: none;
+}
+.more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.more label {
+  display: flex;
+  align-items: center;
 }
 .spinner {
   background: #fff;

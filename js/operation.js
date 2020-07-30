@@ -29,6 +29,23 @@ for (let key in editors) {
     console.log("editor onchange", key, delta);
     codeValidity(key);
   });
+  let {session} = editor;
+  session.on("changeAnnotation", function () {
+    var annotations = session.getAnnotations() || [], i = len = annotations.length;
+    while (i--) {
+      let {text} = annotations[i];
+      if (
+        /doctype first\. Expected/.test(text) ||
+        /Unexpected End of file\. Expected/.test(text) ||
+        /Unqualified attribute selectors/.test(text)
+      ) {
+        annotations.splice(i, 1);
+      }
+    }
+    if (len > annotations.length) {
+      session.setAnnotations(annotations);
+    }
+  });
 }
 
 function getCurrentTab() {
@@ -135,10 +152,29 @@ function codeValidity(key = null) {
 }
 
 // load initial data
-(function() {
-  console.log('location', location.href);
-  isCreate = init.manifest.id == 'new';
-  document.title = isCreate ? "Create New Assistant" : "Operation Room";
+console.log('location', location.href);
+isCreate = init.manifest.id == 'new';
+document.title = isCreate ? "Create New Assistant" : "Operation Room";
+if (isCreate) {
+  $.when(
+    $.get(baseUrl + 'assistants/new/html.html'),
+    $.get(baseUrl + 'assistants/new/style.css'),
+    $.get(baseUrl + 'assistants/new/knowledge.json'),
+    $.get(baseUrl + 'assistants/new/manifest.json'),
+  ).done(function (htmlResult, cssResult, knowledgeResult, manifestResult) {
+    let manifest = manifestResult[0];
+    let knowledge = knowledgeResult[0];
+    let html = htmlResult[0];
+    let css = cssResult[0];
+    initEditor({
+      ...init,
+      manifest,
+      knowledge,
+      html,
+      css
+    });
+  });
+} else {
   chrome.storage.sync.get('my_assistants', function(data) {
     console.log('my assistants data', data);
     let item = data.my_assistants?.filter(a => a.meta.id == init.manifest.id)[0];
@@ -156,26 +192,7 @@ function codeValidity(key = null) {
       css
     });
   });
-
-  // $.when(
-  //   $.get(baseUrl + 'assistants/' + init.manifest.id + '/html.html'),
-  //   $.get(baseUrl + 'assistants/' + init.manifest.id + '/style.css'),
-  //   $.get(baseUrl + 'assistants/' + init.manifest.id + '/knowledge.json'),
-  //   $.get(baseUrl + 'assistants/' + init.manifest.id + '/manifest.json'),
-  // ).done(function (htmlResult, cssResult, knowledgeResult, manifestResult) {
-  //   let manifest = manifestResult[0];
-  //   let knowledge = knowledgeResult[0];
-  //   let html = htmlResult[0];
-  //   let css = cssResult[0];
-  //   initEditor({
-  //     ...init,
-  //     manifest,
-  //     knowledge,
-  //     html,
-  //     css
-  //   });
-  // });
-})();
+}
 
 function initEditor(initData) {
   init = initData;

@@ -1,5 +1,7 @@
 'use strict';
 
+var selectedAssistant;
+
 chrome.storage.sync.get('my_assistants', function(data) {
   console.log('loaded assistant list', data);
   let ids = defaultAssistants;
@@ -12,9 +14,13 @@ chrome.storage.sync.get('my_assistants', function(data) {
     console.log("list result", list);
     ul.querySelectorAll('li:not([data-assistant="new"])').forEach(l => l.remove());
     list.forEach(res => {
+      let mine = data.my_assistants?.filter(a => a.meta.id == res.ID)[0];
+      let currentversion = mine?.meta?.version || '';
       let li = document.createElement('li');
       li.setAttribute('data-assistant', res.ID);
       li.setAttribute('data-name', res.NAME);
+      li.setAttribute('data-current-version', currentversion);
+      li.setAttribute('data-version', res.VERSION);
       li.innerHTML = `<img src="${baseUrl}assistants/${res.ID}/${res.ICON}"/> ${res.NAME}`;
       li.onclick = click;
       ul.insertBefore(li, ul.querySelector('li[data-assistant="new"]'));
@@ -26,6 +32,7 @@ chrome.storage.sync.get('my_assistants', function(data) {
           console.log('get init result', response);
           if (!response) return;
           document.querySelector('input[name="scale"]').value = response?.scale || 1;
+          document.querySelector('input[name="mute"]').checked = response?.mute;
           assistantMetaUpdated(response.meta);
           if (response.activity) {
             document.querySelector('li[data-action="' + response.activity + '"]').classList.add('active');
@@ -57,30 +64,22 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
 function assistantMetaUpdated(meta) {
   if (meta?.id) {
+    let {id, name} = meta;
     document.querySelector('.tool').style.display = 'block';
-    document.querySelector('li[data-assistant="' + meta.id + '"]').classList.add('active');
+    document.querySelector('li[data-assistant="' + id + '"]').classList.add('active');
     loadActivities(meta.activities);
+    selectedAssistant = { id, name };
   } else {
     document.querySelectorAll('li[data-assistant]').forEach(li => li.classList.remove('active'));
     document.querySelector('.tool').style.display = 'none';
+    selectedAssistant = null;
   }
 }
 
-function click(e) {
-  let assistant = e.target.getAttribute("data-assistant");
-  let request = e.target.getAttribute("data-request");
-  let action = e.target.getAttribute("data-action");
-
-  console.log('click', e, {
-    assistant,
-    request,
-    action
-  });
-
+function clickAction(e, { assistant, request, action }) {
   if (assistant) {
     if (e.target.classList.contains('active')) {
-      send({ action: 'request', type: 'dismiss' });
-      window.close();
+      send({ action: 'request', type: 'dismiss', options: {confirmation: false} });
     } else {
       if (assistant == "new") {
         chrome.tabs.create({active: true, url: chrome.runtime.getURL("operation.html")});
@@ -93,7 +92,7 @@ function click(e) {
     }
   } else if (request) {
     if (request == 'delete') {
-      if (!confirm('Are you sure?')) return;
+      if (!confirm(`Are you sure you want to remove ${selectedAssistant.name}?`)) return;
     }
     send({
       action: 'request',
@@ -118,15 +117,31 @@ function click(e) {
   }
 }
 
+function click(e) {
+  let assistant = e.target.getAttribute("data-assistant");
+  let request = e.target.getAttribute("data-request");
+  let action = e.target.getAttribute("data-action");
+
+  console.log('click', e, { assistant, request, action });
+  chrome.tabs.getSelected(null, function(tab) {
+    if (isHttp(tab.url)) {
+      clickAction(e, { assistant, request, action });
+    } else {
+      console.log('Cannot do it here.');
+      alert('Cannot do it here.');
+    }
+  });
+}
+
 function setAssistant(assistant) {
   console.log('getting assistant data ...', assistant);
   document.querySelectorAll('li[data-assistant]').forEach(li => li?.classList?.remove('active'));
   chrome.storage.sync.get('my_assistants', function(data) {
     console.log('my assistants data', data);
     let myAssistantList = data.my_assistants || [];
-    let findMyAssistant = myAssistantList.filter(a => a.meta.id == assistant) || [];
-    if (findMyAssistant.length) {
-      let myAssistant = findMyAssistant[0];
+    let findMyAssistant = myAssistantList?.filter(a => a.meta.id == assistant)[0];
+    if (findMyAssistant) {
+      let myAssistant = findMyAssistant;
       console.log('loaded from local', myAssistant);
       loadActivities(myAssistant.meta.activities);
       send({
@@ -187,10 +202,27 @@ function send(message) {
   });
 }
 
+function sendAll(message) {
+  console.log('send all', message);
+  chrome.tabs.query({windowType: 'normal', url: ['http://*/*', 'https://*/*'], status: 'complete'}, function(tabs) {
+    tabs.forEach(tab => {
+      chrome.tabs.sendMessage(tab.id, message);
+    });
+  });
+}
+
 document.addEventListener('DOMContentLoaded', function () {
   document.querySelectorAll('li').forEach(li => li.addEventListener('click', click));
+  document.querySelector('input[name="mute"]').oninput = (e) => {
+    sendAll({
+      action: 'mute',
+      options: {
+        mute: e.currentTarget.checked
+      }
+    });
+  };
   document.querySelector('input[name="scale"]').oninput = (e) => {
-    send({
+    sendAll({
       action: 'scale',
       options: {
         scale: e.target.value
@@ -229,7 +261,7 @@ document.addEventListener('DOMContentLoaded', function () {
               console.log('assistant data saved!')
             });
           });        
-          send({
+          sendAll({
             action: 'assistant',
             options
           });

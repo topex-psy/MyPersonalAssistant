@@ -21,6 +21,7 @@ var myAssistant = {
   el: null,
   options: {
     scale: 1.0,
+    mute: false,
   },
   state: {
     activity: null,
@@ -36,11 +37,17 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   let isReady = !!(div && myAssistant.el);
   let response = {isReady};
   if (request.action == 'init') {
-    let {meta, dom, css, activity, scale } = options.assistant;
+    let {
+      meta,
+      dom,
+      css,
+      activity,
+      // scale
+    } = options.assistant;
     if (isReady) {
       console.log('current assistant exist');
       if (meta?.id) {
-        if (myAssistant.options.scale != scale) setScale(scale);
+        // if (myAssistant.options.scale != scale) setScale(scale);
         if (myAssistant.state.activity != activity) setAction(activity);
         if (myAssistant.meta.id != meta.id) setAssistant({meta, dom, css});
       } else {
@@ -72,10 +79,10 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
       }
     }
   } else if (request.action == 'get_init') {
-    let {scale} = myAssistant.options;
+    let {scale, mute} = myAssistant.options;
     let {activity, facing, x} = myAssistant.state;
     let {meta} = myAssistant;
-    response = {meta, scale, activity, facing, x};
+    response = {meta, scale, mute, activity, facing, x};
   } else if (request.action == 'get_position') {
     // let {activity, facing, x} = myAssistant.state;
     // response = {activity, facing, x};
@@ -98,15 +105,19 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   } else if (request.action == 'assistant') {
     setAssistant(options);
   } else if (request.action == 'request') {
-    requestAction(type);
+    requestAction(type, options);
   } else if (request.action == 'action') {
     setAction(type, options);
   } else if (request.action == 'balloon') {
     setBalloon(message, options);
   } else if (request.action == 'scale') {
     setScale(options.scale);
-  } else if (request.action == 'dismissed') {
-    dismiss(true);
+  } else if (request.action == 'mute') {
+    setMute(options.mute);
+  } else if (request.action == 'dismiss') {
+    dismiss();
+  // } else if (request.action == 'dismissed') {
+  //   dismiss(true);
   }
   console.log('sendResponse', response);
   sendResponse(response);
@@ -136,6 +147,7 @@ function setAssistant(options = {}) {
   
   closeBalloon();
   setTimeout(() => {
+    if (!myAssistant.el) return;
     myAssistant.el.setAttribute("data-greeting", true);
     timeOutGreeting = setTimeout(() => {
       myAssistant.el.removeAttribute("data-greeting");
@@ -159,20 +171,24 @@ function onClickAssistant() {
     doNothing();
     myAssistant.el.setAttribute("data-attention", true);
     timeOutAttention = setTimeout(() => {
-      myAssistant.el.removeAttribute("data-attention");
+      myAssistant.el?.removeAttribute("data-attention");
     }, durationAttention);
     requestAction('click');
   }
 }
 
-function requestAction(action) {
+function requestAction(action, options = {}) {
+  if (!myAssistant.el) {
+    console.log('no assistant to do the', action);
+    return;
+  }
   if (action == 'shutup') {
     closeBalloon(true);
   } else if (action == 'dispel') {
     dismiss();
   } else if (action == 'delete') {
     if (defaultAssistants.includes(myAssistant.meta.id)) {
-      alert('You cannot delete built-in assistants from the list. Only data will be deleted.');
+      alert(`You can't remove built-in assistant. Only data will be erased.`);
     }
     chrome.storage.sync.get('my_assistants', function(data) {
       console.log('my assistants data', data);
@@ -181,15 +197,18 @@ function requestAction(action) {
       let index = myAssistantList.indexOf(findMyAssistant);
       let newList = myAssistantList;
       newList.splice(index, 1);
+      console.log('newList', newList);
       chrome.storage.sync.set({my_assistants: newList}, function() {
         console.log('assistant data saved!');
       });
+      dismiss();
     });
-    dismiss();
   } else {
     if (action == 'dismiss') doNothing();
-    if (action == 'lookup' && myAssistant.el.hasAttribute("data-greeting")) return;
-    chrome.runtime.sendMessage({action: action}, function(response) {
+    if (action == 'lookup') {
+      if (!myAssistant.el || myAssistant.el.hasAttribute("data-greeting")) return;
+    }
+    chrome.runtime.sendMessage({action, options}, function(response) {
       console.log(action + ' response', response);
     });
   }
@@ -206,9 +225,12 @@ function closeBalloon(force = false) {
 
 function setBalloon(message, options = {}) {
   if (!myAssistant.el) return;
-  console.log("setBalloon", message, options);
-  let {duration, replies} = options;
+  console.log('setBalloon when visibility', document.visibilityState, message, options);
+  if (document.visibilityState === "hidden") {
+    return;
+  }
 
+  let {duration, replies} = options;
   let balloon = div.firstElementChild;
   balloon.querySelector('big').innerText = message;
 
@@ -372,6 +394,18 @@ function doNothing(callback = function(){}) {
   callback();
 }
 
+function setMute(mute = true) {
+  if (myAssistant.options.mute == mute) return;
+  myAssistant.options.mute = mute;
+  if (mute) {
+    closeBalloon();
+    clearTimeout(timeOutLook);
+    timeOutLook = null;
+  } else {
+    doRandomLook();
+  }
+  sendUpdate({mute});
+}
 function setScale(scale = 1.0) {
   let {meta, options} = myAssistant;
   div.firstElementChild.style.bottom = ((meta.knowledge.balloon_offset?.bottom || defaultBalloonOffsetBottom) * scale) + 'px';
@@ -411,6 +445,10 @@ function dismiss(silent = false) {
 }
 
 function sendUpdate(update) {
+  if (document.visibilityState === "hidden") {
+    console.log('visibility', document.visibilityState);
+    return;
+  }
   chrome.runtime.sendMessage({action: 'update', update}, function(response) {
     console.log('update sent', update, response);
   });

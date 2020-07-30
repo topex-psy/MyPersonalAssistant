@@ -7,7 +7,10 @@ var assistant = {
   dom: null,
   css: null,
   activity: null,
-  scale: 1.0,
+  options: {
+    scale: 1.0,
+    mute: false,
+  }
 };
 var position = {
   window: null,
@@ -34,31 +37,35 @@ chrome.storage.sync.get('assistant', function(data) {
 function bindListeners() {
   chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     console.log("on action", request, sender);
-    let {action, update} = request;
+    let {action, update, options} = request;
     if (action == 'lookup' && sender.tab.selected) lookup();
     else if (action == 'click') click();
     else if (action == 'count') count();
     else if (action == 'greeting') greeting();
-    else if (action == 'dismiss') dismiss();
+    else if (action == 'dismiss') dismiss(options);
     else if (action == 'operation') chrome.tabs.create({active: true, url: chrome.runtime.getURL("operation.html?id=" + assistant.meta.id)});
     else if (action == 'update') {
-      if (update.hasOwnProperty('activity')) assistant.activity = update.activity;
-      if (update.hasOwnProperty('scale')) assistant.scale = update.scale;
+      if (update.hasOwnProperty('activity')) {
+        assistant.activity = update.activity;
+      }
+      if (update.hasOwnProperty('scale')) {
+        assistant.options.scale = update.scale;
+      }
+      if (update.hasOwnProperty('mute')) {
+        assistant.options.mute = update.mute;
+      }
       if (update.hasOwnProperty('meta')) {
         assistant.meta = update.meta;
         assistant.dom = update.dom;
         assistant.css = update.css;
-        chrome.tabs.query({windowType: 'normal', url: ['http://*/*', 'https://*/*'], status: 'complete'}, function(tabs) {
-          tabs.forEach(tab => {
-            if (update.meta) {
-              let {meta, dom, css} = assistant;
-              chrome.tabs.sendMessage(tab.id, { action: 'assistant', options: {meta, dom, css} });
-            } else {
-              chrome.tabs.sendMessage(tab.id, { action: 'dismissed' });
-            }
-          });
-        });
       }
+      // if (message) chrome.tabs.query({windowType: 'normal', url: ['http://*/*', 'https://*/*'], status: 'complete'}, function(tabs) {
+      //   tabs.forEach(tab => {
+      //     if (tab.id != sender.tab.id) {
+      //       chrome.tabs.sendMessage(tab.id, message);
+      //     }
+      //   });
+      // });
       chrome.storage.sync.set({assistant}, function() {
         console.log('all data saved!')
       });
@@ -91,6 +98,7 @@ function bindListeners() {
     chrome.tabs.get(+tabId, function(tab) {
       console.log("tab activated get", tab);
       if (isTabReady(tab)) {
+        console.log('initiateAssistant: onActivated');
         initiateAssistant(tabId);
       }
     });
@@ -99,6 +107,7 @@ function bindListeners() {
   chrome.tabs.onUpdated.addListener(function(tabId, info, tab) {
     console.log("tab updated", tabId, info, tab);
     if (isTabReady(tab)) {
+      console.log('initiateAssistant: onUpdated');
       initiateAssistant(tabId);
     }
   });
@@ -176,7 +185,7 @@ function analizeTab(tab) {
 
 function sendBalloon(message, options = {}) {
   chrome.tabs.getSelected(null, function(tab) {
-    chrome.tabs.sendMessage(tab.id, {
+    if (isTabReady(tab)) chrome.tabs.sendMessage(tab.id, {
       action: 'balloon',
       message,
       options
@@ -273,22 +282,32 @@ function greeting() {
   }
 }
 
-function dismiss() {
+function dismiss({confirmation = true}) {
   console.log("dismiss ...");
-  let { meta } = assistant;
-  let possibleResponses = meta.knowledge.dismiss?.responses;
-  if (possibleResponses && possibleResponses.length) {
-    let message = getRandomFrom(possibleResponses).replace('[name]', meta.name);
-    sendBalloon(message, {
-      duration: 10000,
-      replies: [
-        generateAnswer('dismiss', 'dispel'),
-        generateAnswer('dismiss', 'shutup'),
-      ],
-    });
+  if (confirmation) {
+    let { meta } = assistant;
+    let possibleResponses = meta.knowledge.dismiss?.responses;
+    if (possibleResponses?.length) {
+      let message = getRandomFrom(possibleResponses).replace('[name]', meta.name);
+      sendBalloon(message, {
+        duration: 10000,
+        replies: [
+          generateAnswer('dismiss', 'dispel'),
+          generateAnswer('dismiss', 'shutup'),
+        ],
+      });
+    } else {
+      dispel();
+    }
   } else {
-    lookup();
+    dispel();
   }
+}
+
+function dispel() {
+  chrome.tabs.getSelected(null, function(tab) {
+    chrome.tabs.sendMessage(tab.id, { action: 'dismiss' });
+  });
 }
 
 function lookup() {

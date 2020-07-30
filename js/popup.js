@@ -79,7 +79,8 @@ function assistantMetaUpdated(meta) {
 function clickAction(e, { assistant, request, action }) {
   if (assistant) {
     if (e.target.classList.contains('active')) {
-      send({ action: 'request', type: 'dismiss', options: {confirmation: false} });
+      // send({ action: 'request', type: 'dismiss', options: {confirmation: false} });
+      sendAll({ action: 'dismiss' });
     } else {
       if (assistant == "new") {
         chrome.tabs.create({active: true, url: chrome.runtime.getURL("operation.html")});

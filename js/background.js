@@ -2,11 +2,15 @@ console.log('location', location.href);
 
 var initOptions;
 var isReady;
+var timeOutResponse;
 var assistant = {
   meta: null,
   dom: null,
   css: null,
-  activity: null,
+  state: {
+    activity: null,
+    greet: false,
+  },
   options: {
     scale: 1.0,
     mute: false,
@@ -46,7 +50,7 @@ function bindListeners() {
     else if (action == 'operation') chrome.tabs.create({active: true, url: chrome.runtime.getURL("operation.html?id=" + assistant.meta.id)});
     else if (action == 'update') {
       if (update.hasOwnProperty('activity')) {
-        assistant.activity = update.activity;
+        assistant.state.activity = update.activity;
       }
       if (update.hasOwnProperty('scale')) {
         assistant.options.scale = update.scale;
@@ -58,6 +62,8 @@ function bindListeners() {
         assistant.meta = update.meta;
         assistant.dom = update.dom;
         assistant.css = update.css;
+        assistant.state = update.state || assistant.state;
+        if (assistant.meta?.id && !assistant.state.greet) greeting();
       }
       // if (message) chrome.tabs.query({windowType: 'normal', url: ['http://*/*', 'https://*/*'], status: 'complete'}, function(tabs) {
       //   tabs.forEach(tab => {
@@ -173,14 +179,17 @@ function analizeTab(tab) {
     .replace(/\[title\]/g, item_title)
 
   // send message
-  sendBalloon(message, {
-    duration: 5000,
-    replies: getRandomFrom([
-      generateAnswer('click', 'lookup'),
-      generateAnswer('click', 'dismiss'),
-      generateAnswer('click', 'shutup'),
-    ], getMaxOptions()),
-  });
+  clearTimeout(timeOutResponse);
+  timeOutResponse = setTimeout(() => {
+    sendBalloon(message, {
+      duration: 5000,
+      replies: getRandomFrom([
+        generateAnswer('click', 'lookup'),
+        generateAnswer('click', 'dismiss'),
+        generateAnswer('click', 'shutup'),
+      ], getMaxOptions()),
+    });
+  }, getMinMax(0, 500));
 }
 
 function sendBalloon(message, options = {}) {
@@ -265,7 +274,7 @@ function count() {
 }
 
 function greeting() {
-  console.log("greeting ...");
+  console.log("greeting ...", {...assistant});
   let { meta } = assistant;
   let possibleResponses = meta.knowledge.greet?.responses;
   if (possibleResponses && possibleResponses.length) {
@@ -274,12 +283,14 @@ function greeting() {
       return { action: 'shutup', title }
     });
     sendBalloon(message, {
+      type: 'greeting',
       duration: durationGreeting,
       replies
     });
   } else {
     lookup();
   }
+  assistant.state.greet = true;
 }
 
 function dismiss({confirmation = true}) {
@@ -305,8 +316,10 @@ function dismiss({confirmation = true}) {
 }
 
 function dispel() {
-  chrome.tabs.getSelected(null, function(tab) {
-    chrome.tabs.sendMessage(tab.id, { action: 'dismiss' });
+  chrome.tabs.query({windowType: 'normal', url: ['http://*/*', 'https://*/*'], status: 'complete'}, function(tabs) {
+    tabs.forEach(tab => {
+      chrome.tabs.sendMessage(tab.id, { action: 'dismiss' });
+    });
   });
 }
 

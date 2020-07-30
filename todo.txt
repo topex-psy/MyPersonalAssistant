@@ -5,6 +5,8 @@ klik: *embarased
 alarm/timer:
 teriak pada jam .... (list jam & keterangan)
 
+lookups:
+> cuaca/suhu hari ini ...
 
 
 

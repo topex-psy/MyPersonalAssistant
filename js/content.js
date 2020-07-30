@@ -1,7 +1,7 @@
 var timeOutAction;
 var timeOutAttention;
 var timeOutBalloon;
-var timeOutGreeting;
+// var timeOutGreeting;
 var timeOutLook;
 var timeOutWalk;
 var intervalWalk;
@@ -42,14 +42,14 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
       meta,
       dom,
       css,
-      activity,
-      // scale
+      state,
+      // options
     } = options.assistant;
     if (isReady) {
       console.log('current assistant exist');
       if (meta?.id) {
-        // if (myAssistant.options.scale != scale) setScale(scale);
-        if (myAssistant.state.activity != activity) setAction(activity);
+        // if (myAssistant.options.scale != options.scale) setScale(options.scale);
+        if (myAssistant.state.activity != state.activity) setAction(state.activity);
         // if (myAssistant.meta.id != meta.id) setAssistant({meta, dom, css});
       } else {
         console.log(`... but it shouldn't`);
@@ -77,7 +77,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
       // initiating ass
       if (meta?.id) {
-        setAssistant({meta, dom, css});
+        setAssistant({meta, dom, css, state});
       }
     }
   } else if (request.action == 'get_init') {
@@ -125,9 +125,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   sendResponse(response);
 });
 
-function setAssistant(options = {}) {
-  let {meta, dom, css} = options;
-  
+function setAssistant({meta, dom, css, state = {}}) {
   if (!div) {
     console.log('not ready yet!');
     return;
@@ -144,20 +142,9 @@ function setAssistant(options = {}) {
   myAssistant.el.onclick = onClickAssistant;
   myAssistant.meta = meta;
   setAssistantStyle(css);
-
   setScale(myAssistant.options.scale);
-  
+  sendUpdate({meta, dom, css, state});
   closeBalloon();
-  setTimeout(() => {
-    if (!myAssistant.el) return;
-    myAssistant.el.setAttribute("data-greeting", true);
-    timeOutGreeting = setTimeout(() => {
-      myAssistant.el.removeAttribute("data-greeting");
-    }, durationGreeting);
-    requestAction('greeting');
-  }, maxDelayGreeting * Math.random());
-
-  sendUpdate({meta, dom, css});
   doTheThings();
 }
 
@@ -206,10 +193,8 @@ function requestAction(action, options = {}) {
       dismiss();
     });
   } else {
-    if (action == 'dismiss') doNothing();
-    if (action == 'lookup') {
-      if (!myAssistant.el || myAssistant.el.hasAttribute("data-greeting")) return;
-    }
+    if (action == 'dismiss' || action == 'greeting') doNothing();
+    if (action == 'lookup') closeBalloon(true);
     chrome.runtime.sendMessage({action, options}, function(response) {
       console.log(action + ' response', response);
     });
@@ -223,16 +208,22 @@ function closeBalloon(force = false) {
   balloon.classList.remove('show');
   if (force) balloon.classList.add('dismissed');
   myAssistant.el.removeAttribute("data-talking");
+  myAssistant.el.removeAttribute("data-greeting");
 }
 
-function setBalloon(message, options = {}) {
+function setBalloon(message, {duration, replies, type}) {
   if (!myAssistant.el) return;
-  console.log('setBalloon when visibility', document.visibilityState, message, options);
+  console.log('setBalloon when visibility', document.visibilityState, {message, duration, replies, type});
   if (document.visibilityState === "hidden") {
     return;
   }
+  if (type == 'greeting') {
+    myAssistant.el.setAttribute("data-greeting", true);
+    // timeOutGreeting = setTimeout(() => {
+    //   myAssistant.el.removeAttribute("data-greeting");
+    // }, durationGreeting);
+  }
 
-  let {duration, replies} = options;
   let balloon = div.firstElementChild;
   balloon.querySelector('big').innerText = message;
 
@@ -325,7 +316,9 @@ function doRandomLook() {
   console.log('do random look', delay);
   clearTimeout(timeOutLook);
   timeOutLook = setTimeout(() => {
-    requestAction('lookup');
+    if (!myAssistant.el.hasAttribute("data-greeting")) {
+      requestAction('lookup');
+    }
     doRandomLook();
   }, delay);
 }
@@ -346,7 +339,10 @@ function doRandomWalk() {
 
   clearTimeout(timeOutWalk);
   timeOutWalk = setTimeout(() => {
-    if (isKeepDoing) return;
+    if (isKeepDoing || myAssistant.el.hasAttribute("data-greeting")) {
+      doRandomWalk();
+      return;
+    }
     if (Math.random() > .5) {
       setAction('walk', {}, () => doRandomWalk());
     } else {
@@ -387,7 +383,7 @@ function doNothing(callback = function(){}) {
   console.log("idle from", previousActivity);
   clearTimeout(timeOutAction);
   clearTimeout(timeOutAttention);
-  clearTimeout(timeOutGreeting);
+  // clearTimeout(timeOutGreeting);
   clearInterval(intervalWalk);
   myAssistant.el.removeAttribute("data-attention");
   myAssistant.el.removeAttribute("data-greeting");
@@ -446,7 +442,11 @@ function dismiss(silent = false) {
   if (!silent) sendUpdate({
     meta: null,
     dom: null,
-    css: null
+    css: null,
+    state: {
+      activity: null,
+      greet: false,
+    },
   });
 }
 

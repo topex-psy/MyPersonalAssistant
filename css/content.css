@@ -70,15 +70,16 @@
   padding-left: 0;
 }
 .mpa-balloon ul li {
-  line-height: 30px;
+  line-height: 24px !important;
+  height: 31px !important;
 }
 .mpa-balloon ul li a {
   cursor: pointer;
   background: #eefbfb;
   padding: 4px 8px;
   border-radius: 8px;
-  font-weight: 600;
-  font-size: 12px;
+  font-weight: 600 !important;
+  font-size: 12px !important;
   color: #71a3ff !important;
   text-decoration: none;
   transition: all .4s;

@@ -200,9 +200,9 @@ function setBalloon(message, options = {}) {
     let listActionEl = replies.map(rep => `<li data-action="${rep.action}"><a>${rep.title}</a></li>`).join('');
     balloon.querySelector('ul').innerHTML = listActionEl;
     balloon.querySelectorAll('li a').forEach(li => li.addEventListener('click', e => {
+      myAssistant.el?.removeAttribute("data-attention");
+      myAssistant.el?.removeAttribute("data-greeting");
       requestAction(e.target.parentNode.getAttribute('data-action'));
-      myAssistant.el.removeAttribute("data-attention");
-      myAssistant.el.removeAttribute("data-greeting");
     }));
   } else {
     balloon.querySelector('ul').innerHTML = ''

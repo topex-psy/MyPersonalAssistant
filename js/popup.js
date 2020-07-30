@@ -10,7 +10,7 @@
       let li = document.createElement('li');
       li.setAttribute('data-assistant', assistant.id);
       li.setAttribute('data-name', assistant.name);
-      li.innerHTML = '<img src="assistants/' + assistant.id + '/' + assistant.icon + '"/>' + assistant.name;
+      li.innerHTML = '<img src="' + baseUrl + 'assistants/' + assistant.id + '/' + assistant.icon + '"/>' + assistant.name;
       ul.insertBefore(li, li_new);
     });
   });
@@ -96,14 +96,29 @@ function click(e) {
   }
 }
 
+function loadAssistants() {
+  $.get(baseUrl + 'assistants/get.php', function(list) {
+    var ul = document.querySelector('ul.assistant-list');
+    ul.innerHTML = '';
+    list.forEach(res => {
+      let li = document.createElement('li');
+      li.setAttribute(data-assistant, res.ID);
+      li.setAttribute(data-name, res.NAME);
+      li.innerHTML = `<img src="${baseUrl}assistants/${res.ID}/${res.ICON}"/>
+      ${res.NAME}`;
+      ul.appendChild(li);
+    });
+  });
+}
+
 function setAssistant(assistant) {
   document.querySelectorAll('li[data-assistant]').forEach(li => li.classList.remove('active'));
   console.log('getting assistant data ...', assistant);
   $.when(
-    $.get('assistants/' + assistant + '/html.html'),
-    $.get('assistants/' + assistant + '/style.css'),
-    $.get('assistants/' + assistant + '/knowledge.json'),
-    $.get('assistants/' + assistant + '/manifest.json'),
+    $.get(baseUrl + 'assistants/' + assistant + '/html.html'),
+    $.get(baseUrl + 'assistants/' + assistant + '/style.css'),
+    $.get(baseUrl + 'assistants/' + assistant + '/knowledge.json'),
+    $.get(baseUrl + 'assistants/' + assistant + '/manifest.json'),
   ).done(function (domResult, cssResult, knowledgeResult, manifestResult) {
     let manifest = manifestResult[0];
     let knowledge = knowledgeResult[0];

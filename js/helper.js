@@ -8,6 +8,10 @@ var durationAttention = 3000;
 var durationActivityMin = 3000;
 var durationActivityMax = 8000;
 
+var isLocal = false;
+var baseUrl = isLocal ? '' : 'https://www.taufiknur.com/';
+
+
 function arrayCombine(...arrays) {
   let result = [];
   arrays.forEach(arr => {

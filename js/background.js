@@ -50,7 +50,6 @@ function bindListeners() {
         assistant.dom = update.dom;
         assistant.css = update.css;
         chrome.tabs.query({windowType: 'normal', url: ['http://*/*', 'https://*/*'], status: 'complete'}, function(tabs) {
-          // if (isHttp(tab.url) && tab.status == "complete")
           tabs.forEach(tab => {
             if (update.meta) {
               let {meta, dom, css} = assistant;

@@ -8,7 +8,7 @@ var editors = {
   html: ace.edit("editor-html", { mode: "ace/mode/html" }),
   css: ace.edit("editor-css", { mode: "ace/mode/css" })
 };
-var options = {
+var init = {
   manifest: {
     id: new URL(location.href).searchParams.get("id") || 'new'
   },
@@ -17,6 +17,7 @@ var options = {
   css: null
 };
 var timeoutCheck;
+var isCreate = false;
 var isImporting = false;
 
 // setting up code editor
@@ -34,17 +35,32 @@ function getCurrentTab() {
   return location.hash.substr(1) || 'manifest';
 }
 
-// listen code editor
-function codeValidity(tab = null) {
+function flushEditor(key = null) {
+  key = key || getCurrentTab();
+  if (key == 'code') {
+    editors.html.resize();
+    editors.css.resize();
+  } else {
+    editors[key].resize();
+  }
+}
+
+function codeValidity(key = null) {
   if (isImporting) {
     console.log("still importing ...");
     return;
   }
-  tab = tab || getCurrentTab();
-  console.log("check validity", tab);
+  let currentTab = getCurrentTab();
+  let isTabActive = !key || currentTab == key.replace(/html|css/gi, 'code');
+  if (!isTabActive) {
+    console.log("no longer in that tab ...");
+    return;
+  }
+  key = key || currentTab;
+  console.log("check validity", key);
   clearTimeout(timeoutCheck);
 
-  if (['code', 'html', 'css'].includes(tab)) {
+  if (['code', 'html', 'css'].includes(key)) {
     timeoutCheck = setTimeout(() => {
       if (getCurrentTab() != 'code') return;
       let annotations = {
@@ -70,24 +86,23 @@ function codeValidity(tab = null) {
     return;
   }
 
-  let value = editors[tab].session.getValue();
+  let value = editors[key].session.getValue();
   if (!value) {
     document.querySelector('#json-success').style.display = 'none';
     document.querySelector('#json-warning').style.display = 'none';
-    document.getElementById(tab + '-form')?.reset();
+    document.getElementById(key + '-form')?.reset();
   } else {
     let parsed = isJSONValid(value);
     if (parsed) {
-      document.getElementById(tab + '-form')?.querySelectorAll('input').forEach(input => {
+      document.getElementById(key + '-form')?.querySelectorAll('input').forEach(input => {
         let name = input.getAttribute('name');
         input.value = parsed[name];
       });
       let errors = []
-      if (tab == 'manifest') {
+      if (key == 'manifest') {
         finalizeScripts(parsed.id, true);
         document.getElementById('header-title').innerText = parsed.name || 'Anonymous';
         document.getElementById('header-author').innerText = parsed.author || 'Anonymous';
-        document.getElementById('icon').src = "assistants/" + parsed.id + "/" + (parsed.icon || "icon.png");
   
         if (!parsed.id) errors.push('<code>id</code> property must be set!')
         else if (parsed.id.length < 4) errors.push('<code>id</code> property must contains at least 4 letters!')
@@ -97,7 +112,7 @@ function codeValidity(tab = null) {
         if (!parsed.version) errors.push('<code>version</code> property must be set!')
         if (!parsed.activities) errors.push('<code>activities</code> property must be set!')
         else if (parsed.activities.filter(a => a.id == 'walk').length) errors.push('<code>id</code> property on <code>activities</code> must be other than "walk"!')
-      } else if (tab == 'knowledge') {
+      } else if (key == 'knowledge') {
         if (!parsed.click) errors.push('<code>click</code> property must be set!')
         if (!parsed.hosts) errors.push('<code>hosts</code> property must be set!')
         if (!parsed.hosts_unknown) errors.push('<code>hosts_unknown</code> property must be set!')
@@ -120,38 +135,44 @@ function codeValidity(tab = null) {
 
 // load initial data
 (function() {
-  console.log('location', location.href)
+  console.log('location', location.href);
+  isCreate = init.manifest.id == 'new';
+  document.title = isCreate ? "Create New Assistant" : "Operation Room";
   $.when(
-    $.get('assistants/' + options.manifest.id + '/html.html'),
-    $.get('assistants/' + options.manifest.id + '/style.css'),
-    $.get('assistants/' + options.manifest.id + '/knowledge.json'),
-    $.get('assistants/' + options.manifest.id + '/manifest.json'),
+    $.get('assistants/' + init.manifest.id + '/html.html'),
+    $.get('assistants/' + init.manifest.id + '/style.css'),
+    $.get('assistants/' + init.manifest.id + '/knowledge.json'),
+    $.get('assistants/' + init.manifest.id + '/manifest.json'),
   ).done(function (htmlResult, cssResult, knowledgeResult, manifestResult) {
     let manifest = manifestResult[0];
     let knowledge = knowledgeResult[0];
     let html = htmlResult[0];
     let css = cssResult[0];
-    options = {
-      ...options,
+    initEditor({
+      ...init,
       manifest,
       knowledge,
       html,
       css
-    };
-    console.log('loaded data', options);
-    initEditor();
+    });
   });
 })();
 
-function initEditor() {
-  document.title = options.manifest.id == 'new' ? "Create New Assistant" : "Operation Room";
-  // document.getElementById('icon').src = "assistants/" + options.manifest.id + "/" + (options.manifest.icon || "icon.png");
-  editors.html.session.setValue(options.html);
-  editors.css.session.setValue(options.css);
-  editors.manifest.session.setValue(JSON.stringify(options.manifest, null, 2));
-  editors.knowledge.session.setValue(JSON.stringify(options.knowledge, null, 2));
-  document.getElementById('header-title').innerText = options.manifest.name || 'Anonymous';
-  document.getElementById('header-author').innerText = options.manifest.author || 'Anonymous';
+function initEditor(initData) {
+  init = initData;
+  console.log('loaded data', init);
+  document.getElementById('icon').src = "assistants/" + init.manifest.id + "/" + (init.manifest.icon || "icon.png");
+  editors.html.session.setValue(init.html);
+  editors.css.session.setValue(init.css);
+  editors.manifest.session.setValue(JSON.stringify(init.manifest, null, 2));
+  editors.knowledge.session.setValue(JSON.stringify(init.knowledge, null, 2));
+  document.getElementById('header-title').innerText = init.manifest.name || 'Anonymous';
+  document.getElementById('header-author').innerText = init.manifest.author || 'Anonymous';
+  finalizeScripts(init.manifest.id, true);
+  for (let key in editors) {
+    editors[key].renderer.updateFull();
+  }
+  isImporting = false;
   console.log('check validity from: initEditor');
   codeValidity();
 }
@@ -183,18 +204,24 @@ function onTabChange() {
 }
 
 function finalizeScripts(cssID, setValues = false) {
-  let html = editors.html.session.getValue().replace(/id="([^"]+)"/, `id="${cssID}"`)
+  let html = editors.html.session.getValue()
+    .replace(/id="([^"]+)"/, `id="${cssID}"`)
+    .replace(/id=""/, `id="${cssID}"`);
   let css = editors.css.session.getValue()
     .replace(/#([^"]+) {/, `#${cssID} {`)
     .replace(/#([^"]+)\[/g, `#${cssID}\[`)
     .replace(/#([^"]+)::/g, `#${cssID}::`)
     .replace(/#([^"]+):/g, `#${cssID}:`)
-    .replace(/#([^"]+)\./g, `#${cssID}\.`);
+    .replace(/#([^"]+)\./g, `#${cssID}\.`)
+    .replace(/# {/, `#${cssID} {`)
+    .replace(/#\[/g, `#${cssID}\[`)
+    .replace(/#::/g, `#${cssID}::`)
+    .replace(/#:/g, `#${cssID}:`)
+    .replace(/#\./g, `#${cssID}\.`);
   let result = { html, css };
   if (setValues) {
     editors.html.session.setValue(html);
     editors.css.session.setValue(css);
-    options = {...options, ...result};
   }
   return result;
 }
@@ -257,23 +284,9 @@ document.addEventListener('DOMContentLoaded', function () {
       var reader = new FileReader();
       reader.readAsText(file, "UTF-8");
       reader.onload = function (evt) {
-        let fileContent = evt.target.result;
-        console.log("success reading file", fileContent);
-        let json = isJSONValid(fileContent);
+        let json = isJSONValid(evt.target.result);
         if (json) {
-          options = json;
-          editors.html.session.setValue(options.html);
-          editors.css.session.setValue(options.css);
-          editors.knowledge.session.setValue(JSON.stringify(options.knowledge, null, 2));
-          editors.manifest.session.setValue(JSON.stringify(options.manifest, null, 2));
-          finalizeScripts(json.manifest.id, true);
-          for (let key in editors) {
-            editors[key].renderer.updateFull();
-          }
-          setTimeout(() => {
-            isImporting = false;
-            codeValidity();
-          }, 1000)
+          initEditor(json);
         } else {
           alert("Cannot import: invalid content!");
         }
@@ -303,17 +316,18 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
   document.querySelectorAll('.panel-header ul li a').forEach(el => el.onclick = (e) => {
-    let panel = e.target.closest(".panel");
+    let panel = e.target.closest(".panel-section");
     panel.setAttribute('data-view', e.target.getAttribute('data-view'));
+    flushEditor();
   });
   document.querySelectorAll('#manifest-form input').forEach(el => {
     el.oninput = (e) => {
       let parsed = isJSONValid(editors.manifest.session.getValue());
       if (parsed) {
         parsed[e.target.getAttribute('name')] = e.target.value;
-        document.getElementById('manifest').value = JSON.stringify(parsed, null, 2);
+        editors.manifest.session.setValue(JSON.stringify(parsed, null, 2));
+        flushEditor('manifest');
       }
-      codeValidity('manifest');
     };
   });
   onTabChange();

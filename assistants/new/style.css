@@ -1,25 +1,25 @@
-#elon {
+#new {
   position: relative;
   width: 22.5vmax;
   height: 8.25vmax;
 }
 
 /* Facing Styles */
-#elon[data-facing="left"] {
+#new[data-facing="left"] {
   transform: rotateY(0deg);
 }
-#elon[data-facing="right"] {
+#new[data-facing="right"] {
   transform: rotateY(180deg);
 }
 
 /* Activity Styles */
 /*
-#elon[data-activity="walk"] {
+#new[data-activity="walk"] {
 }
-#elon[data-activity="dance"] {
+#new[data-activity="dance"] {
 }
-#elon[data-activity="pee"] {
+#new[data-activity="pee"] {
 }
-#elon[data-activity="poop"] {
+#new[data-activity="poop"] {
 }
 */

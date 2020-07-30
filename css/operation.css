@@ -88,19 +88,19 @@ body {
 .panel-content > * {
   height: 100%;
 }
-.panel[data-view] .panel-content [data-view] {
+.panel-section[data-view] .panel-content [data-view] {
   display: none;
 }
-.panel[data-view="1"] .panel-header ul li a[data-view="1"] {
+.panel-section[data-view="1"] .panel-header ul li a[data-view="1"] {
   text-decoration: underline;
 }
-.panel[data-view="2"] .panel-header ul li a[data-view="2"] {
+.panel-section[data-view="2"] .panel-header ul li a[data-view="2"] {
   text-decoration: underline;
 }
-.panel[data-view="1"] .panel-content [data-view="1"] {
+.panel-section[data-view="1"] .panel-content [data-view="1"] {
   display: block;
 }
-.panel[data-view="2"] .panel-content [data-view="2"] {
+.panel-section[data-view="2"] .panel-content [data-view="2"] {
   display: block;
 }
 .panel > div {

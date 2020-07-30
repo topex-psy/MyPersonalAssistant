@@ -74,7 +74,7 @@ function codeValidity(key = null) {
         if (annotations.html.length) statusHTML.classList.add('error'); else statusHTML.classList.remove('error');
         if (annotations.css.length) statusCSS.classList.add('error'); else statusCSS.classList.remove('error');
         document.querySelector('#json-success').style.display = 'none';
-        document.querySelector('#json-warning span').innerHTML = `There's some errors. Please fix them.`;
+        document.querySelector('#json-warning span').innerHTML = `There's some errors. Please fix them!`;
         document.querySelector('#json-warning').style.display = 'flex';
       } else {
         statusHTML.classList.remove('error');
@@ -100,7 +100,7 @@ function codeValidity(key = null) {
       });
       let errors = []
       if (key == 'manifest') {
-        finalizeScripts(parsed.id, true);
+        // finalizeScripts(parsed.id, true);
         document.getElementById('header-title').innerText = parsed.name || 'Anonymous';
         document.getElementById('header-author').innerText = parsed.author || 'Anonymous';
   
@@ -139,16 +139,15 @@ function codeValidity(key = null) {
   console.log('location', location.href);
   isCreate = init.manifest.id == 'new';
   document.title = isCreate ? "Create New Assistant" : "Operation Room";
-  $.when(
-    $.get('assistants/' + init.manifest.id + '/html.html'),
-    $.get('assistants/' + init.manifest.id + '/style.css'),
-    $.get('assistants/' + init.manifest.id + '/knowledge.json'),
-    $.get('assistants/' + init.manifest.id + '/manifest.json'),
-  ).done(function (htmlResult, cssResult, knowledgeResult, manifestResult) {
-    let manifest = manifestResult[0];
-    let knowledge = knowledgeResult[0];
-    let html = htmlResult[0];
-    let css = cssResult[0];
+  chrome.storage.sync.get('my_assistants', function(data) {
+    console.log('my assistants data', data);
+    let item = data.my_assistants?.filter(a => a.meta.id == init.manifest.id)[0];
+    let manifest = item.meta;
+    let knowledge = item.meta.knowledge;
+    let html = item.dom;
+    let css = item.css;
+    delete manifest.knowledge;
+    isImporting = true;
     initEditor({
       ...init,
       manifest,
@@ -157,19 +156,37 @@ function codeValidity(key = null) {
       css
     });
   });
+
+  // $.when(
+  //   $.get(baseUrl + 'assistants/' + init.manifest.id + '/html.html'),
+  //   $.get(baseUrl + 'assistants/' + init.manifest.id + '/style.css'),
+  //   $.get(baseUrl + 'assistants/' + init.manifest.id + '/knowledge.json'),
+  //   $.get(baseUrl + 'assistants/' + init.manifest.id + '/manifest.json'),
+  // ).done(function (htmlResult, cssResult, knowledgeResult, manifestResult) {
+  //   let manifest = manifestResult[0];
+  //   let knowledge = knowledgeResult[0];
+  //   let html = htmlResult[0];
+  //   let css = cssResult[0];
+  //   initEditor({
+  //     ...init,
+  //     manifest,
+  //     knowledge,
+  //     html,
+  //     css
+  //   });
+  // });
 })();
 
 function initEditor(initData) {
   init = initData;
   console.log('loaded data', init);
-  document.getElementById('icon').src = "assistants/" + init.manifest.id + "/" + (init.manifest.icon || "icon.png");
+  document.getElementById('icon').src = baseUrl + "assistants/" + init.manifest.id + "/" + (init.manifest.icon || "icon.png");
   editors.html.session.setValue(init.html);
   editors.css.session.setValue(init.css);
   editors.manifest.session.setValue(JSON.stringify(init.manifest, null, 2));
   editors.knowledge.session.setValue(JSON.stringify(init.knowledge, null, 2));
   document.getElementById('header-title').innerText = init.manifest.name || 'Anonymous';
   document.getElementById('header-author').innerText = init.manifest.author || 'Anonymous';
-  finalizeScripts(init.manifest.id, true);
   for (let key in editors) {
     editors[key].renderer.updateFull();
   }
@@ -204,28 +221,28 @@ function onTabChange() {
   window.scrollTo(0, 0);
 }
 
-function finalizeScripts(cssID, setValues = false) {
-  let html = editors.html.session.getValue()
-    .replace(/id="([^"]+)"/, `id="${cssID}"`)
-    .replace(/id=""/, `id="${cssID}"`);
-  let css = editors.css.session.getValue()
-    .replace(/#([^"]+) {/, `#${cssID} {`)
-    .replace(/#([^"]+)\[/g, `#${cssID}\[`)
-    .replace(/#([^"]+)::/g, `#${cssID}::`)
-    .replace(/#([^"]+):/g, `#${cssID}:`)
-    .replace(/#([^"]+)\./g, `#${cssID}\.`)
-    .replace(/# {/, `#${cssID} {`)
-    .replace(/#\[/g, `#${cssID}\[`)
-    .replace(/#::/g, `#${cssID}::`)
-    .replace(/#:/g, `#${cssID}:`)
-    .replace(/#\./g, `#${cssID}\.`);
-  let result = { html, css };
-  if (setValues) {
-    editors.html.session.setValue(html);
-    editors.css.session.setValue(css);
-  }
-  return result;
-}
+// function finalizeScripts(cssID, setValues = false) {
+//   let html = editors.html.session.getValue()
+//     .replace(/id="([^"]+)"/, `id="${cssID}"`)
+//     .replace(/id=""/, `id="${cssID}"`);
+//   let css = editors.css.session.getValue()
+//     .replace(/#([^"]+) {/, `#${cssID} {`)
+//     .replace(/#([^"]+)\[/g, `#${cssID}\[`)
+//     .replace(/#([^"]+)::/g, `#${cssID}::`)
+//     .replace(/#([^"]+):/g, `#${cssID}:`)
+//     .replace(/#([^"]+)\./g, `#${cssID}\.`)
+//     .replace(/# {/, `#${cssID} {`)
+//     .replace(/#\[/g, `#${cssID}\[`)
+//     .replace(/#::/g, `#${cssID}::`)
+//     .replace(/#:/g, `#${cssID}:`)
+//     .replace(/#\./g, `#${cssID}\.`);
+//   let result = { html, css };
+//   if (setValues) {
+//     editors.html.session.setValue(html);
+//     editors.css.session.setValue(css);
+//   }
+//   return result;
+// }
 
 function isHTMLValid(html) {
   var doc = document.createElement('div');
@@ -234,17 +251,7 @@ function isHTMLValid(html) {
   return doc.innerHTML === html;
 }
 
-function isJSONValid(str) {
-  let parsed;
-  try {
-    parsed = JSON.parse(str);
-  } catch (e) {
-    return null;
-  }
-  return parsed;
-}
-
-function exportFile({manifest, html, css, knowledge}) {
+function exportFile({manifest, knowledge, html, css}) {
   var fileName = `${manifest.id}.${exportExtension}`;
   var content = JSON.stringify({manifest, html, css, knowledge}, null, 2);
   var blob = writeBlob(content);
@@ -306,11 +313,15 @@ document.addEventListener('DOMContentLoaded', function () {
   document.querySelector('#btn-export').onclick = () => {
     let manifest = isJSONValid(editors.manifest.session.getValue());
     let knowledge = isJSONValid(editors.knowledge.session.getValue());
+    let html = editors.html.session.getValue();
+    let css = editors.css.session.getValue();
     if (manifest && knowledge) {
       exportFile({
         manifest,
         knowledge,
-        ...finalizeScripts(manifest.id + '' + new Date().getTime())
+        // ...finalizeScripts(manifest.id + '' + new Date().getTime())
+        html,
+        css
       });
     } else {
       alert(`Please fix all the errors in order to export!`)

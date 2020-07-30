@@ -1,7 +1,6 @@
 var defaultBalloonOffsetBottom = 150;
 var defaultBalloonOffsetLeft = 100;
 var defaultBalloonDuration = 5000;
-
 var maxDelayGreeting = 3000;
 var durationGreeting = 8000;
 var durationAttention = 3000;
@@ -28,6 +27,7 @@ function arrayShuffle(array) {
 }
 
 function getRandomFrom(array, qty = 1) {
+  if (!array) array = [];
   if (qty == 1) return array[Math.floor(Math.random() * array.length)];
   arrayShuffle(array);
   return array.slice(0, qty);
@@ -39,4 +39,14 @@ function getMinMax(min, max) {
 
 function isHttp(url) {
   return url?.substring(0, 4) == "http";
+}
+
+function isJSONValid(str) {
+  let parsed;
+  try {
+    parsed = JSON.parse(str);
+  } catch (e) {
+    return null;
+  }
+  return parsed;
 }

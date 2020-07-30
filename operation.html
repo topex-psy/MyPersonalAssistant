@@ -73,7 +73,7 @@
             <form id="manifest-form" data-view="2">
               <div class="form-group">
                 <label>ID</label>
-                <input type="text" name="id" required minlength="4" maxlength="50"/>
+                <input type="text" name="id" required minlength="4" maxlength="40"/>
               </div>
               <div class="form-group">
                 <label>Name</label>
@@ -142,8 +142,9 @@
           <h3>Basic Informations</h3>
           <table>
             <tbody>
-              <tr><td><code>id</code></td><td>Assistant ID that is lowercase text with no space, minimum 4 letters</td></tr>
+              <tr><td><code>id</code></td><td>Assistant ID that is lowercase text with no space, minimum 4 letters, maximum 50</td></tr>
               <tr><td><code>name</code></td><td>Assistant name</td></tr>
+              <tr><td><code>bio</code></td><td>Assistant description, bio, back-story, or anything</td></tr>
               <tr><td><code>author</code></td><td>Author of this assistant</td></tr>
               <tr><td><code>website</code></td><td>Website (URL) of the author or this assistant</td></tr>
               <tr><td><code>version</code></td><td>Version number of this assistant</td></tr>
@@ -308,6 +309,7 @@
     </div>
     <input type="file" id="file-import" accept="application/JSON"/>
     <script src="https://pagecdn.io/lib/ace/1.4.12/ace.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/helper.js"></script>
     <script src="js/operation.js"></script>
     <script src="js/editor.js"></script>
   </body>

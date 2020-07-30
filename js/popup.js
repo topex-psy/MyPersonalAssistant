@@ -1,11 +1,12 @@
 'use strict';
 
-var isLoading = true;
-
-chrome.storage.local.get('list_assistant', function(data) {
+chrome.storage.sync.get('my_assistants', function(data) {
   console.log('loaded assistant list', data);
-  let list_assistant = arrayCombine(data.list_assistant, defaultAssistants);
-  $.get(baseUrl + 'assistants/get.php?ids=' + list_assistant.join(), function(result) {
+  let ids = defaultAssistants;
+  data.my_assistants?.forEach(a => {
+    if (!ids.includes(a.meta.id)) ids.push(a.meta.id);
+  });
+  $.get(baseUrl + 'assistants/get.php?ids=' + ids.join(), function(result) {
     let ul = document.querySelector('ul.assistant-list');
     let list = JSON.parse(result) || [];
     console.log("list result", list);
@@ -18,6 +19,7 @@ chrome.storage.local.get('list_assistant', function(data) {
       li.onclick = click;
       ul.insertBefore(li, ul.querySelector('li[data-assistant="new"]'));
     });
+    document.body.classList.remove('loading');
     chrome.tabs.getSelected(null, function(tab) {
       if (isHttp(tab.url)) {
         chrome.tabs.sendMessage(tab.id, { action: 'get_init' }, function(response) {
@@ -28,7 +30,6 @@ chrome.storage.local.get('list_assistant', function(data) {
           if (response.activity) {
             document.querySelector('li[data-action="' + response.activity + '"]').classList.add('active');
           }
-          isLoading = false;
         });
       } else {
         console.log('not a http or https');
@@ -46,7 +47,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     } else if (update.hasOwnProperty('activity') && !update.activity) {
       document.querySelectorAll('li[data-action]').forEach(li => li.classList.remove('active'));
     } else { // more actions
-      document.querySelector('li[data-action="' + update.activity + '"]').classList.add('active');
+      document.querySelector('li[data-action="' + update.activity + '"]')?.classList.add('active');
     }
   } else if (action == 'assistant') {
     setAssistant(update);
@@ -91,13 +92,13 @@ function click(e) {
       }
     }
   } else if (request) {
+    if (request == 'delete') {
+      if (!confirm('Are you sure?')) return;
+    }
     send({
       action: 'request',
       type: request
     });
-    if (request == 'dismiss') {
-      window.close();
-    }
   } else if (action) {
     let duration = +e.target.getAttribute("data-duration");
     let durationMin = +e.target.getAttribute("data-duration-min");
@@ -118,37 +119,55 @@ function click(e) {
 }
 
 function setAssistant(assistant) {
-  document.querySelectorAll('li[data-assistant]').forEach(li => li?.classList?.remove('active'));
   console.log('getting assistant data ...', assistant);
-  $.when(
-    $.get(baseUrl + 'assistants/' + assistant + '/html.html'),
-    $.get(baseUrl + 'assistants/' + assistant + '/style.css'),
-    $.get(baseUrl + 'assistants/' + assistant + '/knowledge.json'),
-    $.get(baseUrl + 'assistants/' + assistant + '/manifest.json'),
-  ).done(function (domResult, cssResult, knowledgeResult, manifestResult) {
-    let manifest = manifestResult[0];
-    let knowledge = knowledgeResult[0];
-    let dom = domResult[0];
-    let css = cssResult[0];
-    let meta = { ...manifest, knowledge };
-    let options = {
-      meta,
-      dom,
-      css
-    };
-    loadActivities(meta.activities);
-    send({
-      action: 'assistant',
-      options
-    });
-    window.close();
+  document.querySelectorAll('li[data-assistant]').forEach(li => li?.classList?.remove('active'));
+  chrome.storage.sync.get('my_assistants', function(data) {
+    console.log('my assistants data', data);
+    let myAssistantList = data.my_assistants || [];
+    let findMyAssistant = myAssistantList.filter(a => a.meta.id == assistant) || [];
+    if (findMyAssistant.length) {
+      let myAssistant = findMyAssistant[0];
+      console.log('loaded from local', myAssistant);
+      loadActivities(myAssistant.meta.activities);
+      send({
+        action: 'assistant',
+        options: myAssistant
+      });
+    } else {
+      $.when(
+        $.get(baseUrl + 'assistants/' + assistant + '/html.html'),
+        $.get(baseUrl + 'assistants/' + assistant + '/style.css'),
+        $.get(baseUrl + 'assistants/' + assistant + '/knowledge.json'),
+        $.get(baseUrl + 'assistants/' + assistant + '/manifest.json'),
+      ).done(function (domResult, cssResult, knowledgeResult, manifestResult) {
+        let manifest = manifestResult[0];
+        let knowledge = knowledgeResult[0];
+        let dom = domResult[0];
+        let css = cssResult[0];
+        let meta = { ...manifest, knowledge };
+        let options = {
+          meta,
+          dom,
+          css
+        };
+        console.log('loaded from online', options);
+        loadActivities(meta.activities);
+        chrome.storage.sync.set({my_assistants: [...myAssistantList, options]}, function() {
+          console.log('assistant data saved!')
+        });
+        send({
+          action: 'assistant',
+          options
+        });
+      });
+    }
   });
 }
 
 function loadActivities(activities) {
   console.log('loadActivities', activities);
   document.querySelectorAll('li[data-action]:not(:first-child)').forEach(li => li.remove());
-  activities.forEach(activity => {
+  activities?.forEach(activity => {
     let li = document.createElement('li');
     li.setAttribute("data-action", activity.id);
     if (activity.duration) li.setAttribute("data-duration", activity.duration);
@@ -177,5 +196,51 @@ document.addEventListener('DOMContentLoaded', function () {
         scale: e.target.value
       }
     });
+  };
+  document.querySelector('.btn-import').onclick = () => {
+    document.querySelector('#file-import').click();
+  };
+  document.querySelector('#file-import').oninput = (e) => {
+    var file = e.currentTarget.files[0];
+    if (file) {
+      isImporting = true;
+      var reader = new FileReader();
+      reader.readAsText(file, "UTF-8");
+      reader.onload = function (evt) {
+        let json = isJSONValid(evt.target.result);
+        if (json) {
+          let options = {
+            meta: {...json.manifest, knowledge: json.knowledge},
+            dom: json.html,
+            css: json.css
+          };
+          console.log('loaded from online', options);
+          loadActivities(meta.activities);
+          chrome.storage.sync.get('my_assistants', function(data) {
+            console.log('my assistants data', data);
+            let myAssistantList = data.my_assistants || [];
+            let findMyAssistant = myAssistantList.filter(a => a.meta.id == options.meta.id) || [];
+            let newList = myAssistantList;
+            if (findMyAssistant.length) {
+              newList.splice(myAssistantList.indexOf(findMyAssistant[0]), 1);
+            }
+            newList.push(options);
+            chrome.storage.sync.set({my_assistants: newList}, function() {
+              console.log('assistant data saved!')
+            });
+          });        
+          send({
+            action: 'assistant',
+            options
+          });
+          alert(json.manifest.name + " has been set as your assistant!");
+        } else {
+          alert("Cannot import: invalid content!");
+        }
+      }
+      reader.onerror = function (evt) {
+        console.log("error reading file", evt);
+      }
+    }
   };
 });

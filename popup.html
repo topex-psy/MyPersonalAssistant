@@ -95,11 +95,11 @@
       background: #eefbfb;
       border-color: #c7efef;
     }
-    li[data-request="dismiss"] {
+    li[data-request="delete"] {
       background: #ff3030;
       color: #fff;
     }
-    li[data-request="dismiss"]:hover {
+    li[data-request="delete"]:hover {
       background: #ff4949;
     }
     li[data-request="operation"] {
@@ -134,8 +134,33 @@
     input[type="number"] {
       text-align: center;
     }
+    .btn-import {
+      padding-left: 1rem;
+    }
+    .container {
+      position: relative;
+    }
     .tool {
+      padding-top: 8px;
       display: none;
+    }
+    .spinner {
+      background: #fff;
+      transition: opacity .4s;
+      opacity: 0;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      left: 0;
+      top: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+    body.loading .spinner {
+      pointer-events: auto;
+      opacity: 1;
     }
     @keyframes wobble {
       0%, 100% {
@@ -145,34 +170,46 @@
         transform: scale(1.3);
       }
     }
+    #file-import {
+      display: none;
+    }
     </style>
+    <link href="css/loader.css" rel="stylesheet"/>
     <script src="vendor/jquery-2.1.3.min.js"></script>
     <script src="js/helper.js"></script>
     <script src="js/popup.js"></script>
   </head>
-  <body>
-    <div class="assistant">
-      <h3>Select your assistant:</h3>
-      <ul class="assistant-list">
-        <li data-assistant="new"><h1>+</h1> Create</li>
-      </ul>
-    </div>
-    <div class="tool">
-      <h3>Select action:</h3>
-      <ul class="list-action">
-        <li data-action="walk">Walk</li>
-      </ul>
-      <h3>Select request:</h3>
-      <ul>
-        <li data-request="lookup">Lookup</li>
-        <li data-request="count">Count</li>
-        <li data-request="dismiss">Dismiss</li>
-        <li data-request="operation">Operation Room</li>
-      </ul>
-      <h3>More:</h3>
-      <div>
-        <label>Scale:</label>
-        <input type="number" name="scale" min="0.2" max="2.0" step="0.1" value="1.0"/>
+  <body class="loading">
+    <div class="container">
+      <div class="assistant">
+        <h3>Select your assistant:</h3>
+        <ul class="assistant-list">
+          <li data-assistant="new"><h1>+</h1> Create</li>
+        </ul>
+        <a class="btn-browse" href="https://www.taufiknur.com/assistants/showcase.html" target="_blank">Browse online</a>
+        <a class="btn-import" href="#">Import file</a>
+        <input type="file" id="file-import" accept="application/JSON"/>
+      </div>
+      <div class="tool">
+        <h3>Select action:</h3>
+        <ul class="list-action">
+          <li data-action="walk">Walk</li>
+        </ul>
+        <h3>Select request:</h3>
+        <ul>
+          <li data-request="lookup">Lookup</li>
+          <li data-request="count">Count</li>
+          <li data-request="delete">Delete</li>
+          <li data-request="operation">Operation Room</li>
+        </ul>
+        <h3>More:</h3>
+        <div>
+          <label>Scale:</label>
+          <input type="number" name="scale" min="0.2" max="2.0" step="0.1" value="1.0"/>
+        </div>
+      </div>
+      <div class="spinner">
+        <div class="lds-spinner"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
       </div>
     </div>
   </body>

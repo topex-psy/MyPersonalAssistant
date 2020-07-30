@@ -45,6 +45,11 @@
       "Ga jadi"
     ]
   },
+  "dispel": {
+    "responses": [
+      "Yaudah, bye!"
+    ]
+  },
   "click": {
     "responses": [
       "Ada apa?",

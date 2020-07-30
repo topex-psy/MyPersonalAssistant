@@ -170,6 +170,12 @@ function requestAction(action) {
     closeBalloon(true);
   } else if (action == 'dispel') {
     dismiss();
+  } else if (action == 'delete') {
+    if (defaultAssistants.includes(myAssistant.meta.id)) {
+      alert('You cannot delete built-in assistants from the list. Only data will be deleted.');
+    }
+    // TODO sync remove from my ass
+    dismiss();
   } else {
     if (action == 'dismiss') doNothing();
     if (action == 'lookup' && myAssistant.el.hasAttribute("data-greeting")) return;
@@ -381,7 +387,7 @@ function dismiss(silent = false) {
   clearTimeout(timeOutLook);
   clearTimeout(timeOutWalk);
   let balloon = div.firstElementChild;
-  balloon.querySelector('big').innerText = 'Yaudah, bye!';
+  balloon.querySelector('big').innerText = getRandomFrom(myAssistant.meta.knowledge.dispel?.responses) || 'Good bye!';
   balloon.querySelector('ul').innerHTML = '';
   closeBalloon(true);
   myAssistant.el.remove();

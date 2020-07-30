@@ -19,7 +19,9 @@ $.get('css/content.css', function(css) {
   console.log('initOptions', initOptions);
 });
 
-chrome.storage.local.get('assistant', function(data) {
+// chrome.storage.sync.clear();
+
+chrome.storage.sync.get('assistant', function(data) {
   console.log('loaded assistant data', data);
   if (data.assistant) assistant = data.assistant;
   chrome.tabs.getSelected(null, function(tab) {
@@ -57,7 +59,7 @@ function bindListeners() {
           });
         });
       }
-      chrome.storage.local.set({assistant}, function() {
+      chrome.storage.sync.set({assistant}, function() {
         console.log('all data saved!')
       });
     }

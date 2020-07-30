@@ -99,21 +99,26 @@ function clickAction(e, { assistant, request, action }) {
       type: request
     });
   } else if (action) {
-    let duration = +e.target.getAttribute("data-duration");
-    let durationMin = +e.target.getAttribute("data-duration-min");
-    let durationMax = +e.target.getAttribute("data-duration-max");
-    if (durationMin && durationMax) {
-      duration = getMinMax(durationMin, durationMax);
+    if (e.target.classList.contains('active')) {
+      send({ action: 'action' }); // stop current activity
+    } else {
+      let duration = +e.target.getAttribute("data-duration");
+      let durationMin = +e.target.getAttribute("data-duration-min");
+      let durationMax = +e.target.getAttribute("data-duration-max");
+      if (durationMin && durationMax) {
+        duration = getMinMax(durationMin, durationMax);
+      }
+      duration = duration || (3000 + Math.random() * 5000);
+      let options = {
+        duration,
+        persist: true
+      };
+      send({
+        action: 'action',
+        type: action,
+        options
+      });
     }
-    duration = duration || (3000 + Math.random() * 5000);
-    let options = {
-      duration
-    };
-    send({
-      action: 'action',
-      type: action,
-      options
-    });
   }
 }
 

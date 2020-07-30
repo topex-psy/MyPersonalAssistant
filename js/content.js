@@ -8,6 +8,7 @@ var intervalWalk;
 var div;
 
 var disableWalk = false;
+var isKeepDoing = false;
 
 // got it from: https://stackoverflow.com/a/15506705/5060513
 const setAssistantStyle = (() => {
@@ -49,8 +50,9 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
       if (meta?.id) {
         // if (myAssistant.options.scale != scale) setScale(scale);
         if (myAssistant.state.activity != activity) setAction(activity);
-        if (myAssistant.meta.id != meta.id) setAssistant({meta, dom, css});
+        // if (myAssistant.meta.id != meta.id) setAssistant({meta, dom, css});
       } else {
+        console.log(`... but it shouldn't`);
         dismiss(true);
       }
     } else {
@@ -259,10 +261,12 @@ function setBalloon(message, options = {}) {
 function setAction(action, options = {}, callback = function(){}) {
   if (!myAssistant.el) return;
   doNothing();
+  if (!action) return;
 
   let previousActivity = myAssistant.state.activity;
   let duration = options?.duration || getMinMax(durationActivityMin, durationActivityMax);
   let facing = options?.facing || null;
+  isKeepDoing = options?.persist || false;
   console.log("change action from", previousActivity);
   console.log('now do', action, 'for', duration, 'ms');
 
@@ -342,11 +346,12 @@ function doRandomWalk() {
 
   clearTimeout(timeOutWalk);
   timeOutWalk = setTimeout(() => {
-    let duration;
+    if (isKeepDoing) return;
     if (Math.random() > .5) {
-      setAction('walk', {duration}, () => doRandomWalk());
+      setAction('walk', {}, () => doRandomWalk());
     } else {
       let activity = getRandomFrom(myAssistant.meta.activities);
+      let duration;
       let durationMin = +activity.durationMin;
       let durationMax = +activity.durationMax;
       if (durationMin && durationMax) {
@@ -388,6 +393,7 @@ function doNothing(callback = function(){}) {
   myAssistant.el.removeAttribute("data-greeting");
   myAssistant.state.activity = null;
   myAssistant.state.facing = null;
+  isKeepDoing = false;
   setDataAttributes();
   sendUpdate({activity: null});
   alignBalloon();

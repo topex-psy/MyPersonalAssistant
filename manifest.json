@@ -43,5 +43,5 @@
       ]
     }
   ],
-  "content_security_policy": "script-src 'self' https://pagecdn.io; object-src 'self'; default-src 'self' *.taufiknur.com"
+  "content_security_policy": "script-src 'self' https://pagecdn.io https://www.taufiknur.com; object-src 'self'"
 }

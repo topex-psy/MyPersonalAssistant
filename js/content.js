@@ -174,7 +174,17 @@ function requestAction(action) {
     if (defaultAssistants.includes(myAssistant.meta.id)) {
       alert('You cannot delete built-in assistants from the list. Only data will be deleted.');
     }
-    // TODO sync remove from my ass
+    chrome.storage.sync.get('my_assistants', function(data) {
+      console.log('my assistants data', data);
+      let myAssistantList = data.my_assistants || [];
+      let findMyAssistant = myAssistantList?.filter(a => a.meta.id == myAssistant.meta.id)[0];
+      let index = myAssistantList.indexOf(findMyAssistant);
+      let newList = myAssistantList;
+      newList.splice(index, 1);
+      chrome.storage.sync.set({my_assistants: newList}, function() {
+        console.log('assistant data saved!');
+      });
+    });
     dismiss();
   } else {
     if (action == 'dismiss') doNothing();

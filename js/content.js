@@ -1,7 +1,6 @@
 var timeOutAction;
 var timeOutAttention;
 var timeOutBalloon;
-// var timeOutGreeting;
 var timeOutLook;
 var timeOutWalk;
 var intervalWalk;
@@ -31,6 +30,22 @@ var myAssistant = {
   }
 };
 
+chrome.runtime.sendMessage({action: 'get_init'}, function(response) {
+  console.log('get init response', response);
+  const style = document.createElement('style');
+  style.textContent = response.css;
+  document.head.append(style);
+  document.body.insertAdjacentHTML('beforeend', `<div class="mpa-container">
+    <div class="mpa-balloon">
+      <big></big>
+      <ul></ul>
+    </div>
+    <div class="mpa-wrapper"></div>
+  </div>`);
+  div = document.body.lastElementChild;
+});
+
+
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   console.log("request received", request, sender);
@@ -38,52 +53,29 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   let isReady = !!(div && myAssistant.el);
   let response = {isReady};
   if (request.action == 'init') {
-    let {
-      meta,
-      dom,
-      css,
-      state,
-      // options
-    } = options.assistant;
+    let { meta, dom, css, state } = options.assistant;
+    let { scale, mute } = options.assistant.options;
+    setScale(scale, false);
+    setMute(mute, false);
     if (isReady) {
       console.log('current assistant exist');
       if (meta?.id) {
-        // if (myAssistant.options.scale != options.scale) setScale(options.scale);
-        if (myAssistant.state.activity != state.activity) setAction(state.activity);
-        // if (myAssistant.meta.id != meta.id) setAssistant({meta, dom, css});
-      } else {
-        console.log(`... but it shouldn't`);
-        dismiss(true);
+        if (myAssistant.state.activity != state.activity) {
+          console.log(`... and should sync the activity`);
+          setAction(state.activity);
+        }
       }
     } else {
-      console.log('initiating assistant');
-
-      if (!div) {
-        // initiating css
-        const style = document.createElement('style');
-        style.textContent = options.initOptions.css;
-        document.head.append(style);
-  
-        // initiating dom
-        document.body.insertAdjacentHTML('beforeend', `<div class="mpa-container">
-          <div class="mpa-balloon">
-            <big></big>
-            <ul></ul>
-          </div>
-          <div class="mpa-wrapper"></div>
-        </div>`);
-        div = document.body.lastElementChild;
-      }
-
-      // initiating ass
+      console.log('current assistant not exist');
       if (meta?.id) {
+        console.log('but it should exist');
         setAssistant({meta, dom, css, state});
       }
     }
   } else if (request.action == 'get_init') {
-    let {scale, mute} = myAssistant.options;
-    let {activity, facing, x} = myAssistant.state;
-    let {meta} = myAssistant;
+    let { scale, mute } = myAssistant.options;
+    let { activity, facing, x } = myAssistant.state;
+    let { meta } = myAssistant;
     response = {meta, scale, mute, activity, facing, x};
   } else if (request.action == 'get_position') {
     // let {activity, facing, x} = myAssistant.state;
@@ -118,8 +110,6 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     setMute(options.mute);
   } else if (request.action == 'dismiss') {
     dismiss();
-  // } else if (request.action == 'dismissed') {
-  //   dismiss(true);
   }
   console.log('sendResponse', response);
   sendResponse(response);
@@ -142,10 +132,16 @@ function setAssistant({meta, dom, css, state = {}}) {
   myAssistant.el.onclick = onClickAssistant;
   myAssistant.meta = meta;
   setAssistantStyle(css);
-  setScale(myAssistant.options.scale);
+  setScale(myAssistant.options.scale, false);
   sendUpdate({meta, dom, css, state});
   closeBalloon();
-  doTheThings();
+  doChangeFacing();
+  doRandomWalk();
+  console.log('setAssistant ...', {meta, dom, css, state});
+  console.log('setAssistant', myAssistant);
+  if (!myAssistant.options.mute) {
+    doRandomLook();
+  }
 }
 
 function onClickAssistant() {
@@ -176,9 +172,6 @@ function requestAction(action, options = {}) {
   } else if (action == 'dispel') {
     dismiss();
   } else if (action == 'delete') {
-    if (defaultAssistants.includes(myAssistant.meta.id)) {
-      alert(`You can't remove built-in assistant. Only data will be erased.`);
-    }
     chrome.storage.sync.get('my_assistants', function(data) {
       console.log('my assistants data', data);
       let myAssistantList = data.my_assistants || [];
@@ -190,6 +183,7 @@ function requestAction(action, options = {}) {
       chrome.storage.sync.set({my_assistants: newList}, function() {
         console.log('assistant data saved!');
       });
+      sendUpdate({my_assistants: newList});
       dismiss();
     });
   } else {
@@ -212,16 +206,21 @@ function closeBalloon(force = false) {
 }
 
 function setBalloon(message, {duration, replies, type}) {
-  if (!myAssistant.el) return;
-  console.log('setBalloon when visibility', document.visibilityState, {message, duration, replies, type});
+  console.log('will show balloon', {message, duration, replies, type});
+  if (!myAssistant.el) {
+    console.log('but no assistant')
+    return;
+  }
   if (document.visibilityState === "hidden") {
+    console.log('but tab not opened')
+    return;
+  }
+  if (myAssistant.options.mute) {
+    console.log('but muted')
     return;
   }
   if (type == 'greeting') {
     myAssistant.el.setAttribute("data-greeting", true);
-    // timeOutGreeting = setTimeout(() => {
-    //   myAssistant.el.removeAttribute("data-greeting");
-    // }, durationGreeting);
   }
 
   let balloon = div.firstElementChild;
@@ -316,7 +315,11 @@ function doRandomLook() {
   console.log('do random look', delay);
   clearTimeout(timeOutLook);
   timeOutLook = setTimeout(() => {
-    if (!myAssistant.el.hasAttribute("data-greeting")) {
+    let mute = myAssistant.options.mute;
+    let greeting = myAssistant.el.hasAttribute("data-greeting");
+    if (mute || greeting) {
+      console.log('lookup prevented', {mute, greeting});
+    } else {
       requestAction('lookup');
     }
     doRandomLook();
@@ -372,18 +375,11 @@ function doWalk() {
   div.style.left = myAssistant.state.x + '%';
 }
 
-function doTheThings() {
-  doChangeFacing();
-  doRandomWalk();
-  doRandomLook();
-}
-
 function doNothing(callback = function(){}) {
   let previousActivity = myAssistant.state.activity;
   console.log("idle from", previousActivity);
   clearTimeout(timeOutAction);
   clearTimeout(timeOutAttention);
-  // clearTimeout(timeOutGreeting);
   clearInterval(intervalWalk);
   myAssistant.el.removeAttribute("data-attention");
   myAssistant.el.removeAttribute("data-greeting");
@@ -396,8 +392,20 @@ function doNothing(callback = function(){}) {
   callback();
 }
 
-function setMute(mute = true) {
+function setScale(scale = 1.0, sync = true) {
+  if (myAssistant.options.scale == scale) return;
+  if (sync) sendUpdate({scale});
+  myAssistant.options.scale = scale;
+  if (myAssistant.el) {
+    div.firstElementChild.style.bottom = ((myAssistant.meta.knowledge.balloon_offset?.bottom || defaultBalloonOffsetBottom) * scale) + 'px';
+    div.lastElementChild.style.transform = 'scale(' + scale + ')';
+    alignBalloon();
+  }
+}
+
+function setMute(mute = true, sync = true) {
   if (myAssistant.options.mute == mute) return;
+  if (sync) sendUpdate({mute});
   myAssistant.options.mute = mute;
   if (mute) {
     closeBalloon();
@@ -406,15 +414,6 @@ function setMute(mute = true) {
   } else {
     doRandomLook();
   }
-  sendUpdate({mute});
-}
-function setScale(scale = 1.0) {
-  let {meta, options} = myAssistant;
-  div.firstElementChild.style.bottom = ((meta.knowledge.balloon_offset?.bottom || defaultBalloonOffsetBottom) * scale) + 'px';
-  div.lastElementChild.style.transform = 'scale(' + scale + ')';
-  options.scale = scale;
-  sendUpdate({scale});
-  alignBalloon();
 }
 
 function alignBalloon() {
@@ -427,7 +426,7 @@ function alignBalloon() {
   div.classList.add(facing);
 }
 
-function dismiss(silent = false) {
+function dismiss() {
   if (!myAssistant.el) return;
   doNothing();
   clearTimeout(timeOutLook);
@@ -439,7 +438,7 @@ function dismiss(silent = false) {
   myAssistant.el.remove();
   myAssistant.el = null;
   myAssistant.meta = null;
-  if (!silent) sendUpdate({
+  sendUpdate({
     meta: null,
     dom: null,
     css: null,

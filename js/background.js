@@ -21,10 +21,6 @@ var position = {
   tab: null,
 };
 
-$.get('css/content.css', function(css) {
-  initOptions = {css};
-  console.log('initOptions', initOptions);
-});
 
 // chrome.storage.sync.clear();
 
@@ -42,21 +38,32 @@ function bindListeners() {
   chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     console.log("on action", request, sender);
     let {action, update, options} = request;
-    if (action == 'lookup' && sender.tab.selected) lookup();
+    if (action == 'get_init') {
+      $.get('css/content.css', function(css) {
+        initOptions = {css};
+        console.log('initOptions', initOptions);
+        sendResponse(initOptions);
+      });
+      return true;
+    }
+    else if (action == 'lookup' && sender.tab.selected) lookup();
     else if (action == 'click') click();
     else if (action == 'count') count();
     else if (action == 'greeting') greeting();
     else if (action == 'dismiss') dismiss(options);
     else if (action == 'operation') chrome.tabs.create({active: true, url: chrome.runtime.getURL("operation.html?id=" + assistant.meta.id)});
     else if (action == 'update') {
+      let sync = false;
       if (update.hasOwnProperty('activity')) {
         assistant.state.activity = update.activity;
       }
       if (update.hasOwnProperty('scale')) {
         assistant.options.scale = update.scale;
+        sync = true;
       }
       if (update.hasOwnProperty('mute')) {
         assistant.options.mute = update.mute;
+        sync = true;
       }
       if (update.hasOwnProperty('meta')) {
         assistant.meta = update.meta;
@@ -64,6 +71,7 @@ function bindListeners() {
         assistant.css = update.css;
         assistant.state = update.state || assistant.state;
         if (assistant.meta?.id && !assistant.state.greet) greeting();
+        sync = true;
       }
       // if (message) chrome.tabs.query({windowType: 'normal', url: ['http://*/*', 'https://*/*'], status: 'complete'}, function(tabs) {
       //   tabs.forEach(tab => {
@@ -72,8 +80,8 @@ function bindListeners() {
       //     }
       //   });
       // });
-      chrome.storage.sync.set({assistant}, function() {
-        console.log('all data saved!')
+      if (sync) chrome.storage.sync.set({assistant}, function() {
+        console.log('assistant data saved!', update);
       });
     }
     sendResponse({ok: true});

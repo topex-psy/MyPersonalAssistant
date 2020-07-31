@@ -12,7 +12,7 @@
 .mpa-container.notransition {
   transition: none !important;
 }
-.mpa-wrapper {
+.mpa-wrapper.animate {
   transition: transform .4s;
   transform-origin: bottom;
 }
@@ -88,4 +88,11 @@
 }
 .mpa-balloon ul li a:hover {
   background: #c7efef;
+}
+.mpa-balloon .mpa-balloon-mute {
+  position: absolute;
+  right: 1rem;
+  bottom: 1rem;
+  width: 24px;
+  cursor: pointer;
 }

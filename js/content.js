@@ -39,10 +39,12 @@ chrome.runtime.sendMessage({action: 'get_init'}, function(response) {
     <div class="mpa-balloon">
       <big></big>
       <ul></ul>
+      <img class="mpa-balloon-mute" title="Muted" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAAAwCAYAAAChS3wfAAAITklEQVRoQ91afXAdVRU/5+6mpGqR9JFkHKuOVXRUVJSiZSgfIoOiaBUkYwvGcWLdj5eJDVKGqUVeQRRFraR5e3ebatRBxnb4qFRr+agjonSkIn+hjDg6CpIPSdUqNiTv3uOc+jaz2ezL2928ZHzc/97uvfec32/PPfd8PIT/g7F3715jdHR0JQAc6+vre2EpVcKlFBaVFQTBqVrrjYj4EaXU2UKIVgCoENGDALDNdd3HlkK3JSdgcHDwLYZhbAGAjwPASUkgtdbTiNjluu6+xSZhyQgol8tvMgxju1LqY0KINHKPKaVW9/b2TiwmCWkUWZB8KWUHIt6klOoRQhjzbDautT5JCPHycA4iftq27W8tSIE6ixeNgFKpJDo7O3sB4CYAOLmGqT9lGMYupdSeYrH4tJTyBgAoRQi4wbbtG5uOAN/3305EQwBwVg3lH2OrsCzrXkSkcI6UksEzCeHY7jjODCGLQURDLaBUKpmdnZ3bAODzAGDGFSai3yPidY7j3JMEpqkJ8H3/NKXUHUKINQngjrFpCyEGLcuarvUlm5YAKeUnAMADgJfFwWmt95qmudmyrJF6Jtx0BARB0KK1vg0AnARwzyKibdv2/nrAm9IHDAwMtJumeQ8inpNw1vcwKa7r/j0teJ6XxQKICH3fb3ccZzyLDJ7LUWhbW9uxrq6uqVxO0PO8NyLiAQBYHRP+b0Qs2rb9vaxKZSFg9+7dK6enpzlkfgcA/EYpdXGagImv5o6OjmFE7AaAvwHApZkJCILgnZVK5T4hxKlRkFrrJ03T/KhlWU/mAZ+FAN/3ryair0fkHCoUCu/r6upS88mWUnJMcX04h4j2ZyKgXC7zvf5ANFrjzRDxx1NTUxv7+vrY2+ceaY+A7/s9RLQ7Jug2x3E2z3PDXA4Ad0bfI+LtqQnwPO9tiPgzAGiLbkJEO8fHxzeXSiWdG3l1YVoC2PkqpX6KiOtiMj/lOM534noEQfBWpdRhRHxp+E5r/ZxpmmfOIYCdSxAEH9ZadxMRp6mdACBqgPuC4zgc6jZkpCWgelw6AODXAPCqiHCuJZznOM6j4bPBwcGCEOIIIr42Mo/T7otc131oFgG+779ZKfXdGsHMLJCIuNW27S83BHlGCwhlep53JiI+DADLI1/2rwCwplgsjlYj04MA8N6Y6bOj5rgFZgjwPO98RPxRUjATB0lEX3Ndl3P6ho4sFhAKllJeCQC3RxXRWh9ub2+/YGJi4hYA6I8pOWTbthXmICcI4C9PRL9KCX6/4zjro0lMo1jIQwDL9jzvVkS8JqbHQwBwfuzZI4VC4T18/4fPkc+853mPxsyeixA3CiH2jYyMPLNq1apTpqamPgQAlxiGYVmW9c9GgY7uk5cArikePXr0ABFdXEsvrfXM0Zh1HHzfX09E0dLThNZ6bbFY/MNigJxvz7wEVK2gDRHZ+b0+QcYLWutzi8Xikfg7/vp3IeJlkRefdRxnYKnBs7yFEMDry+XyGXwzxCtPRNTvuu43kzBhuVx+VgjxivClEOI1lmX9pdkIqOYGAQBsStD9cSHEOsuy/jPHAsrlciXK2NjYmNGIoCYPgQuxACklZ6QnrrYa4weO42yYQ4CUkh3aTM1ucnKyrb+//x95ACx0TV4CfN8/j4gORatQRPR8NPJj3YjoOtd1vzLLCUopfw4A54YPiWi967r3LhRMnvV5CAiC4NVaa44I2yMYGPyFAMAV5dMjumgiutR13Z+Ez1BKyYHCN8IHvFl7e/s50bsyD5g8a7ISEATBS7TWv6imxVGRl3Hd0fO81VrrI4ZhcNvtxEBEtu532bb91InfAwMDJ7e0tPwRAAqRSfdXKpXP9Pb2/jl8xjG1aZrrbNv+YR5wadZkIaDq9L4PAPFzPauS7HneRUR0MHYz/G7ZsmXv7unp+VcYCW4gojtiSnJ29zgiPk1EK7XWnBi1IGKfbds70wDKOicLAZ7nbUHEr846z4j7RkdHL4878biVV/3B/yLacAMp5c0AsLWe0lprJYS4olZpu976+d6nJcDzvLVE9Ei0xaaU+u3y5cvX8ldNkiGl5CoVF29nBiJumZUNSin7AIBZTWxahiuVUlOmaXY1+jikJUBKyVWdmY4Rn2ul1FnzRa/Dw8Otk5OT7PCjzZpDc+oBXN/XWm9DxCuiaWYCq5xTc+EzXpnJbQRpCfB9/2wiYucn2CIB4APFYvH+eoKllK9kpxgJ/K6pWRFixo4fP35GtSDCEdQaIvpiQnFkx9jY2LWlUqlST4F679MSwPtUSeCr7oFoAaSejKGhoVXT09MbhBB/sm37ztQlMd7Y87yrEHE4oe31sGmaGzdt2vRMPQUa4QMWIiO+NhMBVRIuIaI9QogV0c2UUkdN03Rt2+aeQK6RxQJyCUhYlJkA3kNKeTqn0Ij4uvieRHS3YRi9aVph8bVNQwArvmPHjlNaW1u5Ars+gVguj18/NjbmZfENTUVACNr3fZdrhEk3BiI+QUSfcxznvjQm25QEMLBdu3a9oVKpfDupT1gF/qDWemtSRSZKTNMSwCCq/QRHKfWleOcoBMkdJAC42bbtw0kW0dQEhICqf4q6hYg+WauhQkS/RMTBQqFwdzTrfFEQECGCO7e3xpsS8avTMIy7iOiAEOIJrbWNiFdH5jS085RkdbmuwTQOLULEhUS0PaGPV3cbIrrSdd14llp3XZYJi05AqAx3nojoWu4tpPmjpNZ6ZMWKFad1d3c/nwVQ1rlLRkCoWPXG4NbUVQDADc45gzu3QogPZonxswKfccx5Fy50HTcuOzo6LkDE93OKSkScqU0IIQ4ahrHTsqznFiojzfolt4A0Si3lnP8CZLP1FIS/4w0AAAAASUVORK5CYII="/>
     </div>
     <div class="mpa-wrapper"></div>
   </div>`);
   div = document.body.lastElementChild;
+  div.firstElementChild.lastElementChild.onclick = () => setMute(false);
 });
 
 
@@ -55,9 +57,10 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   if (request.action == 'init') {
     let { meta, dom, css, state } = options.assistant;
     let { scale, mute } = options.assistant.options;
-    setScale(scale, false);
-    setMute(mute, false);
+    // console.log("set scale from init");
     if (isReady) {
+      setScale(scale, false);
+      setMute(mute, false);
       console.log('current assistant exist');
       if (meta?.id) {
         if (myAssistant.state.activity != state.activity) {
@@ -66,6 +69,8 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         }
       }
     } else {
+      myAssistant.options.scale = scale;
+      myAssistant.options.mute = mute;
       console.log('current assistant not exist');
       if (meta?.id) {
         console.log('but it should exist');
@@ -132,6 +137,7 @@ function setAssistant({meta, dom, css, state = {}}) {
   myAssistant.el.onclick = onClickAssistant;
   myAssistant.meta = meta;
   setAssistantStyle(css);
+  // console.log("set scale from setAssistant");
   setScale(myAssistant.options.scale, false);
   sendUpdate({meta, dom, css, state});
   closeBalloon();
@@ -140,6 +146,7 @@ function setAssistant({meta, dom, css, state = {}}) {
   console.log('setAssistant ...', {meta, dom, css, state});
   console.log('setAssistant', myAssistant);
   if (!myAssistant.options.mute) {
+    // console.log('doRandomLook from setAssistant');
     doRandomLook();
   }
 }
@@ -213,10 +220,6 @@ function setBalloon(message, {duration, replies, type}) {
   }
   if (document.visibilityState === "hidden") {
     console.log('but tab not opened')
-    return;
-  }
-  if (myAssistant.options.mute) {
-    console.log('but muted')
     return;
   }
   if (type == 'greeting') {
@@ -299,6 +302,8 @@ function doChangeFacing() {
 }
 
 function doRandomLook() {
+  // console.log('doRandomLook ...', {...myAssistant.meta});
+  if (!myAssistant.meta) return;
   let delay;
   let level = +myAssistant.meta.talkativeness || 3;
   if (level < 1) level = 1;
@@ -312,7 +317,7 @@ function doRandomLook() {
     case 5: delay = 5000 + Math.random() * 30000; break;
   }
 
-  console.log('do random look', delay);
+  // console.log('do random look', delay);
   clearTimeout(timeOutLook);
   timeOutLook = setTimeout(() => {
     let mute = myAssistant.options.mute;
@@ -322,6 +327,7 @@ function doRandomLook() {
     } else {
       requestAction('lookup');
     }
+    // console.log('doRandomLook from doRandomLook');
     doRandomLook();
   }, delay);
 }
@@ -393,26 +399,40 @@ function doNothing(callback = function(){}) {
 }
 
 function setScale(scale = 1.0, sync = true) {
-  if (myAssistant.options.scale == scale) return;
-  if (sync) sendUpdate({scale});
+  console.log("set scale", scale, sync, {...myAssistant});
+  if (sync) {
+    if (myAssistant.options.scale == scale) return;
+    sendUpdate({scale});
+  }
   myAssistant.options.scale = scale;
   if (myAssistant.el) {
     div.firstElementChild.style.bottom = ((myAssistant.meta.knowledge.balloon_offset?.bottom || defaultBalloonOffsetBottom) * scale) + 'px';
     div.lastElementChild.style.transform = 'scale(' + scale + ')';
+    if (!div.lastElementChild.classList.contains('animate')) {
+      setTimeout(() => {
+        div.lastElementChild.classList.add('animate');
+      }, 400);
+    }
     alignBalloon();
   }
 }
 
 function setMute(mute = true, sync = true) {
-  if (myAssistant.options.mute == mute) return;
-  if (sync) sendUpdate({mute});
+  console.log("set mute", mute, sync);
+  if (sync) {
+    if (myAssistant.options.mute == mute) return;
+    sendUpdate({mute});
+  }
   myAssistant.options.mute = mute;
   if (mute) {
     closeBalloon();
     clearTimeout(timeOutLook);
     timeOutLook = null;
+    div.firstElementChild.lastElementChild.style.display = 'block';
   } else {
+    // console.log('doRandomLook from setMute');
     doRandomLook();
+    div.firstElementChild.lastElementChild.style.display = 'none';
   }
 }
 
@@ -451,7 +471,7 @@ function dismiss() {
 
 function sendUpdate(update) {
   if (document.visibilityState === "hidden") {
-    console.log('visibility', document.visibilityState);
+    console.log('update not sent because visibility', document.visibilityState);
     return;
   }
   chrome.runtime.sendMessage({action: 'update', update}, function(response) {

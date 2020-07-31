@@ -408,11 +408,10 @@ function setScale(scale = 1.0, sync = true) {
   if (myAssistant.el) {
     div.firstElementChild.style.bottom = ((myAssistant.meta.knowledge.balloon_offset?.bottom || defaultBalloonOffsetBottom) * scale) + 'px';
     div.lastElementChild.style.transform = 'scale(' + scale + ')';
-    if (!div.lastElementChild.classList.contains('animate')) {
-      setTimeout(() => {
-        div.lastElementChild.classList.add('animate');
-      }, 400);
-    }
+    div.lastElementChild.classList.remove('animate');
+    setTimeout(() => {
+      div.lastElementChild.classList.add('animate');
+    }, 400);
     alignBalloon();
   }
 }

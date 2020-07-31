@@ -1,7 +1,6 @@
 var defaultBalloonOffsetBottom = 150;
 var defaultBalloonOffsetLeft = 100;
 var defaultBalloonDuration = 5000;
-var maxDelayGreeting = 3000;
 var durationGreeting = 8000;
 var durationAttention = 3000;
 var durationActivityMin = 3000;

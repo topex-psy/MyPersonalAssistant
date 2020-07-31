@@ -1,25 +1,47 @@
-#new {
+#my_assistant {
   position: relative;
-  width: 22.5vmax;
-  height: 8.25vmax;
+  width: 202.5px;
+  height: 74.25px;
 }
 
 /* Facing Styles */
-#new[data-facing="left"] {
+#my_assistant[data-facing="left"] {
   transform: rotateY(0deg);
 }
-#new[data-facing="right"] {
+#my_assistant[data-facing="right"] {
   transform: rotateY(180deg);
 }
 
 /* Activity Styles */
+#my_assistant[data-activity="walk"] .part__left_hand,
+#my_assistant[data-activity="walk"] .part__right_hand {
+  animation: walking-hand 1.2s ease infinite;
+}
+#my_assistant[data-activity="walk"] .part__left_foot,
+#my_assistant[data-activity="walk"] .part__right_foot {
+  animation: walking-foot 1.2s ease infinite;
+}
 /*
-#new[data-activity="walk"] {
+#my_assistant[data-activity="dance"] {
 }
-#new[data-activity="dance"] {
+#my_assistant[data-activity="pee"] {
 }
-#new[data-activity="pee"] {
-}
-#new[data-activity="poop"] {
+#my_assistant[data-activity="poop"] {
 }
 */
+
+@keyframes walking-hand {
+  0% {}
+  30% {}
+  40% {}
+  65% {}
+  100% {}
+}
+
+@keyframes walking-foot {
+  0% {}
+  30% {}
+  40% {}
+  65% {}
+  100% {}
+}

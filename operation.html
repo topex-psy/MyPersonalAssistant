@@ -142,7 +142,7 @@
           <h3>Basic Informations</h3>
           <table>
             <tbody>
-              <tr><td><code>id</code></td><td>Assistant ID that is lowercase text with no space, minimum 4 letters, maximum 50</td></tr>
+              <tr><td><code>id</code></td><td>Assistant ID that is lowercase text with no space, minimum 4 letters, maximum 40</td></tr>
               <tr><td><code>name</code></td><td>Assistant name</td></tr>
               <tr><td><code>bio</code></td><td>Assistant description, bio, back-story, or anything</td></tr>
               <tr><td><code>author</code></td><td>Author of this assistant</td></tr>
@@ -178,9 +178,9 @@
             <tbody>
               <tr><td><code>[data-activity="('walk' or custom)"]</code></td><td>Filled with Activity ID as the attribute value e.g. <code>[data-activity="walk"]</code> which indicates what activity the assistant doing. Activity IDs other than "walk" can be defined in the <a href="#manifest">Manifest</a>.</td></tr>
               <tr><td><code>[data-facing="('left' or 'right')"]</code></td><td>Filled with "left", "right", or removed which indicates where this assistant heading.</td></tr>
-              <tr><td><code>[data-talking="true"]</code></td><td>Filled with "true" or removed which indicates whether this assistant is talking or not.</td></tr>
-              <tr><td><code>[data-attention="true"]</code></td><td>Filled with "true" or removed which indicates whether this assistant is talking or not.</td></tr>
+              <tr><td><code>[data-attention="true"]</code></td><td>Filled with "true" or removed which is expectedly being true for few seconds after a click on the assistant.</td></tr>
               <tr><td><code>[data-greeting="true"]</code></td><td>Filled with "true" or removed which indicates whether this assistant is introducing themself or not. Usually once when this assistant appears on your screen.</td></tr>
+              <tr><td><code>[data-talking="true"]</code></td><td>Filled with "true" or removed which indicates whether this assistant is talking or not.</td></tr>
             </tbody>
           </table>
           <div class="caption no-padding">

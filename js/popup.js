@@ -261,7 +261,6 @@ document.addEventListener('DOMContentLoaded', function () {
             action: 'assistant',
             options
           });
-          alert(json.manifest.name + " has been set as your assistant!");
         } else {
           alert("Cannot import: invalid content!");
         }

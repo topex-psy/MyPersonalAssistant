@@ -16,8 +16,7 @@ var init = {
   html: null,
   css: null
 };
-var timeoutCheck;
-var isCreate = false;
+var isCreate = init.manifest.id == 'new';
 var isImporting = false;
 
 // setting up code editor
@@ -75,31 +74,27 @@ function codeValidity(key = null) {
   }
   key = key || currentTab;
   console.log("check validity", key);
-  clearTimeout(timeoutCheck);
 
   if (['code', 'html', 'css'].includes(key)) {
-    timeoutCheck = setTimeout(() => {
-      if (getCurrentTab() != 'code') return;
-      let annotations = {
-        html: editors.html.getSession().getAnnotations().filter(a => a.type == 'error'),
-        css: editors.css.getSession().getAnnotations().filter(a => a.type == 'error'),
-      };
-      let statusHTML = document.querySelector('#panel-html .status');
-      let statusCSS = document.querySelector('#panel-css .status');
-      console.log('annotations', annotations);
-      if (annotations.html.length || annotations.css.length) {
-        if (annotations.html.length) statusHTML.classList.add('error'); else statusHTML.classList.remove('error');
-        if (annotations.css.length) statusCSS.classList.add('error'); else statusCSS.classList.remove('error');
-        document.querySelector('#json-success').style.display = 'none';
-        document.querySelector('#json-warning span').innerHTML = `There's some errors. Please fix them!`;
-        document.querySelector('#json-warning').style.display = 'flex';
-      } else {
-        statusHTML.classList.remove('error');
-        statusCSS.classList.remove('error');
-        document.querySelector('#json-success').style.display = 'flex';
-        document.querySelector('#json-warning').style.display = 'none';
-      }
-    }, 500);
+    let annotations = {
+      html: editors.html.getSession().getAnnotations().filter(a => a.type == 'error'),
+      css: editors.css.getSession().getAnnotations().filter(a => a.type == 'error'),
+    };
+    let statusHTML = document.querySelector('#panel-html .status');
+    let statusCSS = document.querySelector('#panel-css .status');
+    console.log('annotations', annotations);
+    if (annotations.html.length || annotations.css.length) {
+      if (annotations.html.length) statusHTML.classList.add('error'); else statusHTML.classList.remove('error');
+      if (annotations.css.length) statusCSS.classList.add('error'); else statusCSS.classList.remove('error');
+      document.querySelector('#json-success').style.display = 'none';
+      document.querySelector('#json-warning span').innerHTML = `There's some errors. Please fix them!`;
+      document.querySelector('#json-warning').style.display = 'flex';
+    } else {
+      statusHTML.classList.remove('error');
+      statusCSS.classList.remove('error');
+      document.querySelector('#json-success').style.display = 'flex';
+      document.querySelector('#json-warning').style.display = 'none';
+    }
     return;
   }
 
@@ -117,7 +112,6 @@ function codeValidity(key = null) {
       });
       let errors = []
       if (key == 'manifest') {
-        // finalizeScripts(parsed.id, true);
         document.getElementById('header-title').innerText = parsed.name || 'Anonymous';
         document.getElementById('header-author').innerText = parsed.author || 'Anonymous';
   
@@ -153,15 +147,16 @@ function codeValidity(key = null) {
 
 // load initial data
 console.log('location', location.href);
-isCreate = init.manifest.id == 'new';
 document.title = isCreate ? "Create New Assistant" : "Operation Room";
 if (isCreate) {
+  $.ajaxSetup({ cache: false });
   $.when(
     $.get(baseUrl + 'assistants/new/html.html'),
     $.get(baseUrl + 'assistants/new/style.css'),
     $.get(baseUrl + 'assistants/new/knowledge.json'),
     $.get(baseUrl + 'assistants/new/manifest.json'),
   ).done(function (htmlResult, cssResult, knowledgeResult, manifestResult) {
+    console.log('ajax results', htmlResult, cssResult, knowledgeResult, manifestResult);
     let manifest = manifestResult[0];
     let knowledge = knowledgeResult[0];
     let html = htmlResult[0];

@@ -26,7 +26,7 @@ var myAssistant = {
   state: {
     activity: null,
     facing: null,
-    x: '50',
+    x: 50,
   }
 };
 

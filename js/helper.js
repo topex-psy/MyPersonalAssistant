@@ -49,3 +49,28 @@ function isJSONValid(str) {
   }
   return parsed;
 }
+
+function exportFile({manifest, knowledge, html, css}) {
+  var fileName = `${manifest.id}.${exportExtension}`;
+  var content = JSON.stringify({manifest, html, css, knowledge}, null, 2);
+  var blob = writeBlob(content);
+  var url = window.URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.style.display = 'none';
+  a.href = url;
+  a.download = fileName;
+  document.body.append(a);
+  a.click();
+  window.URL.revokeObjectURL(url);
+}
+
+function writeBlob(content, type = exportMime) {
+  try {
+    return new Blob([content], {type});
+  } catch (e) {
+    var BlobBuilder = window.WebKitBlobBuilder || window.MozBlobBuilder || window.BlobBuilder || window.OperaBlobBuilder;
+    var bb = new BlobBuilder();
+    bb.append(content);
+    return bb.getBlob(type);
+  }
+}

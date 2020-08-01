@@ -171,29 +171,10 @@ function setAssistant(assistant) {
         options: myAssistant
       });
     } else {
-      $.when(
-        $.get(baseUrl + 'assistants/' + assistant + '/html.html'),
-        $.get(baseUrl + 'assistants/' + assistant + '/style.css'),
-        $.get(baseUrl + 'assistants/' + assistant + '/knowledge.json'),
-        $.get(baseUrl + 'assistants/' + assistant + '/manifest.json'),
-      ).done(function (domResult, cssResult, knowledgeResult, manifestResult) {
-        let manifest = manifestResult[0];
-        let knowledge = knowledgeResult[0];
-        let dom = domResult[0];
-        let css = cssResult[0];
-        let meta = { ...manifest, knowledge };
-        let options = {
-          meta,
-          dom,
-          css
-        };
-        console.log('loaded from online', options);
-        chrome.storage.sync.set({my_assistants: [...myAssistantList, options]}, function() {
-          console.log('assistant data saved!')
-        });
+      hireAssistant(assistant, (result) => {
         sendAll({
           action: 'assistant',
-          options
+          result
         });
       });
     }
@@ -225,6 +206,10 @@ document.addEventListener('DOMContentLoaded', function () {
   };
   document.querySelector('input[name="scale"]').oninput = (e) => {
     sendAll({ action: 'scale', options: { scale: e.target.value } });
+  };
+  document.querySelector('.btn-browse').onclick = () => {
+    chrome.tabs.create({active: true, url: chrome.runtime.getURL("showcase.html")});
+    window.close();
   };
   document.querySelector('.btn-import').onclick = () => {
     document.querySelector('#file-import').click();

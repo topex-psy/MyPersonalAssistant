@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
   <head>
     <title>Select Your Assistant</title>
@@ -6,6 +6,7 @@
     <link href="css/loader.css" rel="stylesheet"/>
     <script src="vendor/jquery-2.1.3.min.js"></script>
     <script src="js/helper.js"></script>
+    <script src="js/functions.js"></script>
     <script src="js/popup.js"></script>
   </head>
   <body class="loading">
@@ -15,8 +16,9 @@
         <ul class="assistant-list">
           <li data-assistant="new"><h1>+</h1> Create</li>
         </ul>
-        <a class="btn-browse" href="https://www.taufiknur.com/assistants/showcase.html" target="_blank">Browse online</a>
-        <a class="btn-import" href="#">Import file</a>
+        <!-- <a class="btn-browse" href="https://www.taufiknur.com/assistants/showcase.html" target="_blank">Browse online</a> -->
+        <a class="btn-browse">Browse online</a>
+        <a class="btn-import">Import file</a>
         <input type="file" id="file-import" accept="application/JSON"/>
       </div>
       <div class="tool">
@@ -36,10 +38,6 @@
         <div class="more">
           <label>Scale:</label>
           <input type="number" name="scale" min="0.2" max="2.0" step="0.1" value="1.0"/>
-          <!-- <label title="Disable talk balloons">
-            <input type="checkbox" name="mute"/>
-            Mute
-          </label> -->
           <input id="checkbox-mute" type="checkbox" name="mute"/>
           <label for="checkbox-mute">Mute</label>
         </div>

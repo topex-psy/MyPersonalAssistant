@@ -4,6 +4,7 @@ a {
   font-weight: 600;
   text-decoration: none;
   color: #5596ff;
+  cursor: pointer;
 }
 a:hover {
   text-decoration: underline;

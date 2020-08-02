@@ -1,10 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,800;1,400&display=swap');
 
-* {
-  box-sizing: border-box;
-}
 body {
   font-family: 'Montserrat', sans-serif;
+  background: #fff;
   margin: 0;
 }
 a, input {
@@ -18,22 +16,112 @@ a {
   transition: all .4s;
 }
 a:not(.btn):hover, a:not(.btn):active, a:not(.btn).active {
+  text-decoration: underline;
   color: #2478ff;
 }
-input:not([type="file"]) {
+input:not([type="file"]), select, textarea {
   border-radius: 2rem;
-  padding: 0 1rem;
-  line-height: 2rem;
+  padding: .5rem 1rem;
+  line-height: 1rem;
   border: 1px solid #d9d9d9 !important;
   background: #fff;
   box-shadow: 0px 4px 7px -7px rgba(0,0,0,.3);
 }
+input[type="checkbox"] {
+  position: absolute;
+  pointer-events: none;
+  opacity: 0;
+}
+input[type="checkbox"] + label {
+  position: relative;
+  cursor: pointer;
+  padding: 0;
+}
+input[type="checkbox"] + label:before {
+  content: '';
+  margin-right: 5px;
+  display: inline-block;
+  vertical-align: text-top;
+  width: 20px;
+  height: 20px;
+  background: #fbeeee;
+  border-radius: 50%;
+}
+input[type="checkbox"]:hover + label:before {
+  background: #ffcebe;
+}
+input[type="checkbox"]:focus + label:before {
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.12);
+}
+input[type="checkbox"]:checked + label:before {
+  background: #f35429;
+}
+input[type="checkbox"]:disabled + label {
+  color: #b8b8b8;
+  cursor: auto;
+}
+input[type="checkbox"]:disabled + label:before {
+  box-shadow: none;
+  background: #ddd;
+}
+input[type="checkbox"]:checked + label:after {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 9px;
+  background: white;
+  width: 2px;
+  height: 2px;
+  box-shadow: 2px 0 0 white, 4px 0 0 white, 4px -2px 0 white, 4px -4px 0 white, 4px -6px 0 white, 4px -8px 0 white;
+  -webkit-transform: rotate(45deg);
+          transform: rotate(45deg);
+}
+.form-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-top: 1rem;
+}
+.form-group:first-child {
+  margin-top: 0;
+}
+.form-group label {
+  font-weight: 600;
+  margin-bottom: .25rem;
+}
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  box-sizing: border-box;
+}
+.form-group.inline {
+  flex-direction: row;
+  justify-content: space-between;
+}
+.form-group.inline input,
+.form-group.inline select {
+  width: auto;
+}
+.form-group.inline textarea {
+  width: 500px;
+}
+.form-group.inline label {
+  margin-right: 1rem;
+}
 #file-import {
   display: none;
+}
+.justify-content-start {
+  justify-content: flex-start !important;
+}
+.swal2-container {
+  padding: 1rem;
 }
 .swal2-popup {
   border-radius: 1rem !important;
   box-shadow: 0 0 8px rgba(0,0,0,.1);
+  padding: 1rem;
 }
 .swal2-popup.swal2-toast .swal2-content {
   padding-left: .5rem;

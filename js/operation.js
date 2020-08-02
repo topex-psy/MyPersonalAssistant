@@ -102,11 +102,11 @@ function codeValidity(key = null) {
     document.querySelector('#json-warning').style.display = 'none';
     document.getElementById(key + '-form')?.reset();
   } else {
-    let parsed = isJSONValid(value);
+    let parsed = isValidJson(value);
     if (parsed) {
-      document.getElementById(key + '-form')?.querySelectorAll('input').forEach(input => {
+      document.getElementById(key + '-form')?.querySelectorAll('input, select, textarea').forEach(input => {
         let name = input.getAttribute('name');
-        input.value = parsed[name];
+        input.value = parsed[name] || '';
       });
       let errors = []
       if (key == 'manifest') {
@@ -119,6 +119,8 @@ function codeValidity(key = null) {
         else if (!/^[a-z]+$/.test(parsed.id)) errors.push('<code>id</code> property must contains only lowercase letters without spaces, numbers, etc!')
         if (!parsed.name) errors.push('<code>name</code> property must be set!')
         if (!parsed.author) errors.push('<code>author</code> property must be set!')
+        if (!parsed.email) errors.push('<code>email</code> property must be set!')
+        else if (!isValidEmail(parsed.email)) errors.push('<code>email</code> property must be valid email address!')
         if (!parsed.version) errors.push('<code>version</code> property must be set!')
         if (!parsed.activities) errors.push('<code>activities</code> property must be set!')
         else if (parsed.activities.filter(a => a.id == 'walk').length) errors.push('<code>id</code> property on <code>activities</code> must be other than "walk"!')
@@ -270,15 +272,11 @@ document.addEventListener('DOMContentLoaded', function () {
       var reader = new FileReader();
       reader.readAsText(file, "UTF-8");
       reader.onload = function (evt) {
-        let json = isJSONValid(evt.target.result);
+        let json = isValidJson(evt.target.result);
         if (json) {
           initEditor(json);
         } else {
-          Swal.fire(
-            'Import Failed!',
-            'Cannot import: Invalid content!',
-            'error'
-          );
+          Swal.fire('Import Failed!', 'Cannot import: Invalid content!', 'error');
         }
       }
       reader.onerror = function (evt) {
@@ -302,8 +300,8 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelector('#file-import').click();
   }
   document.querySelector('#btn-export').onclick = () => {
-    let manifest = isJSONValid(editors.manifest.session.getValue());
-    let knowledge = isJSONValid(editors.knowledge.session.getValue());
+    let manifest = isValidJson(editors.manifest.session.getValue());
+    let knowledge = isValidJson(editors.knowledge.session.getValue());
     let html = editors.html.session.getValue();
     let css = editors.css.session.getValue();
     if (manifest && knowledge) {
@@ -343,9 +341,9 @@ document.addEventListener('DOMContentLoaded', function () {
     panel.setAttribute('data-view', e.target.getAttribute('data-view'));
     flushEditor();
   });
-  document.querySelectorAll('#manifest-form input').forEach(el => {
+  document.getElementById('manifest-form').querySelectorAll('input, select, textarea').forEach(el => {
     el.oninput = (e) => {
-      let parsed = isJSONValid(editors.manifest.session.getValue());
+      let parsed = isValidJson(editors.manifest.session.getValue());
       if (parsed) {
         parsed[e.target.getAttribute('name')] = e.target.value;
         editors.manifest.session.setValue(JSON.stringify(parsed, null, 2));

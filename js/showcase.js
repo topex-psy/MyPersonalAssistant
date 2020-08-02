@@ -107,7 +107,7 @@ function action(e) {
             chrome.storage.sync.set({my_assistants: newList}, function() {
               console.log('assistant data saved!');
               sendAll({action: 'remove', options: {id}});
-              let update = { dismissed: true };
+              let update = { dismissed: id };
               chrome.runtime.sendMessage({action: 'update', update}, function(response) {
                 console.log('update sent', update, response);
               });
@@ -121,14 +121,20 @@ function action(e) {
         chrome.storage.sync.get('my_assistants', function(data) {
           let myAssistantList = data.my_assistants || [];
           chrome.storage.sync.set({my_assistants: [...myAssistantList, result]}, function() {
-            console.log('assistant data saved!')
-            getData();
+            let error = chrome.runtime.lastError;
+            if (error) {
+              console.log('assistant data not saved!', error.message);
+              Swal.fire('Hire Failed!', 'Local storage quota exceeded!', 'error');
+            } else {
+              console.log('assistant data saved!');
+              Toast.fire({
+                text: name + ' has been hired to your list!',
+                type: 'success',
+              });
+              getData();
+            }
           });
         });
-        Toast.fire({
-          text: name + ' has been hired to your list!',
-          type: 'success',
-        })
       });
     }
   }
@@ -446,7 +452,7 @@ function closeBalloon(force = false) {
   demoAssistant.el.removeAttribute("data-greeting");
 }
 
-function sendAll(message) {
+function sendAll(message, callback = function(){}) {
   console.log('send all', message);
   chrome.tabs.query({windowType: 'normal', url: ['http://*/*', 'https://*/*'], status: 'complete'}, function(tabs) {
     tabs.forEach(tab => {
@@ -458,6 +464,7 @@ function sendAll(message) {
         } else {
           console.log('send all response', response)
         }
+        callback(response);
       });
     });
   });
@@ -471,53 +478,71 @@ document.addEventListener('DOMContentLoaded', function () {
   document.querySelector('#search').oninput = e => {
     if (!e.currentTarget.value) getData();
   };
-  document.querySelector('.btn-publish').onclick = () => {
-    document.querySelector('#file-import').click();
-  };
-  document.querySelector('#file-import').oninput = (e) => {
-    var file = e.currentTarget.files[0];
-    if (file) {
-      var reader = new FileReader();
-      reader.readAsText(file, "UTF-8");
-      reader.onload = function (evt) {
-        let { result } = evt.target;
-        if (result.toLowerCase().includes('script')) {
-          Swal.fire(
-            'Publish Failed!',
-            'Cannot publish: Contains "script" is not allowed!',
-            'error'
-          );
-          return;
-        }
-        let json = isJSONValid(result);
-        if (json) {
-          $.post(`${baseUrl}assistants/post.php`, json, function(response) {
-            console.log("post result", response);
-            let res = JSON.parse(response);
-            if (res.error) {
-              Swal.fire(
-                'Publish Failed!',
-                'Cannot publish: ' + res.error,
-                'error'
-              );
-            } else {
-              Swal.fire(
-                'Publish Success!',
-                'Your assistant has been published to the showcase!',
-                'success'
-              ).then(getData);
-            }
-          });
-        } else {
-          Swal.fire(
-            'Publish Failed!',
-            'Cannot publish: Invalid content!',
-            'error'
-          );
-        }
+  document.querySelector('.btn-publish').onclick = async () => {
+    // TODO swal form input file & email
+    // TODO send email edit key & remove key
+    const { value: formValues } = await Swal.fire({
+      title: 'Publish Your Assistant',
+      html: `<div id="form-publish">
+        <div class="form-group"><label>Upload .json:</label><input id="input-publish-json" required type="file" accept="application/JSON"></div>
+        <div class="form-group"><label>Key (Optional):</label><input id="input-publish-key" type="text" placeholder="If you're updating or deleting"></div>
+        <div class="form-group inline justify-content-start" id="div-publish-type">
+          <label><input type="radio" name="key_type" value="update"/> Update</label>
+          <label><input type="radio" name="key_type" value="delete"/> Delete</label>
+        </div>
+      </div>`,
+      focusConfirm: false,
+      showCancelButton: true,
+      onBeforeOpen: (modal) => {
+        let divPublishType = modal.querySelector('#div-publish-type');
+        modal.querySelector('#input-publish-key').oninput = (e) => {
+          if (e.target.value) {
+            divPublishType.style.display = 'block';
+          } else {
+            divPublishType.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+            divPublishType.style.display = 'none';
+          }
+        };
+      },
+      preConfirm: () => {
+        let file = document.getElementById('input-publish-json').files[0];
+        let key = document.getElementById('input-publish-key').value;
+        let keyType = document.getElementById('div-publish-type').querySelector('input[type="radio"]:checked').value;
+        if (file) return { file, key, keyType }
       }
-      reader.onerror = function (evt) {
-        console.log("error reading file", evt);
+    })
+    if (formValues) {
+      console.log('formValues', formValues);
+      let { file } = formValues;
+      if (file) {
+        var reader = new FileReader();
+        reader.readAsText(file, "UTF-8");
+        reader.onload = function (evt) {
+          let { result } = evt.target;
+          if (result.toLowerCase().includes('script')) {
+            Swal.fire('Publish Failed!', 'Cannot publish: Contains "script" is not allowed!', 'error');
+            return;
+          }
+          let json = isValidJson(result);
+          if (json) {
+            $.post(`${baseUrl}assistants/post.php`, json, function(response) {
+              console.log("post result", response);
+              let res = JSON.parse(response);
+              if (res.error) {
+                Swal.fire('Publish Failed!', 'Cannot publish: ' + res.error, 'error');
+              } else {
+                Swal.fire('Publish Success!', 'Your assistant has been published to the showcase!', 'success').then(getData);
+              }
+            });
+          } else {
+            Swal.fire('Publish Failed!', 'Cannot publish: Invalid content!', 'error');
+          }
+        }
+        reader.onerror = function (evt) {
+          console.log("error reading file", evt);
+        }
+      } else {
+        Swal.fire('Publish Failed!', 'Cannot publish: File is required!', 'error');
       }
     }
   };

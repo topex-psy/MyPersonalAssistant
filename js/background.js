@@ -47,7 +47,7 @@ function bindListeners() {
       return true;
     }
     else if (action == 'lookup' && sender.tab.selected) lookup();
-    else if (action == 'action') action();
+    else if (action == 'action') selectAction();
     else if (action == 'click') click();
     else if (action == 'count') count();
     else if (action == 'greeting') greeting();
@@ -74,7 +74,7 @@ function bindListeners() {
         if (assistant.meta?.id && !assistant.state.greet) greeting();
         sync = true;
       }
-      if (update.hasOwnProperty('dismissed')) {
+      if (update.hasOwnProperty('dismissed') && assistant.meta?.id == update.dismissed) {
         assistant.meta = null;
         assistant.dom = null;
         assistant.css = null;
@@ -238,7 +238,7 @@ function click() {
   }
 }
 
-function action() {
+function selectAction() {
   let { meta } = assistant;
   let possibleResponses = meta.knowledge.action.responses;
   let message = getRandomFrom(possibleResponses).replace('[name]', meta.name);

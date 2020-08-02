@@ -75,31 +75,57 @@
               <div class="editor" id="editor-manifest">loading ...</div>
             </div>
             <form id="manifest-form" data-view="2">
-              <div class="form-group">
+              <div class="form-group inline">
                 <label>ID</label>
                 <input type="text" name="id" required minlength="4" maxlength="40"/>
               </div>
-              <div class="form-group">
+              <div class="form-group inline">
                 <label>Name</label>
                 <input type="text" name="name" required/>
               </div>
-              <div class="form-group">
+              <div class="form-group inline">
                 <label>Author</label>
                 <input type="text" name="author" required/>
               </div>
-              <div class="form-group">
+              <div class="form-group inline">
+                <label>Email</label>
+                <input type="email" name="email" required/>
+              </div>
+              <div class="form-group inline">
                 <label>Website</label>
                 <input type="url" name="website"/>
               </div>
-              <div class="form-group">
+              <div class="form-group inline">
                 <label>Version</label>
                 <input type="text" name="version" required/>
               </div>
-              <div class="form-group">
+              <div class="form-group inline">
+                <label>Bio</label>
+                <textarea name="bio"></textarea>
+              </div>
+              <div class="form-group inline">
+                <label>Icon</label>
+                <select name="icon">
+                  <option>icon.png</option>
+                  <option>icon.gif</option>
+                </select>
+              </div>
+              <div class="form-group inline">
+                <label>Keywords</label>
+                <input type="text" name="keywords"/>
+              </div>
+              <div class="form-group inline">
+                <label>Language</label>
+                <select name="language">
+                  <option value="en">English</option>
+                  <option value="id">Indonesian</option>
+                </select>
+              </div>
+              <div class="form-group inline">
                 <label>Talkativeness</label>
                 <input type="number" min="1" max="5" step="1" name="talkativeness"/>
               </div>
-              <div class="form-group">
+              <div class="form-group inline">
                 <label>Hyperactiveness</label>
                 <input type="number" min="1" max="5" step="1" name="hyperactiveness"/>
               </div>
@@ -149,6 +175,7 @@
               <tr><td><code>id</code></td><td>Assistant ID that is lowercase text with no space, minimum 4 letters, maximum 40.</td></tr>
               <tr><td><code>name</code></td><td>Assistant name.</td></tr>
               <tr><td><code>author</code></td><td>Author of this assistant.</td></tr>
+              <tr><td><code>email</code></td><td>Email of the author of this assistant.</td></tr>
               <tr><td><code>website</code></td><td>Website (URL) of the author or this assistant.</td></tr>
               <tr><td><code>version</code></td><td>Version number of this assistant.</td></tr>
               <tr><td><code>bio</code></td><td>Assistant description, bio, hobbies, or anything in one sentence.</td></tr>

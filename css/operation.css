@@ -4,7 +4,7 @@ body {
   height: 100vh;
 }
 #header {
-  padding: 1rem;
+  padding: 0 1rem;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -57,6 +57,7 @@ body {
 }
 .container {
   padding: 1rem;
+  padding-bottom: 3rem;
   display: flex;
   flex-grow: 1;
 }
@@ -116,7 +117,7 @@ code {
 code.multiline {
   white-space: pre-wrap;
 }
-textarea {
+/* textarea {
   border-radius: .5rem;
   padding: .75rem;
   border: 1px solid #eee;
@@ -124,7 +125,7 @@ textarea {
   height: 100%;
   box-shadow: 0px 2px 11px -6px rgba(0, 0, 0, .5);
   font-size: 1rem;
-}
+} */
 .dropdown {
   display: inline-block;
   position: relative;
@@ -164,7 +165,7 @@ textarea {
   background-color: #f2fcff;
   padding-left: 2.5rem;
   position: relative;
-  min-height: 32px;
+  /* min-height: 32px; */
   line-height: 18px;
 }
 .caption p::before {
@@ -268,7 +269,7 @@ textarea {
 .panel-title .status.error::before {
   content: '!'
 }
-.form-group {
+/* .form-group {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -276,7 +277,7 @@ textarea {
 }
 .form-group label {
   margin-right: 1rem;
-}
+} */
 .no-padding {
   padding: 0 !important;
 }

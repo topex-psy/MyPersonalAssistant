@@ -42,7 +42,10 @@ function isHttp(url) {
   return url?.substring(0, 4) == "http";
 }
 
-function isJSONValid(str) {
+function isValidEmail(email) {
+  return /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$/.test(email);
+}
+function isValidJson(str) {
   let parsed;
   try {
     parsed = JSON.parse(str);

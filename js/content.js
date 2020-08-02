@@ -30,7 +30,7 @@ var myAssistant = {
   }
 };
 
-chrome.runtime.sendMessage({action: 'get_init'}, function(response) {
+chrome.runtime?.sendMessage({action: 'get_init'}, function(response) {
   console.log('get init response', response);
   const style = document.createElement('style');
   style.textContent = response.css;
@@ -57,7 +57,6 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   if (request.action == 'init') {
     let { meta, dom, css, state } = options.assistant;
     let { scale, mute } = options.assistant.options;
-    // console.log("set scale from init");
     if (isReady) {
       setScale(scale, false);
       setMute(mute, false);
@@ -201,8 +200,13 @@ function requestAction(action, options = {}) {
   } else {
     if (action == 'dismiss' || action == 'greeting') doNothing();
     if (action == 'lookup') closeBalloon(true);
-    chrome.runtime.sendMessage({action, options}, function(response) {
-      console.log(action + ' response', response);
+    chrome.runtime?.sendMessage({action, options}, function(response) {
+      let error = chrome.runtime.lastError;
+      if (error) {
+        console.log(action + ' error', error.message);
+      } else {
+        console.log(action + ' response', response);
+      }
     });
   }
 }
@@ -241,7 +245,9 @@ function setBalloon(message, {duration, replies, type}) {
       let action = e.currentTarget.parentNode.getAttribute('data-action');
       myAssistant.el?.removeAttribute("data-attention");
       myAssistant.el?.removeAttribute("data-greeting");
-      if (myAssistant.meta.activities.filter(a => a.id == action).length) {
+      let isAction = myAssistant.meta.activities.filter(a => a.id == action).length > 0;
+      console.log('click action', action, isAction);
+      if (isAction) {
         setAction(action);
       } else {
         requestAction(action);
@@ -484,7 +490,7 @@ function sendUpdate(update) {
     console.log('update not sent because visibility', document.visibilityState);
     return;
   }
-  chrome.runtime.sendMessage({action: 'update', update}, function(response) {
+  chrome.runtime?.sendMessage({action: 'update', update}, function(response) {
     console.log('update sent', update, response);
   });
 }

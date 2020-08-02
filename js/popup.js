@@ -226,7 +226,7 @@ document.addEventListener('DOMContentLoaded', function () {
       var reader = new FileReader();
       reader.readAsText(file, "UTF-8");
       reader.onload = function (evt) {
-        let json = isJSONValid(evt.target.result);
+        let json = isValidJson(evt.target.result);
         if (json) {
           let options = {
             meta: {...json.manifest, knowledge: json.knowledge},

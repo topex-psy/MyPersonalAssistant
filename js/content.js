@@ -47,8 +47,6 @@ chrome.runtime?.sendMessage({action: 'get_init'}, function(response) {
   div.firstElementChild.lastElementChild.onclick = () => setMute(false);
 });
 
-
-
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   console.log("request received", request, sender);
   let {message, type, options} = request;
@@ -258,6 +256,7 @@ function setBalloon(message, {duration, replies, type}) {
   }
 
   balloon.classList.remove('dismissed');
+  balloon.classList.remove('noanimation');
   balloon.classList.add('show');
   myAssistant.el.setAttribute("data-talking", true);
 
@@ -463,12 +462,17 @@ function alignBalloon() {
 
 function dismiss(sync = true) {
   if (!myAssistant.el) return;
+  if (sync) sendUpdate({ dismissed: myAssistant.meta.id });
   doNothing();
   clearTimeout(timeOutLook);
   clearTimeout(timeOutWalk);
   let balloon = div.firstElementChild;
-  balloon.querySelector('big').innerText = getRandomFrom(myAssistant.meta.knowledge.dispel?.responses) || 'Good bye!';
-  balloon.querySelector('ul').innerHTML = '';
+  if (document.visibilityState === "hidden") {
+    balloon.classList.add('noanimation');
+  } else {
+    balloon.querySelector('big').innerText = getRandomFrom(myAssistant.meta.knowledge.dispel?.responses) || 'Good bye!';
+    balloon.querySelector('ul').innerHTML = '';
+  }
   closeBalloon(true);
   myAssistant.el.remove();
   myAssistant.el = null;
@@ -482,7 +486,6 @@ function dismiss(sync = true) {
   //     greet: false,
   //   },
   // });
-  if (sync) sendUpdate({ dismissed: true });
 }
 
 function sendUpdate(update) {

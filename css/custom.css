@@ -87,7 +87,7 @@ input[type="checkbox"]:checked + label:after {
 }
 .form-group label {
   font-weight: 600;
-  margin-bottom: .25rem;
+  margin-bottom: .5rem;
 }
 .form-group input,
 .form-group select,

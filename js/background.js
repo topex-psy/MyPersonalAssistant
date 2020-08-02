@@ -137,7 +137,7 @@ function initiateAssistant(tabId) {
   chrome.tabs.sendMessage(tabId, { action: 'init', options }, function(response) {
     let error = chrome.runtime.lastError;
     if (error) {  
-      console.log('initiateAssistant error', error);
+      console.log('initiateAssistant error', error.message);
     } else {
       console.log('initiateAssistant response', response)
     }

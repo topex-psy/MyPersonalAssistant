@@ -101,8 +101,7 @@ function clickAction(e, { assistant, request, action }) {
       sendAll({ action: 'dismiss' });
     } else {
       if (assistant == "new") {
-        chrome.tabs.create({active: true, url: chrome.runtime.getURL("operation.html")});
-        window.close();
+        openUI("operation.html");
       } else {
         let name = e.target.getAttribute("data-name");
         console.log("will set assistant to:", name);
@@ -138,6 +137,19 @@ function clickAction(e, { assistant, request, action }) {
       });
     }
   }
+}
+
+function openUI(file) {
+  chrome.tabs.query({currentWindow: true, windowType: 'normal'}, function(tabs) {
+    let url = chrome.runtime.getURL(file);
+    let findTab = tabs.filter(t => t.url == url);
+    if (findTab.length) {
+      chrome.tabs.update(findTab[0].id, {selected: true});
+    } else {
+      chrome.tabs.create({active: true, url});
+    }
+    window.close();
+  });
 }
 
 function click(e) {
@@ -214,8 +226,7 @@ document.addEventListener('DOMContentLoaded', function () {
     sendAll({ action: 'scale', options: { scale: e.target.value } });
   };
   document.querySelector('.btn-browse').onclick = () => {
-    chrome.tabs.create({active: true, url: chrome.runtime.getURL("showcase.html")});
-    window.close();
+    openUI("showcase.html");
   };
   document.querySelector('.btn-import').onclick = () => {
     document.querySelector('#file-import').click();

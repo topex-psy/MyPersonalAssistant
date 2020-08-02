@@ -67,6 +67,9 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
           console.log(`... and should sync the activity`);
           setAction(state.activity);
         }
+      } else {
+        console.log(`but it shouldn't be`);
+        dismiss(false);
       }
     } else {
       myAssistant.options.scale = scale;
@@ -115,8 +118,10 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     setMute(options.mute);
   } else if (request.action == 'dismiss') {
     dismiss();
+  } else if (request.action == 'remove') {
+    if (myAssistant.meta.id == options.id) dismiss(false);
   }
-  console.log('sendResponse', response);
+  console.log('response sent for', request.action, response);
   sendResponse(response);
 });
 
@@ -233,9 +238,14 @@ function setBalloon(message, {duration, replies, type}) {
     let listActionEl = replies.map(rep => `<li data-action="${rep.action}"><a>${rep.title}</a></li>`).join('');
     balloon.querySelector('ul').innerHTML = listActionEl;
     balloon.querySelectorAll('li a').forEach(li => li.addEventListener('click', e => {
+      let action = e.currentTarget.parentNode.getAttribute('data-action');
       myAssistant.el?.removeAttribute("data-attention");
       myAssistant.el?.removeAttribute("data-greeting");
-      requestAction(e.target.parentNode.getAttribute('data-action'));
+      if (myAssistant.meta.activities.filter(a => a.id == action).length) {
+        setAction(action);
+      } else {
+        requestAction(action);
+      }
     }));
   } else {
     balloon.querySelector('ul').innerHTML = ''
@@ -445,7 +455,7 @@ function alignBalloon() {
   div.classList.add(facing);
 }
 
-function dismiss() {
+function dismiss(sync = true) {
   if (!myAssistant.el) return;
   doNothing();
   clearTimeout(timeOutLook);
@@ -457,15 +467,16 @@ function dismiss() {
   myAssistant.el.remove();
   myAssistant.el = null;
   myAssistant.meta = null;
-  sendUpdate({
-    meta: null,
-    dom: null,
-    css: null,
-    state: {
-      activity: null,
-      greet: false,
-    },
-  });
+  // sendUpdate({
+  //   meta: null,
+  //   dom: null,
+  //   css: null,
+  //   state: {
+  //     activity: null,
+  //     greet: false,
+  //   },
+  // });
+  if (sync) sendUpdate({ dismissed: true });
 }
 
 function sendUpdate(update) {

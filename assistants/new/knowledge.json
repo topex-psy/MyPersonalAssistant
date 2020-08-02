@@ -4,211 +4,149 @@
     "bottom": 150,
     "left": 100
   },
-  "responses": [],
+  "responses": [
+    "Do you love science?",
+    "You're doing a great thing!",
+    "You seems busy. Keep up the good work!"
+  ],
   "to_lookup": [
-    "Masa sih?"
+    "Really?"
   ],
   "to_shutup": [
-    "Oke",
-    "Ya tau",
-    "Iyain aja deh",
-    "Diem dong",
-    "Ya emang",
-    "Pfffft"
+    "Okay",
+    "I know",
+    "That's right",
+    "Alright",
+    "Awesome"
   ],
   "to_dismiss": [
-    "Pergi sana",
-    "Kamu saya usir"
+    "Leave me alone",
+    "Go away"
+  ],
+  "to_action": [
+    "Do something for me",
+    "What can you do?",
+    "Make me impressed",
+    "Can you do a favor?",
+    "Cheer me up!"
   ],
   "greet": {
     "responses": [
-      "Halo, aku [name]. Yoroshiku ne~",
-      "Halo, [name] di sini!"
+      "Hello, I'm [name]!",
+      "Hi, [name] here!"
     ],
     "to_shutup_add": [
-      "Yoroshiku~",
-      "Salam kenal",
-      "Iya, mohon bantuannya",
-      "Mohon kerjasamanya"
+      "Nice to meet you",
+      "Yes, please help",
+      "Please cooperate"
     ]
   },
   "dismiss": {
     "responses": [
-      "Yakin nih ga mau ditemenin?",
-      "Yakin ga mau ditemenin sama [name]?"
+      "Are you sure you don't want to be accompanied?",
+      "Are you sure [name] have to go?"
     ],
     "to_dispel": [
-      "Yakin",
-      "Ya, sana pergi"
+      "Sure, see you later",
+      "Yes, go now"
     ],
     "to_shutup": [
-      "Ga jadi"
+      "I don't think so"
+    ]
+  },
+  "dispel": {
+    "responses": [
+      "Hasta la vista~",
+      "Good bye!"
+    ]
+  },
+  "action": {
+    "responses": [
+      "Eh, what should I do?",
+      "Okay, let me do it!",
+      "Okay ......",
+      "Okay ...... what?",
+      "[name] will do anything ..."
     ]
   },
   "click": {
     "responses": [
-      "Ada apa?",
-      "Apaan sih pegang-pegang",
-      "Lapeeeeeer ....",
+      "What's up?",
+      "What's the matter?",
+      "How can I help you?",
       "Hey ..."
     ],
     "to_lookup": [
-      "Eh, gimana menurutmu?",
-      "Menurutmu ini gimana?"
+      "What do you think?",
+      "Please give me advice"
     ]
   },
   "count": {
     "responses": {
       "less": [
-        "Cuma ada [count] tab bro"
+        "You have [count] tab(s) opened"
       ],
       "many": [
-        "Njir [count] tab!",
-        "Buset gan masa buka [count] tab!",
-        "Banyak amat sampe [count] tab!"
+        "Wow, you have [count] tabs!",
+        "You have [count] tabs opened!"
       ]
     },
     "to_shutup_add": [
-      "Oke, thanks"
+      "Okay, thanks"
     ]
   },
   "hosts": [
     {
-      "keyword": "github.com",
+      "keyword": "amazon.com",
       "responses": [
-        "Udah dipush belum projectnya?",
-        "[name] mau dong gabung ke reponya"
-      ]
-    },
-    {
-      "keyword": "discord.com",
-      "responses": [
-        "Ayo kita buat channel buat ngobrol"
-      ],
-      "specifics": [
-        {
-          "keyword": "/channels/",
-          "responses_add": [
-            "[name] mau dong join ke channelnya",
-            "Invite [name] dong ke channelnya"
-          ]
-        }
-      ]
-    },
-    {
-      "keyword": "tokopedia.com",
-      "responses": [
-        "Cieee, belanja~",
-        "Cieee, baru gajian nih kayaknya :3",
-        "Selamat datang di toko kami, selamat belanja!",
-        "Beliin aku dong~ :3"
-      ],
-      "specifics": [
-        {
-          "keyword": "tab=wishlist",
-          "responses_add": [
-            "Wishlist mulu, kapan dibelinya?"
-          ]
-        }
+        "What? You spend your money again",
+        "Is your salary okay? :/",
+        "Buy me food~ :D"
       ]
     },
     {
       "keyword": "translate.google.com",
       "responses": [
-        "Eaaaa google translate kok dipake",
-        "Bahasa inggrisku lebih jago lho",
-        "Translateku lebih gaul bro"
+        "I am multilingual!",
+        "Language is science!"
       ]
     },
     {
-      "keyword": "facebook.com",
+      "keyword": "github.com",
       "responses": [
-        "Facebook terooos!",
-        "Timelinemu varokah sekali",
-        "Sekrol-sekrol terooos!"
+        "Has your project been pushed?",
+        "[name] wants to join the repo"
       ]
     },
     {
-      "keyword": "twitter.com",
+      "keyword": "discord.com",
       "responses": [
-        "Twitteran terooos!",
-        "Njiir isi twitternya ..."
+        "Let's make a channel for chatting"
       ],
-      "title_remove": " / Twitter"
-    },
-    {
-      "keyword": "stackoverflow.com",
-      "responses": [
-        "Tinggal copas aja gan!",
-        "Wah, moga bugnya cepet solve!",
-        "Ada bug apa lagi, bro?"
-      ],
-      "title_remove": " - Stack Overflow"
+      "specifics": [
+        {
+          "keyword": "/channels/",
+          "responses_add": [
+            "[name] wants to join this channel",
+            "Please invite [name] too"
+          ]
+        }
+      ]
     },
     {
       "keyword": "youtube.com",
       "responses": [
-        "YouTube teroooss!",
-        "Asyik nonton YouTube!"
+        "Let's watch fun videos!",
+        "Hoooray YouTube!"
       ],
       "title_remove": " - YouTube",
       "specifics": [
         {
           "keyword": "/watch?v=",
           "responses_add": [
-            "Kayaknya kita udah nonton yang ini deh ...",
-            "Njir, baru nonton sekarang, wkwkwk",
-            "[title]? Seriusan?"
-          ]
-        }
-      ]
-    },
-    {
-      "keyword": "pixiv.net",
-      "responses": [
-        "Hentong teroooss!"
-      ],
-      "to_lookup_add": [
-        "Ssssssst!",
-        "Jangan bilang emak ya"
-      ],
-      "to_dismiss_add": [
-        "Kamu nutupin gambar"
-      ],
-      "title_remove": " - pixiv",
-      "specifics": [
-        {
-          "keyword": "?illust_id=",
-          "responses_add": [
-            "Eaa, gambarnya mantap-mantap!",
-            "Duh, gak ngotak, sikat gan!",
-            "Yamette kudasai~"
-          ]
-        }
-      ]
-    },
-    {
-      "keyword": "myanimelist.net",
-      "responses": [
-        "Wibuuu wibuuuu wibuuuu~",
-        "Konnichiwa hajimemashite sayonara~",
-        "Cari anime genre apa ya?"
-      ],
-      "title_remove": " - MyAnimeList.net",
-      "specifics": [
-        {
-          "keyword": "/anime/",
-          "responses": [
-            "Belum nonton [title]?",
-            "Anime rekomen nih!",
-            "Anime jelek nih!",
-            "Ini bagus gak? Aku belum nonton"
-          ],
-          "to_lookup_add": [
-            "Entahlah",
-            "Sorry lupa",
-            "Belum nonton, gak tau",
-            "Ga tau juga"
+            "I think we have wathed this one ...",
+            "Wow, this is good!",
+            "[title]? Really?"
           ]
         }
       ]
@@ -216,8 +154,8 @@
   ],
   "hosts_unknown": {
     "responses_add": [
-      "Ini situs apa ya? Saya gak tau",
-      "Kenapa aku ada di sini? XD"
+      "What is this site? I don't know",
+      "Why am I here?"
     ]
   }
 }

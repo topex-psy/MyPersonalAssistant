@@ -47,6 +47,7 @@ function bindListeners() {
       return true;
     }
     else if (action == 'lookup' && sender.tab.selected) lookup();
+    else if (action == 'action') action();
     else if (action == 'click') click();
     else if (action == 'count') count();
     else if (action == 'greeting') greeting();
@@ -73,13 +74,16 @@ function bindListeners() {
         if (assistant.meta?.id && !assistant.state.greet) greeting();
         sync = true;
       }
-      // if (message) chrome.tabs.query({windowType: 'normal', url: ['http://*/*', 'https://*/*'], status: 'complete'}, function(tabs) {
-      //   tabs.forEach(tab => {
-      //     if (tab.id != sender.tab.id) {
-      //       chrome.tabs.sendMessage(tab.id, message);
-      //     }
-      //   });
-      // });
+      if (update.hasOwnProperty('dismissed')) {
+        assistant.meta = null;
+        assistant.dom = null;
+        assistant.css = null;
+        assistant.state = {
+          activity: null,
+          greet: false,
+        };
+        sync = true;
+      }
       if (sync) chrome.storage.sync.set({assistant}, function() {
         console.log('assistant data saved!', update);
       });
@@ -131,7 +135,12 @@ function initiateAssistant(tabId) {
   console.log('initiateAssistant', assistant, tabId);
   let options = { initOptions, assistant };
   chrome.tabs.sendMessage(tabId, { action: 'init', options }, function(response) {
-    console.log('initiateAssistant response', response)
+    let error = chrome.runtime.lastError;
+    if (error) {  
+      console.log('initiateAssistant error', error);
+    } else {
+      console.log('initiateAssistant response', response)
+    }
   });
 }
 
@@ -218,14 +227,28 @@ function click() {
     message = message.replace('[name]', meta.name);
     sendBalloon(message, {
       duration: 8000,
-      replies: [
+      replies: getRandomFrom([
         generateAnswer('click', 'lookup'),
         generateAnswer('click', 'dismiss'),
-      ],
+        generateAnswer('click', 'action'),
+      ], getMaxOptions()),
     });
   } else {
     lookup();
   }
+}
+
+function action() {
+  let { meta } = assistant;
+  let possibleResponses = meta.knowledge.action.responses;
+  let message = getRandomFrom(possibleResponses).replace('[name]', meta.name);
+  let replies = assistant.meta.activities.map(a => {
+    return { action: a.id, title: a.name }
+  });
+  sendBalloon(message, {
+    duration: 8000,
+    replies,
+  });
 }
 
 function generateAnswer(type = 'click', action = 'lookup', qty = 1) {
@@ -251,6 +274,11 @@ function generateAnswer(type = 'click', action = 'lookup', qty = 1) {
       titles = knowledge[type]?.to_dispel
         ? arrayCombine(knowledge[type]?.to_dispel, knowledge[type]?.to_dispel_add)
         : arrayCombine(knowledge.to_dispel, knowledge.to_dispel_add, knowledge[type]?.to_dispel_add);
+      break;
+    case 'action':
+      titles = knowledge[type]?.to_action
+        ? arrayCombine(knowledge[type]?.to_action, knowledge[type]?.to_action_add)
+        : arrayCombine(knowledge.to_action, knowledge.to_action_add, knowledge[type]?.to_action_add);
       break;
   }
   let title = getRandomFrom(titles, qty);

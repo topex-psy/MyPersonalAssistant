@@ -1,7 +1,5 @@
 ace.config.set('basePath', 'https://pagecdn.io/lib/ace/1.4.12/');
 
-var exportExtension = 'json';
-var exportMime = 'application/json';
 var editors = {
   manifest: ace.edit("editor-manifest", { mode: "ace/mode/json" }),
   knowledge: ace.edit("editor-knowledge", { mode: "ace/mode/json" }),
@@ -276,7 +274,11 @@ document.addEventListener('DOMContentLoaded', function () {
         if (json) {
           initEditor(json);
         } else {
-          alert("Cannot import: Invalid content!");
+          Swal.fire(
+            'Import Failed!',
+            'Cannot import: Invalid content!',
+            'error'
+          );
         }
       }
       reader.onerror = function (evt) {
@@ -285,7 +287,16 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
   document.querySelector('#btn-close').onclick = () => {
-    if (confirm(`Are you sure you're done here?`)) window.close();
+    Swal.fire({
+      text: `Are you sure you're done here?`,
+      type: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+    }).then((result) => {
+      if (result.value) {
+        window.close();
+      }
+    });
   }
   document.querySelector('#btn-import').onclick = () => {
     document.querySelector('#file-import').click();
@@ -304,8 +315,28 @@ document.addEventListener('DOMContentLoaded', function () {
         css
       });
     } else {
-      alert(`Please fix all the errors in order to export!`)
+      Swal.fire(
+        'Cannot Export!',
+        'Please fix all the errors in order to export!',
+        'warning'
+      );
     }
+  }
+  document.querySelector('#btn-save').onclick = () => {
+    Swal.fire({
+      text: `Are you sure you want to apply the changes?`,
+      type: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+    }).then((result) => {
+      if (result.value) {
+        Swal.fire(
+          'Changes Saved!',
+          `All changes has been applied to ${init.manifest.name}!`,
+          'success'
+        ).then(() => window.close());
+      }
+    });
   }
   document.querySelectorAll('.panel-header ul li a').forEach(el => el.onclick = (e) => {
     let panel = e.target.closest(".panel-section");

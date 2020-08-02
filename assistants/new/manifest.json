@@ -1,11 +1,14 @@
 {
   "id": "new",
   "name": "Elon-chan",
-  "author": "Your Full Name",
-  "website": "https://your.website.com",
+  "author": "Iconka",
+  "website": "https://iconka.com/en/",
   "version": "1.0",
   "talkativeness": 3,
   "hyperactiveness": 3,
+  "bio": "A smart robot who like science and technology",
+  "keywords": "robot,humanoid",
+  "language": "en",
   "activities": [
     {
       "id": "dance",

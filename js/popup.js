@@ -146,37 +146,43 @@ function click(e) {
   let action = e.target.getAttribute("data-action");
 
   console.log('click', e, { assistant, request, action });
-  chrome.tabs.getSelected(null, function(tab) {
-    if (isHttp(tab.url)) {
-      clickAction(e, { assistant, request, action });
-    } else {
-      console.log('Cannot do it here.');
-      alert('Cannot do it here.');
-    }
-  });
+  clickAction(e, { assistant, request, action });
 }
 
 function setAssistant(assistant) {
-  console.log('getting assistant data ...', assistant);
-  document.querySelectorAll('li[data-assistant]').forEach(li => li?.classList?.remove('active'));
-  chrome.storage.sync.get('my_assistants', function(data) {
-    console.log('my assistants data', data);
-    let myAssistantList = data.my_assistants || [];
-    let findMyAssistant = myAssistantList?.filter(a => a.meta.id == assistant)[0];
-    if (findMyAssistant) {
-      let myAssistant = findMyAssistant;
-      console.log('loaded from local', myAssistant);
-      sendAll({
-        action: 'assistant',
-        options: myAssistant
+  chrome.tabs.getSelected(null, function(tab) {
+    if (isHttp(tab.url)) {
+      console.log('getting assistant data ...', assistant);
+      document.querySelectorAll('li[data-assistant]').forEach(li => li?.classList?.remove('active'));
+      chrome.storage.sync.get('my_assistants', function(data) {
+        console.log('my assistants data', data);
+        let myAssistantList = data.my_assistants || [];
+        let findMyAssistant = myAssistantList?.filter(a => a.meta.id == assistant)[0];
+        if (findMyAssistant) {
+          console.log('loaded from local', findMyAssistant);
+          sendAll({
+            action: 'assistant',
+            options: findMyAssistant
+          });
+        } else {
+          fetchAssistant(assistant, (result) => {
+            console.log('loaded from online', result);
+            chrome.storage.sync.get('my_assistants', function(data) {
+              let myAssistantList = data.my_assistants || [];
+              chrome.storage.sync.set({my_assistants: [...myAssistantList, result]}, function() {
+                console.log('assistant data saved!')
+              });
+            });
+            sendAll({
+              action: 'assistant',
+              options: result
+            });
+          });
+        }
       });
     } else {
-      hireAssistant(assistant, (result) => {
-        sendAll({
-          action: 'assistant',
-          result
-        });
-      });
+      console.log('Cannot do it here.');
+      alert('Cannot do it here.');
     }
   });
 }

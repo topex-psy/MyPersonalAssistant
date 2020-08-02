@@ -1,4 +1,6 @@
-function hireAssistant(id, callback = function(){}) {
+$.ajaxSetup({ cache: false });
+
+function fetchAssistant(id, callback = function(){}) {
   $.when(
     $.get(baseUrl + 'assistants/' + id + '/html.html'),
     $.get(baseUrl + 'assistants/' + id + '/style.css'),
@@ -10,18 +12,10 @@ function hireAssistant(id, callback = function(){}) {
     let dom = domResult[0];
     let css = cssResult[0];
     let meta = { ...manifest, knowledge };
-    let options = {
+    callback({
       meta,
       dom,
       css
-    };
-    console.log('loaded from online', options);
-    chrome.storage.sync.get('my_assistants', function(data) {
-      let myAssistantList = data.my_assistants || [];
-      chrome.storage.sync.set({my_assistants: [...myAssistantList, options]}, function() {
-        console.log('assistant data saved!')
-        callback(options);
-      });
     });
   });
 }

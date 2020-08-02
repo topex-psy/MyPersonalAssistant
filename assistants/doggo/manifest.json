@@ -6,6 +6,7 @@
   "version": "1.0",
   "talkativeness": 3,
   "hyperactiveness": 1,
+  "language": "id",
   "activities": [
     {
       "id": "dance",

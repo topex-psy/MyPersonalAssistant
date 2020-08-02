@@ -4,7 +4,9 @@
     "bottom": 200,
     "left": 120
   },
-  "responses": [],
+  "responses": [
+    "Beri aku makanan atau uang"
+  ],
   "to_lookup": [
     "Masa sih?"
   ],
@@ -19,6 +21,11 @@
   "to_dismiss": [
     "Pergi sana",
     "Kamu saya usir"
+  ],
+  "to_action": [
+    "Lakuin sesuatu dong",
+    "Buat aku terpana",
+    "Hibur aku :("
   ],
   "greet": {
     "responses": [
@@ -47,7 +54,17 @@
   },
   "dispel": {
     "responses": [
-      "Yaudah, bye!"
+      "Yaudah, bye!",
+      "Sayonara~"
+    ]
+  },
+  "action": {
+    "responses": [
+      "Errrr, lakuin apaan?",
+      "[name] disuruh ngapain?",
+      "[name] harus ngapain?",
+      "Okeeee ......",
+      "Oke, ngapain?"
     ]
   },
   "click": {
@@ -59,7 +76,8 @@
     ],
     "to_lookup": [
       "Eh, gimana menurutmu?",
-      "Menurutmu ini gimana?"
+      "Menurutmu ini gimana?",
+      "Kasih saran dong"
     ]
   },
   "count": {
@@ -106,7 +124,8 @@
         "Cieee, belanja~",
         "Cieee, baru gajian nih kayaknya :3",
         "Selamat datang di toko kami, selamat belanja!",
-        "Beliin aku dong~ :3"
+        "Beliin aku dong~ :3",
+        "Beliin aku makanan~ :3"
       ],
       "specifics": [
         {

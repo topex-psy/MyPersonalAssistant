@@ -12,7 +12,8 @@
   "permissions": [
     "activeTab",
     "tabs",
-    "storage"
+    "storage",
+    "unlimitedStorage"
   ],
   "browser_action": {
     "default_title": "Select Your Assistant",
@@ -37,7 +38,6 @@
         "https://*/*"
       ],
       "js": [
-        "vendor/jquery-2.1.3.min.js",
         "js/content.js",
         "js/helper.js"
       ]

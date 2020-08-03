@@ -20,12 +20,13 @@ a:not(.btn):hover, a:not(.btn):active, a:not(.btn).active {
   color: #2478ff;
 }
 input:not([type="file"]), select, textarea {
-  border-radius: 2rem;
+  border-radius: 1rem;
   padding: .5rem 1rem;
   line-height: 1rem;
   border: 1px solid #d9d9d9 !important;
   background: #fff;
   box-shadow: 0px 4px 7px -7px rgba(0,0,0,.3);
+  resize: vertical;
 }
 input[type="checkbox"] {
   position: absolute;

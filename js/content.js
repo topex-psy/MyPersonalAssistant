@@ -147,10 +147,9 @@ function setAssistant({meta, dom, css, state = {}}) {
   doRandomWalk();
   console.log('setAssistant ...', {meta, dom, css, state});
   console.log('setAssistant', myAssistant);
-  if (!myAssistant.options.mute) {
-    // console.log('doRandomLook from setAssistant');
-    doRandomLook();
-  }
+  let isMuted = myAssistant.options.mute;
+  div.firstElementChild.lastElementChild.style.display = isMuted ? 'block' : 'none';
+  if (!isMuted) doRandomLook();
 }
 
 function onClickAssistant() {
@@ -444,7 +443,6 @@ function setMute(mute = true, sync = true) {
     timeOutLook = null;
     div.firstElementChild.lastElementChild.style.display = 'block';
   } else {
-    // console.log('doRandomLook from setMute');
     doRandomLook();
     div.firstElementChild.lastElementChild.style.display = 'none';
   }

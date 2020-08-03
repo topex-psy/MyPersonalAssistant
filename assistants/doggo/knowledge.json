@@ -1,5 +1,5 @@
 {
-  "maximum_options": 5,
+  "maximum_options": 3,
   "balloon_offset": {
     "bottom": 100,
     "left": 65
@@ -99,7 +99,8 @@
       "keyword": "github.com",
       "responses": [
         "Has your project been pushed?",
-        "[name] wants to join the repo"
+        "[name] wants to join the repository",
+        "What kind of project do you working on?"
       ]
     },
     {
@@ -148,9 +149,9 @@
     {
       "keyword": "stackoverflow.com",
       "responses": [
-        "Tinggal copas aja gan!",
-        "Wah, moga bugnya cepet solve!",
-        "Ada bug apa lagi, bro?"
+        "An easy copy-paste, isn't it?",
+        "I hope the bugs will be nullified.",
+        "What's wrong with your code?"
       ],
       "title_remove": " - Stack Overflow"
     },
@@ -175,14 +176,14 @@
     {
       "keyword": "pixiv.net",
       "responses": [
-        "Hentong teroooss!"
+        "Looking for some waifus?"
       ],
       "to_lookup_add": [
         "Ssssssst!",
-        "Jangan bilang emak ya"
+        "Don't say to anyone about it"
       ],
       "to_dismiss_add": [
-        "Kamu nutupin gambar"
+        "You're covering the picture"
       ],
       "title_remove": " - pixiv",
       "specifics": [
@@ -214,10 +215,11 @@
             "Ini bagus gak? Aku belum nonton"
           ],
           "to_lookup_add": [
-            "Entahlah",
-            "Sorry lupa",
-            "Belum nonton, gak tau",
-            "Ga tau juga"
+            "I don't know",
+            "I forgot. Sorry.",
+            "I haven't watched it",
+            "No idea",
+            "Meh"
           ]
         }
       ]

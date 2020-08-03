@@ -101,4 +101,5 @@
   bottom: 1rem;
   width: 24px;
   cursor: pointer;
+  display: none;
 }

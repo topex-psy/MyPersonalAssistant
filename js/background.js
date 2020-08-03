@@ -36,7 +36,7 @@ chrome.storage.sync.get('assistant', function(data) {
 
 function bindListeners() {
   chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-    console.log("on action", request, sender);
+    console.log("on action", request, sender, assistant);
     let {action, update, options} = request;
     if (action == 'get_init') {
       $.get('css/content.css', function(css) {

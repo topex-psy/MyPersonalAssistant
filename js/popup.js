@@ -3,6 +3,7 @@
 var selectedAssistant;
 
 chrome.storage.sync.get('my_assistants', function(data) {
+  console.log('setAssistants from init');
   setAssistants(data.my_assistants);
 });
 
@@ -55,9 +56,14 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     if (update.hasOwnProperty('meta')) {
       console.log('assistantMetaUpdated from: onMessage');
       assistantMetaUpdated(update.meta);
+    } else if (update.hasOwnProperty('dismissed')) {
+      if (update.dismissed == selectedAssistant?.id) {
+        resetAssistant();
+      }
     } else if (update.hasOwnProperty('activity') && !update.activity) {
       document.querySelectorAll('li[data-action]').forEach(li => li.classList.remove('active'));
     } else if (update.hasOwnProperty('my_assistants')) {
+      console.log('setAssistants from onMessage');
       setAssistants(update.my_assistants);
     } else { // more actions
       document.querySelector('li[data-action="' + update.activity + '"]')?.classList.add('active');
@@ -70,28 +76,29 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
 function assistantMetaUpdated(meta) {
   console.log('assistantMetaUpdated', meta);
-  if (meta?.id) {
-    let {id, name, activities} = meta;
-    document.querySelector('.tool').style.display = 'block';
-    document.querySelector('li[data-assistant="' + id + '"]')?.classList.add('active');
-    selectedAssistant = { id, name };
-    document.querySelectorAll('li[data-action]:not(:first-child)').forEach(li => li.remove());
-    activities?.forEach(activity => {
-      let li = document.createElement('li');
-      li.setAttribute("data-action", activity.id);
-      if (activity.duration) li.setAttribute("data-duration", activity.duration);
-      if (activity.durationMin) li.setAttribute("data-duration-min", activity.durationMin);
-      if (activity.durationMax) li.setAttribute("data-duration-max", activity.durationMax);
-      li.innerText = activity.name;
-      li.addEventListener('click', click);
-      document.querySelector('ul.list-action').appendChild(li);
-      console.log('-> activity added', activity.name);
-    });
-  } else {
-    document.querySelectorAll('li[data-assistant]').forEach(li => li.classList.remove('active'));
-    document.querySelector('.tool').style.display = 'none';
-    selectedAssistant = null;
-  }
+  if (!meta?.id) return;
+  let {id, name, activities} = meta;
+  document.querySelector('.tool').style.display = 'block';
+  document.querySelector('li[data-assistant="' + id + '"]')?.classList.add('active');
+  selectedAssistant = { id, name };
+  document.querySelectorAll('li[data-action]:not(:first-child)').forEach(li => li.remove());
+  activities?.forEach(activity => {
+    let li = document.createElement('li');
+    li.setAttribute("data-action", activity.id);
+    if (activity.duration) li.setAttribute("data-duration", activity.duration);
+    if (activity.durationMin) li.setAttribute("data-duration-min", activity.durationMin);
+    if (activity.durationMax) li.setAttribute("data-duration-max", activity.durationMax);
+    li.innerText = activity.name;
+    li.addEventListener('click', click);
+    document.querySelector('ul.list-action').appendChild(li);
+    console.log('-> activity added', activity.name);
+  });
+}
+
+function resetAssistant() {
+  document.querySelectorAll('li[data-assistant]').forEach(li => li.classList.remove('active'));
+  document.querySelector('.tool').style.display = 'none';
+  selectedAssistant = null;
 }
 
 function clickAction(e, { assistant, request, action }) {
@@ -257,6 +264,7 @@ document.addEventListener('DOMContentLoaded', function () {
             chrome.storage.sync.set({my_assistants: newList}, function() {
               console.log('assistant data saved!')
             });
+            console.log('setAssistants from import');
             setAssistants(newList);
           });
           sendAll({

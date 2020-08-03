@@ -422,10 +422,14 @@ function setScale(scale = 1.0, sync = true) {
   if (myAssistant.el) {
     div.firstElementChild.style.bottom = ((myAssistant.meta.knowledge.balloon_offset?.bottom || defaultBalloonOffsetBottom) * scale) + 'px';
     div.lastElementChild.style.transform = 'scale(' + scale + ')';
-    div.lastElementChild.classList.remove('animate');
-    setTimeout(() => {
+    if (document.visibilityState === "hidden") {
+      div.lastElementChild.classList.remove('animate');
+      setTimeout(() => {
+        div.lastElementChild.classList.add('animate');
+      }, 400);
+    } else {
       div.lastElementChild.classList.add('animate');
-    }, 400);
+    }
     alignBalloon();
   }
 }

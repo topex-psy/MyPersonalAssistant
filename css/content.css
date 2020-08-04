@@ -9,12 +9,12 @@
   z-index: 2147483647;
   transition: all .4s;
 }
-.mpa-container.notransition {
-  transition: none !important;
-}
-.mpa-wrapper.animate {
+.mpa-wrapper {
   transition: transform .4s;
   transform-origin: bottom;
+}
+.notransition {
+  transition: none !important;
 }
 .mpa-balloon {
   background: #fff;

@@ -127,7 +127,8 @@ function setAssistant({meta, dom, css, state = {}}) {
     console.log('not ready yet!');
     return;
   }
-  if (meta.id == myAssistant.meta?.id) {
+  let prevAssistantID = myAssistant.meta?.id;
+  if (meta.id == prevAssistantID) {
     console.log('same assistant!');
     return;
   }
@@ -139,8 +140,7 @@ function setAssistant({meta, dom, css, state = {}}) {
   myAssistant.el.onclick = onClickAssistant;
   myAssistant.meta = meta;
   setAssistantStyle(css);
-  // console.log("set scale from setAssistant");
-  setScale(myAssistant.options.scale, false);
+  setScale(myAssistant.options.scale, false, false);
   sendUpdate({meta, dom, css, state});
   closeBalloon();
   doChangeFacing();
@@ -412,7 +412,7 @@ function doNothing(callback = function(){}) {
   callback();
 }
 
-function setScale(scale = 1.0, sync = true) {
+function setScale(scale = 1.0, sync = true, animate = true) {
   console.log("set scale", scale, sync, {...myAssistant});
   if (sync) {
     if (myAssistant.options.scale == scale) return;
@@ -422,13 +422,11 @@ function setScale(scale = 1.0, sync = true) {
   if (myAssistant.el) {
     div.firstElementChild.style.bottom = ((myAssistant.meta.knowledge.balloon_offset?.bottom || defaultBalloonOffsetBottom) * scale) + 'px';
     div.lastElementChild.style.transform = 'scale(' + scale + ')';
-    if (document.visibilityState === "hidden") {
-      div.lastElementChild.classList.remove('animate');
+    if (!animate) {
+      div.lastElementChild.classList.add('notransition');
       setTimeout(() => {
-        div.lastElementChild.classList.add('animate');
+        div.lastElementChild.classList.remove('notransition');
       }, 400);
-    } else {
-      div.lastElementChild.classList.add('animate');
     }
     alignBalloon();
   }
@@ -499,3 +497,13 @@ function sendUpdate(update) {
     console.log('update sent', update, response);
   });
 }
+
+document.addEventListener("visibilitychange", function() {
+  if (document.visibilityState == "hidden") {
+    div.lastElementChild.classList.add('notransition');
+  } else {
+    setTimeout(() => {
+      if (document.visibilityState == "visible") div.lastElementChild.classList.remove('notransition');
+    }, 400);
+  }
+});

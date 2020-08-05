@@ -172,7 +172,7 @@ if (isCreate) {
 } else {
   chrome.storage.sync.get('my_assistants', function(data) {
     console.log('my assistants data', data);
-    let item = data.my_assistants?.filter(a => a.meta.id == init.manifest.id)[0];
+    let item = data.my_assistants?.find(a => a.meta.id == init.manifest.id);
     let manifest = item.meta;
     let knowledge = item.meta.knowledge;
     let html = item.dom;

@@ -16,7 +16,7 @@ function setAssistants(my_assistants = null) {
     console.log("list result", list);
     ul.querySelectorAll('li:not([data-assistant="new"])').forEach(l => l.remove());
     list.forEach(res => {
-      let mine = my_assistants?.filter(a => a.meta.id == res.ID)[0];
+      let mine = my_assistants?.find(a => a.meta.id == res.ID);
       let currentversion = mine?.meta?.version || '';
       let li = document.createElement('li');
       li.setAttribute('data-assistant', res.ID);
@@ -176,7 +176,7 @@ function setAssistant(assistant) {
       chrome.storage.sync.get('my_assistants', function(data) {
         console.log('my assistants data', data);
         let myAssistantList = data.my_assistants || [];
-        let findMyAssistant = myAssistantList?.filter(a => a.meta.id == assistant)[0];
+        let findMyAssistant = myAssistantList?.find(a => a.meta.id == assistant);
         if (findMyAssistant) {
           console.log('loaded from local', findMyAssistant);
           sendAll({

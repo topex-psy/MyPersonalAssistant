@@ -99,7 +99,7 @@ function action(e) {
           chrome.storage.sync.get('my_assistants', function(data) {
             console.log('my assistants data', data);
             let myAssistantList = data.my_assistants || [];
-            let findMyAssistant = myAssistantList?.filter(a => a.meta.id == id)[0];
+            let findMyAssistant = myAssistantList?.find(a => a.meta.id == id);
             let index = myAssistantList.indexOf(findMyAssistant);
             let newList = myAssistantList;
             newList.splice(index, 1);

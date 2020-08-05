@@ -183,7 +183,7 @@ function requestAction(action, options = {}) {
     chrome.storage.sync.get('my_assistants', function(data) {
       console.log('my assistants data', data);
       let myAssistantList = data.my_assistants || [];
-      let findMyAssistant = myAssistantList?.filter(a => a.meta.id == myAssistant.meta.id)[0];
+      let findMyAssistant = myAssistantList?.find(a => a.meta.id == myAssistant.meta.id);
       let index = myAssistantList.indexOf(findMyAssistant);
       let newList = myAssistantList;
       newList.splice(index, 1);
@@ -236,8 +236,7 @@ function setBalloon(message, {duration, replies, type}) {
   balloon.querySelector('big').innerText = message;
 
   if (replies) {
-    let listActionEl = replies.map(rep => `<li data-action="${rep.action}"><a>${rep.title}</a></li>`).join('');
-    balloon.querySelector('ul').innerHTML = listActionEl;
+    balloon.querySelector('ul').innerHTML = replies.map(rep => `<li data-action="${rep.action}"><a>${rep.title}</a></li>`).join('');
     balloon.querySelectorAll('li a').forEach(li => li.addEventListener('click', e => {
       let action = e.currentTarget.parentNode.getAttribute('data-action');
       myAssistant.el?.removeAttribute("data-attention");
@@ -295,16 +294,10 @@ function setDataAttributes() {
   if (!myAssistant.el) return;
   let {el, state} = myAssistant;
   let {activity, facing} = state;
-  if (activity) {
-    el.setAttribute("data-activity", activity);
-  } else {
-    el.removeAttribute("data-activity");
-  }
-  if (facing) {
-    el.setAttribute("data-facing", facing);
-  } else {
-    el.removeAttribute("data-facing");
-  }
+  if (activity) el.setAttribute("data-activity", activity);
+  else el.removeAttribute("data-activity");
+  if (facing) el.setAttribute("data-facing", facing);
+  else el.removeAttribute("data-facing");
 }
 
 function doChangeFacing() {
@@ -316,7 +309,6 @@ function doChangeFacing() {
 }
 
 function doRandomLook() {
-  // console.log('doRandomLook ...', {...myAssistant.meta});
   if (!myAssistant.meta) return;
   let delay;
   let level = +myAssistant.meta.talkativeness || 3;
@@ -331,7 +323,6 @@ function doRandomLook() {
     case 5: delay = 5000 + Math.random() * 30000; break;
   }
 
-  // console.log('do random look', delay);
   clearTimeout(timeOutLook);
   timeOutLook = setTimeout(() => {
     let mute = myAssistant.options.mute;
@@ -341,7 +332,6 @@ function doRandomLook() {
     } else {
       requestAction('lookup');
     }
-    // console.log('doRandomLook from doRandomLook');
     doRandomLook();
   }, delay);
 }
@@ -477,15 +467,6 @@ function dismiss(sync = true) {
   myAssistant.el.remove();
   myAssistant.el = null;
   myAssistant.meta = null;
-  // sendUpdate({
-  //   meta: null,
-  //   dom: null,
-  //   css: null,
-  //   state: {
-  //     activity: null,
-  //     greet: false,
-  //   },
-  // });
 }
 
 function sendUpdate(update) {
